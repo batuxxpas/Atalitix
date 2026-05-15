@@ -11,9 +11,9 @@ export default async function AdminDashboard() {
     { count: unreadContactsCount },
     { data: recentContacts }
   ] = await Promise.all([
-    supabase.from("iletisim_talepleri").select("*", { count: "exact", head: true }),
-    supabase.from("iletisim_talepleri").select("*", { count: "exact", head: true }).eq("is_read", false),
-    supabase.from("iletisim_talepleri").select("*").order("created_at", { ascending: false }).limit(5)
+    (supabase.from("iletisim_talepleri") as any).select("*", { count: "exact", head: true }),
+    (supabase.from("iletisim_talepleri") as any).select("*", { count: "exact", head: true }).eq("is_read", false),
+    (supabase.from("iletisim_talepleri") as any).select("*").order("created_at", { ascending: false }).limit(5)
   ]);
 
   return (
@@ -57,7 +57,7 @@ export default async function AdminDashboard() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200">
-            {recentContacts?.map((contact) => (
+            {recentContacts?.map((contact: any) => (
               <tr key={contact.id} className="hover:bg-slate-50 transition-colors">
                 <td className="px-6 py-4">
                   <div className="font-medium text-slate-900">{contact.full_name}</div>

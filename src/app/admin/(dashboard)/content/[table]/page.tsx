@@ -10,7 +10,7 @@ export default async function GenericContentPage({ params }: { params: Promise<{
   const supabase = await createClient();
   
   // Fetch data
-  const { data, error } = await supabase.from(tableName).select("*").order("id", { ascending: true });
+  const { data, error } = await (supabase.from(tableName) as any).select("*").order("id", { ascending: true });
 
   if (error || !data) {
     return (

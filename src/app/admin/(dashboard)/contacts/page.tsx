@@ -5,7 +5,7 @@ export const revalidate = 0;
 
 export default async function AdminContactsPage() {
   const supabase = await createClient();
-  const { data: contacts } = await supabase.from("iletisim_talepleri").select("*").order("created_at", { ascending: false });
+  const { data: contacts } = await (supabase.from("iletisim_talepleri") as any).select("*").order("created_at", { ascending: false });
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -20,7 +20,7 @@ export default async function AdminContactsPage() {
             <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
           </span>
           <span className="text-sm font-medium text-slate-700">
-            {contacts?.filter(c => !c.is_read).length || 0} Okunmamış Mesaj
+            {contacts?.filter((c: any) => !c.is_read).length || 0} Okunmamış Mesaj
           </span>
         </div>
       </div>
@@ -39,7 +39,7 @@ export default async function AdminContactsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {contacts?.map((contact) => (
+              {contacts?.map((contact: any) => (
                 <tr key={contact.id} className={`group transition-all duration-200 ${!contact.is_read ? 'bg-blue-50/50 hover:bg-blue-50' : 'hover:bg-slate-50'}`}>
                   <td className="px-6 py-5">
                     <div className="flex items-center space-x-3">

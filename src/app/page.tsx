@@ -17,13 +17,13 @@ export default async function HomePage() {
     { data: approachSteps },
     { data: experienceItems },
   ] = await Promise.all([
-    supabase.from("ana_sayfa_icerik").select("*").eq("is_active", true).single(),
-    supabase.from("isletim_haritasi_adimlari").select("*").eq("is_active", true).order("sort_order"),
-    supabase.from("isletim_haritasi_kategorileri").select("*").eq("is_active", true).order("sort_order"),
-    supabase.from("teknoloji_etiketleri").select("*").eq("is_active", true).order("sort_order"),
-    supabase.from("cozumler").select("*").eq("is_active", true).order("sort_order"),
-    supabase.from("yaklasim_adimlari").select("*").eq("is_active", true).order("sort_order"),
-    supabase.from("deneyim_maddeleri").select("*").eq("is_active", true).order("sort_order"),
+    (supabase.from("ana_sayfa_icerik") as any).select("*").eq("is_active", true).single(),
+    (supabase.from("isletim_haritasi_adimlari") as any).select("*").eq("is_active", true).order("sort_order"),
+    (supabase.from("isletim_haritasi_kategorileri") as any).select("*").eq("is_active", true).order("sort_order"),
+    (supabase.from("teknoloji_etiketleri") as any).select("*").eq("is_active", true).order("sort_order"),
+    (supabase.from("cozumler") as any).select("*").eq("is_active", true).order("sort_order"),
+    (supabase.from("yaklasim_adimlari") as any).select("*").eq("is_active", true).order("sort_order"),
+    (supabase.from("deneyim_maddeleri") as any).select("*").eq("is_active", true).order("sort_order"),
   ]);
 
   return (

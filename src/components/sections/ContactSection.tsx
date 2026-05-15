@@ -11,7 +11,7 @@ export function ContactSection() {
     e.preventDefault();
     setStatus("loading");
     const supabase = createClient();
-    const { error } = await supabase.from("iletisim_talepleri").insert([form]);
+    const { error } = await (supabase.from("iletisim_talepleri") as any).insert([form]);
     if (error) { setStatus("error"); return; }
     setStatus("success");
     setForm({ full_name: "", email: "", phone: "", company: "", message: "" });

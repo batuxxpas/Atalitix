@@ -14,8 +14,8 @@ export async function loginAdminUser(formData: FormData) {
   const supabase = await createClient();
   
   // Custom admin_users tablosundan kontrol et
-  const { data, error } = await supabase
-    .from("admin_users")
+  const { data, error } = await (supabase
+    .from("admin_users") as any)
     .select("*")
     .eq("email", email)
     .single();
