@@ -10,7 +10,7 @@ export async function markAsRead(formData: FormData) {
   const supabase = await createClient();
   const { error } = await supabase
     .from("iletisim_talepleri")
-    .update({ is_read: true })
+    .update({ is_read: true } as any)
     .eq("id", id);
 
   if (!error) {
