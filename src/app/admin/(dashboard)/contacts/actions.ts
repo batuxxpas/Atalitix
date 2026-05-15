@@ -8,9 +8,9 @@ export async function markAsRead(formData: FormData) {
   if (!id) return;
 
   const supabase = await createClient();
-  const { error } = await supabase
-    .from("iletisim_talepleri")
-    .update({ is_read: true } as any)
+  // @ts-ignore
+  const { error } = await (supabase.from("iletisim_talepleri") as any)
+    .update({ is_read: true })
     .eq("id", id);
 
   if (!error) {
