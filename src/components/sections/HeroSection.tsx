@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { AtalitixGraphicMap } from "@/components/ui";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 
 interface ProcessStep {
   step_number: number;
@@ -43,7 +43,7 @@ export function HeroSection({ hero, processSteps, processCategories }: HeroSecti
   const sectionRef = useRef<HTMLElement>(null);
 
   // Stagger variants for the left column
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -54,7 +54,7 @@ export function HeroSection({ hero, processSteps, processCategories }: HeroSecti
     },
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
   };

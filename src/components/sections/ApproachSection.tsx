@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useEffect } from "react";
-import { motion, useInView, animate } from "framer-motion";
+import { motion, useInView, animate, Variants } from "framer-motion";
 
 function AnimatedCounter({ from, to }: { from: number; to: number }) {
   const nodeRef = useRef<HTMLSpanElement>(null);
@@ -44,7 +44,7 @@ export function ApproachSection({ approachSteps, experienceItems }: ApproachSect
   const sectionRef = useRef<HTMLElement>(null);
   const expRef = useRef<HTMLDivElement>(null);
 
-  const staggerVariants = {
+  const staggerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -52,17 +52,17 @@ export function ApproachSection({ approachSteps, experienceItems }: ApproachSect
     },
   };
 
-  const slideRightVariants = {
+  const slideRightVariants: Variants = {
     hidden: { opacity: 0, x: -30 },
     visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: "easeOut" } },
   };
 
-  const slideLeftVariants = {
+  const slideLeftVariants: Variants = {
     hidden: { opacity: 0, x: 30 },
     visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: "easeOut" } },
   };
 
-  const fadeUpVariants = {
+  const fadeUpVariants: Variants = {
     hidden: { opacity: 0, y: 30 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
   };
