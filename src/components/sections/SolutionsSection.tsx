@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
+import { motion } from "framer-motion";
 
 interface Solution {
   category_label: string;
@@ -56,24 +57,36 @@ function SolutionIcon({ name }: { name: string }) {
 }
 
 export function SolutionsSection({ solutions }: SolutionsSectionProps) {
-  const [visible, setVisible] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setVisible(true); },
-      { threshold: 0.15 }
-    );
-    if (sectionRef.current) observer.observe(sectionRef.current);
-    return () => observer.disconnect();
-  }, []);
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2,
+      },
+    },
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+  };
 
   return (
     <section ref={sectionRef} id="cozumler" className="py-24 grid-bg">
       <div className="container">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           {/* Left title */}
-          <div className={`lg:col-span-4 ${visible ? "animate-fade-in-left" : "opacity-0"}`}>
+          <motion.div 
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="lg:col-span-4"
+          >
             <p className="section-label mb-4">ÇÖZÜM ALANLARI</p>
             <h2 className="section-title mb-6">
               ERP içinde standart, ERP dışında esnek dijital katman.
@@ -81,15 +94,22 @@ export function SolutionsSection({ solutions }: SolutionsSectionProps) {
             <p className="text-slate-500 leading-relaxed">
               Her süreci tek bir araca zorlamayız. Önce iş akışını ve hedeflenen değeri netleştirir, sonra çözümü doğru katmana yerleştiririz: ERP, otomasyon, AI, low-code/no-code veya özel yazılım.
             </p>
-          </div>
+          </motion.div>
 
           {/* Solution Cards */}
-          <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-5">
-            {solutions.map((sol, idx) => (
-              <div
+          <motion.div 
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-5"
+          >
+            {solutions.map((sol) => (
+              <motion.div
                 key={sol.title}
-                className={`card-corporate ${visible ? "animate-fade-in-up" : "opacity-0"}`}
-                style={{ animationDelay: `${0.1 + idx * 0.1}s` }}
+                variants={cardVariants}
+                whileHover={{ y: -5, transition: { duration: 0.2 } }}
+                className="card-corporate"
               >
                 <SolutionIcon name={sol.icon_name} />
                 <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-1">
@@ -97,9 +117,9 @@ export function SolutionsSection({ solutions }: SolutionsSectionProps) {
                 </p>
                 <h3 className="text-lg font-bold text-slate-900 mb-2">{sol.title}</h3>
                 <p className="text-sm text-slate-500 leading-relaxed">{sol.description}</p>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>

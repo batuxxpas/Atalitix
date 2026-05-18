@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { motion } from "framer-motion";
 
 export function ContactSection() {
   const [form, setForm] = useState({ full_name: "", email: "", phone: "", company: "", message: "" });
@@ -18,15 +19,27 @@ export function ContactSection() {
   };
 
   return (
-    <section id="iletisim" className="py-24 grid-bg">
+    <section id="iletisim" className="py-24 grid-bg overflow-hidden">
       <div className="container max-w-3xl">
-        <div className="text-center mb-12">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="text-center mb-12"
+        >
           <p className="section-label mb-4">İLETİŞİM</p>
           <h2 className="section-title mb-4">Görüşme Planlayın</h2>
           <p className="text-slate-500">İş süreçlerinizi birlikte değerlendirelim. Size en uygun dijital dönüşüm yolculuğunu tasarlayalım.</p>
-        </div>
+        </motion.div>
 
-        <div className="card-corporate">
+        <motion.div 
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.7, ease: "easeOut", delay: 0.1 }}
+          className="card-corporate"
+        >
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
@@ -51,15 +64,21 @@ export function ContactSection() {
               <textarea rows={4} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent transition resize-none" placeholder="Projeniz hakkında kısa bilgi..." />
             </div>
 
-            {status === "success" && <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm">Mesajınız başarıyla gönderildi! En kısa sürede size dönüş yapacağız.</div>}
-            {status === "error" && <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">Bir hata oluştu. Lütfen tekrar deneyin.</div>}
+            {status === "success" && <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm overflow-hidden">Mesajınız başarıyla gönderildi! En kısa sürede size dönüş yapacağız.</motion.div>}
+            {status === "error" && <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm overflow-hidden">Bir hata oluştu. Lütfen tekrar deneyin.</motion.div>}
 
-            <button type="submit" disabled={status === "loading"} className="btn-primary w-full justify-center disabled:opacity-50">
+            <motion.button 
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              type="submit" 
+              disabled={status === "loading"} 
+              className="btn-primary w-full justify-center disabled:opacity-50"
+            >
               {status === "loading" ? "Gönderiliyor..." : "Görüşme Planla"}
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
-            </button>
+            </motion.button>
           </form>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
