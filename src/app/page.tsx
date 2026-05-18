@@ -38,7 +38,7 @@ export default async function HomePage() {
           />
         )}
         
-        {techTags && techTags.length > 0 && <TechTagsBar tags={techTags} />}
+        {/* {techTags && techTags.length > 0 && <TechTagsBar tags={techTags} />} */}
         
         {solutions && solutions.length > 0 && <SolutionsSection solutions={solutions} />}
         

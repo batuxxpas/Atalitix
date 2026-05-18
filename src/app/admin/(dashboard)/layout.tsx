@@ -29,7 +29,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             { name: "Deneyim Maddeleri", path: "deneyim_maddeleri" },
             { name: "Harita Adımları", path: "isletim_haritasi_adimlari" },
             { name: "Harita Kategorileri", path: "isletim_haritasi_kategorileri" },
-            { name: "Teknoloji Etiketleri", path: "teknoloji_etiketleri" },
+            // { name: "Teknoloji Etiketleri", path: "teknoloji_etiketleri" },
             { name: "Yaklaşım Adımları", path: "yaklasim_adimlari" }
           ].map((table) => (
             <Link key={table.path} href={`/admin/content/${table.path}`} className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 text-sm transition-colors">
