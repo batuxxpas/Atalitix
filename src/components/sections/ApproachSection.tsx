@@ -1,25 +1,53 @@
 "use client";
 
-import { useRef, useEffect } from "react";
-import { motion, useInView, animate, Variants } from "framer-motion";
+import { useRef, useEffect, useState } from "react";
+import { motion, Variants } from "framer-motion";
 
 function AnimatedCounter({ from, to }: { from: number; to: number }) {
   const nodeRef = useRef<HTMLSpanElement>(null);
-  const inView = useInView(nodeRef, { once: true, margin: "-100px" });
+  const [started, setStarted] = useState(false);
 
   useEffect(() => {
     const node = nodeRef.current;
-    if (inView && node) {
-      const controls = animate(from, to, {
-        duration: 2.5, // Daha yavaş sayması için süre artırıldı
-        ease: "easeOut",
-        onUpdate(value) {
-          node.textContent = Math.round(value).toString();
-        },
-      });
-      return () => controls.stop();
-    }
-  }, [from, to, inView]);
+    if (!node) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !started) {
+          setStarted(true);
+        }
+      },
+      { threshold: 0.1, rootMargin: "-100px" }
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [started]);
+
+  useEffect(() => {
+    const node = nodeRef.current;
+    if (!started || !node) return;
+
+    const duration = 2500; // ms
+    const startTime = performance.now();
+
+    const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
+
+    let rafId: number;
+    const tick = (now: number) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const current = from + (to - from) * easeOut(progress);
+      node.textContent = Math.round(current).toString();
+
+      if (progress < 1) {
+        rafId = requestAnimationFrame(tick);
+      }
+    };
+
+    rafId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafId);
+  }, [started, from, to]);
 
   return <span ref={nodeRef}>{from}</span>;
 }
