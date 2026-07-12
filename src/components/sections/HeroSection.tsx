@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { AtalitixGraphicMap } from "@/components/ui";
 import { motion, Variants } from "framer-motion";
+import { InlineEditable, useEditor } from "@/components/editor";
 
 interface ProcessStep {
   step_number: number;
@@ -41,6 +42,7 @@ interface HeroSectionProps {
 
 export function HeroSection({ hero, processSteps, processCategories }: HeroSectionProps) {
   const sectionRef = useRef<HTMLElement>(null);
+  const { isEditorMode } = useEditor();
 
   // Stagger variants for the left column
   const containerVariants: Variants = {
@@ -74,33 +76,33 @@ export function HeroSection({ hero, processSteps, processCategories }: HeroSecti
             {/* Badge */}
             <motion.div variants={itemVariants} className="inline-flex items-center gap-2 mb-8">
               <span className="w-2.5 h-2.5 rounded-full bg-[var(--color-primary)]" style={{ animation: "pulse-dot 2s ease-in-out infinite" }} />
-              <span className="text-sm font-medium text-slate-600">{hero.badge_text}</span>
+              <InlineEditable section="hero" field="badge_text" defaultValue={hero.badge_text} tagName="span" className="text-sm font-medium text-slate-600" />
             </motion.div>
 
             {/* Title */}
             <motion.h1 variants={itemVariants} className="text-5xl md:text-[3.5rem] lg:text-[4rem] font-extrabold leading-[1.05] tracking-tight text-slate-900 mb-8">
-              {hero.title_line1}
+              <InlineEditable section="hero" field="title_line1" defaultValue={hero.title_line1} tagName="span" />
               <br />
-              {hero.title_line2}{" "}
-              <span className="text-[var(--color-primary)]">{hero.title_highlight}</span>
+              <InlineEditable section="hero" field="title_line2" defaultValue={hero.title_line2} tagName="span" />{" "}
+              <InlineEditable section="hero" field="title_highlight" defaultValue={hero.title_highlight} tagName="span" className="text-[var(--color-primary)]" />
               <br />
-              {hero.title_line3}
+              <InlineEditable section="hero" field="title_line3" defaultValue={hero.title_line3} tagName="span" />
               <br />
-              {hero.title_line4}
+              <InlineEditable section="hero" field="title_line4" defaultValue={hero.title_line4} tagName="span" />
             </motion.h1>
 
             {/* Description */}
-            <motion.p variants={itemVariants} className="text-base text-slate-500 leading-relaxed mb-4 max-w-lg">
-              {hero.description}
-            </motion.p>
-            <motion.p variants={itemVariants} className="text-base text-slate-500 leading-relaxed mb-8 max-w-lg">
-              {hero.description2}
-            </motion.p>
+            <motion.div variants={itemVariants} className="mb-4 max-w-lg">
+              <InlineEditable section="hero" field="description" defaultValue={hero.description} tagName="p" className="text-base text-slate-500 leading-relaxed" />
+            </motion.div>
+            <motion.div variants={itemVariants} className="mb-8 max-w-lg">
+              <InlineEditable section="hero" field="description2" defaultValue={hero.description2} tagName="p" className="text-base text-slate-500 leading-relaxed" />
+            </motion.div>
 
             {/* Tagline */}
-            <motion.div variants={itemVariants} className="bg-white rounded-2xl border border-slate-200 p-5 mb-8 inline-block max-w-md shadow-sm hover:shadow-md transition-shadow">
-              <p className="text-lg font-bold italic text-slate-800">{hero.tagline}</p>
-              <p className="text-sm text-slate-400 mt-1">{hero.tagline_sub}</p>
+            <motion.div variants={itemVariants} className="bg-white rounded-2xl border border-slate-200 p-5 mb-8 inline-flex flex-col max-w-md shadow-sm hover:shadow-md transition-shadow">
+              <InlineEditable section="hero" field="tagline" defaultValue={hero.tagline} tagName="p" className="text-lg font-bold italic text-slate-800 w-full" />
+              <InlineEditable section="hero" field="tagline_sub" defaultValue={hero.tagline_sub} tagName="p" className="text-sm text-slate-400 mt-1 w-full" />
             </motion.div>
 
             {/* CTA Buttons */}
@@ -109,10 +111,11 @@ export function HeroSection({ hero, processSteps, processCategories }: HeroSecti
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 href="#cozumler" 
+                onClick={(e) => isEditorMode && e.preventDefault()}
                 className="btn-primary"
               >
-                {hero.cta_primary_text}
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <InlineEditable section="hero" field="cta_primary_text" defaultValue={hero.cta_primary_text} tagName="span" />
+                <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
               </motion.a>
@@ -120,9 +123,10 @@ export function HeroSection({ hero, processSteps, processCategories }: HeroSecti
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 href="#deneyim" 
+                onClick={(e) => isEditorMode && e.preventDefault()}
                 className="btn-outline"
               >
-                {hero.cta_secondary_text}
+                <InlineEditable section="hero" field="cta_secondary_text" defaultValue={hero.cta_secondary_text} tagName="span" />
               </motion.a>
             </motion.div>
           </motion.div>

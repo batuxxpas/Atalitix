@@ -8,15 +8,7 @@ export default async function HomePage() {
   const supabase = await createClient();
 
   // Fetch data
-  const [
-    { data: hero },
-    { data: processSteps },
-    { data: processCategories },
-    { data: techTags },
-    { data: solutions },
-    { data: approachSteps },
-    { data: experienceItems },
-  ] = await Promise.all([
+  const results = await Promise.all([
     (supabase.from("ana_sayfa_icerik") as any).select("*").eq("is_active", true).single(),
     (supabase.from("isletim_haritasi_adimlari") as any).select("*").eq("is_active", true).order("sort_order"),
     (supabase.from("isletim_haritasi_kategorileri") as any).select("*").eq("is_active", true).order("sort_order"),
@@ -25,6 +17,19 @@ export default async function HomePage() {
     (supabase.from("yaklasim_adimlari") as any).select("*").eq("is_active", true).order("sort_order"),
     (supabase.from("deneyim_maddeleri") as any).select("*").eq("is_active", true).order("sort_order"),
   ]);
+
+  console.log("Supabase Fetch Results (hero):", results[0]);
+  console.log("Supabase Fetch Results (processSteps):", results[1]);
+
+  const [
+    { data: hero },
+    { data: processSteps },
+    { data: processCategories },
+    { data: techTags },
+    { data: solutions },
+    { data: approachSteps },
+    { data: experienceItems },
+  ] = results;
 
   return (
     <>
@@ -40,12 +45,13 @@ export default async function HomePage() {
         
         {/* {techTags && techTags.length > 0 && <TechTagsBar tags={techTags} />} */}
         
-        {solutions && solutions.length > 0 && <SolutionsSection solutions={solutions} />}
+        {solutions && solutions.length > 0 && <SolutionsSection solutions={solutions} hero={hero} />}
         
         {approachSteps && experienceItems && (
           <ApproachSection
             approachSteps={approachSteps}
             experienceItems={experienceItems}
+            hero={hero}
           />
         )}
 

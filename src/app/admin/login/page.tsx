@@ -54,13 +54,13 @@ export default function AdminLogin() {
         <form onSubmit={handleLogin} className="space-y-5">
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-              E-posta
+              Kullanıcı Adı
             </label>
             <input
-              type="email"
+              type="text"
               name="email"
               className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#3b82f6] focus:border-transparent transition-all bg-slate-50 focus:bg-white"
-              placeholder="admin@atalitix.com"
+              placeholder="admin"
               required
             />
           </div>

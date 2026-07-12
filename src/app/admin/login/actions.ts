@@ -25,7 +25,8 @@ export async function loginAdminUser(formData: FormData) {
   }
 
   // Şifre kontrolü (Şimdilik düz metin kontrolü, ileride bcrypt eklenebilir)
-  if (data.password_hash !== password) {
+  const dbPassword = data.password || data.password_hash;
+  if (dbPassword !== password) {
     return { error: "Giriş başarısız. Lütfen bilgilerinizi kontrol edin." };
   }
 
