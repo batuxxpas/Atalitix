@@ -31,10 +31,10 @@ export default function VisualEditorClient({ initialData }: { initialData: any }
       const resExp = await saveExperienceItems(updatedExperience);
       if (!resExp.success) throw new Error(resExp.error);
       
-      setSaveMessage("✅ Başarıyla Kaydedildi!");
+      setSaveMessage("success");
       setTimeout(() => setSaveMessage(""), 3000);
     } catch (e: any) {
-      setSaveMessage("❌ Hata: " + e.message);
+      setSaveMessage("error: " + e.message);
       setTimeout(() => setSaveMessage(""), 4000);
     }
     
@@ -77,13 +77,13 @@ function VisualEditorInner({ onSave, isSaving, saveMessage }: { onSave: (data: a
       <Footer />
 
       {/* Floating Editor Controls */}
-      <div className="fixed bottom-8 right-8 z-[100] flex items-center gap-3 animate-in slide-in-from-bottom-5 fade-in duration-500">
+      <div className="fixed bottom-8 right-8 z-[100] flex items-center gap-4 animate-in slide-in-from-bottom-5 fade-in duration-500">
         {/* Back button */}
         <button
           onClick={() => window.location.href = '/admin'}
-          className="bg-white/95 backdrop-blur-sm text-slate-700 font-semibold px-5 py-3.5 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.12)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.18)] transition-all flex items-center gap-2 border border-slate-200/80 hover:-translate-y-0.5"
+          className="bg-[#0B1120]/90 backdrop-blur-xl text-slate-300 font-semibold px-6 py-4 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.2)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.3)] hover:text-white transition-all flex items-center gap-2 border border-white/10 hover:border-white/20 hover:-translate-y-0.5 group"
         >
-          <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 text-slate-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
           Panele Dön
@@ -92,14 +92,28 @@ function VisualEditorInner({ onSave, isSaving, saveMessage }: { onSave: (data: a
         {/* Save button */}
         <div className="relative">
           {saveMessage && (
-            <div className="absolute bottom-full mb-3 right-0 bg-slate-900/95 backdrop-blur-sm text-white px-4 py-2.5 rounded-xl shadow-2xl text-sm font-medium animate-in fade-in slide-in-from-bottom-2 whitespace-nowrap border border-slate-700/50">
-              {saveMessage}
+            <div className={`absolute bottom-full mb-4 right-0 px-5 py-3.5 rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.3)] text-sm font-semibold animate-in fade-in slide-in-from-bottom-3 whitespace-nowrap border flex items-center gap-3 backdrop-blur-md ${
+              saveMessage === "success" 
+                ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500" 
+                : "bg-red-500/10 border-red-500/20 text-red-500"
+            }`}>
+              {saveMessage === "success" ? (
+                <>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
+                  Değişiklikler başarıyla yayınlandı.
+                </>
+              ) : (
+                <>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  Hata: {saveMessage.replace("error: ", "")}
+                </>
+              )}
             </div>
           )}
           <button 
             onClick={() => onSave(data)}
             disabled={isSaving}
-            className="bg-emerald-500 hover:bg-emerald-400 text-white px-6 py-3.5 rounded-2xl shadow-[0_8px_32px_rgba(16,185,129,0.4)] hover:shadow-[0_12px_40px_rgba(16,185,129,0.5)] font-bold text-base flex items-center gap-2.5 transition-all hover:-translate-y-0.5 active:scale-95 disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-[0_8px_32px_rgba(16,185,129,0.4)]"
+            className="bg-gradient-to-r from-emerald-500 to-emerald-400 text-white px-8 py-4 rounded-2xl shadow-[0_8px_32px_rgba(16,185,129,0.3)] hover:shadow-[0_12px_40px_rgba(16,185,129,0.4)] font-bold text-base tracking-wide flex items-center gap-3 transition-all hover:-translate-y-0.5 active:scale-95 disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-[0_8px_32px_rgba(16,185,129,0.3)] border border-emerald-400/20"
           >
             {isSaving ? (
               <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
@@ -111,7 +125,7 @@ function VisualEditorInner({ onSave, isSaving, saveMessage }: { onSave: (data: a
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
               </svg>
             )}
-            {isSaving ? "Kaydediliyor..." : "YAYINLA"}
+            {isSaving ? "KAYDEDİLİYOR..." : "YAYINLA"}
           </button>
         </div>
       </div>
