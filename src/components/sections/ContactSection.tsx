@@ -40,28 +40,28 @@ export function ContactSection() {
           transition={{ duration: 0.7, ease: "easeOut", delay: 0.1 }}
           className="card-corporate"
         >
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5" aria-label="İletişim formu">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">Ad Soyad *</label>
-                <input type="text" required value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent transition" placeholder="Adınız Soyadınız" />
+                <label htmlFor="contact-name" className="block text-sm font-medium text-slate-700 mb-1.5">Ad Soyad *</label>
+                <input id="contact-name" type="text" required autoComplete="name" value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent transition" placeholder="Adınız Soyadınız" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">E-posta *</label>
-                <input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent transition" placeholder="ornek@sirket.com" />
+                <label htmlFor="contact-email" className="block text-sm font-medium text-slate-700 mb-1.5">E-posta *</label>
+                <input id="contact-email" type="email" required autoComplete="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent transition" placeholder="ornek@sirket.com" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">Telefon</label>
-                <input type="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent transition" placeholder="+90 5XX XXX XX XX" />
+                <label htmlFor="contact-phone" className="block text-sm font-medium text-slate-700 mb-1.5">Telefon</label>
+                <input id="contact-phone" type="tel" autoComplete="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent transition" placeholder="+90 5XX XXX XX XX" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">Şirket</label>
-                <input type="text" value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent transition" placeholder="Şirket adı" />
+                <label htmlFor="contact-company" className="block text-sm font-medium text-slate-700 mb-1.5">Şirket</label>
+                <input id="contact-company" type="text" autoComplete="organization" value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent transition" placeholder="Şirket adı" />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Mesaj</label>
-              <textarea rows={4} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent transition resize-none" placeholder="Projeniz hakkında kısa bilgi..." />
+              <label htmlFor="contact-message" className="block text-sm font-medium text-slate-700 mb-1.5">Mesaj</label>
+              <textarea id="contact-message" rows={4} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent transition resize-none" placeholder="Projeniz hakkında kısa bilgi..." />
             </div>
 
             {status === "success" && <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm overflow-hidden">Mesajınız başarıyla gönderildi! En kısa sürede size dönüş yapacağız.</motion.div>}

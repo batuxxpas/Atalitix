@@ -36,6 +36,7 @@ export function Header() {
         <Link 
           href="/" 
           className="flex items-center"
+          aria-label="Atalitix - Ana Sayfa"
           onClick={(e) => {
             if (window.location.pathname === "/") {
               e.preventDefault();

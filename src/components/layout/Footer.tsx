@@ -18,7 +18,7 @@ export function Footer() {
           </div>
 
           {/* Links */}
-          <div>
+          <nav aria-label="Çözümler navigasyonu">
             <h4 className="text-sm font-semibold text-white mb-4">Çözümler</h4>
             <ul className="space-y-2.5">
               {["ERP Danışmanlığı", "Dijitalleşme Yol Haritası", "Veri Görselleştirme", "Non-ERP Otomasyon", "Süreç Tasarımı", "Danışmanlık"].map((item) => (
@@ -29,31 +29,33 @@ export function Footer() {
                 </li>
               ))}
             </ul>
-          </div>
+          </nav>
 
           <div>
             <h4 className="text-sm font-semibold text-white mb-4">İletişim</h4>
-            <div className="mb-4">
-              <p className="text-sm font-semibold text-white">Bennur GÜNER YILMAZ</p>
-              <p className="text-xs text-slate-500 mt-0.5">Founder & Managing Partner</p>
-            </div>
-            <ul className="space-y-2.5">
-              <li>
-                <a href="tel:+905053752992" className="text-sm text-slate-400 hover:text-white transition-colors">
-                  +90 505 375 2992
-                </a>
-              </li>
-              <li>
-                <a href="mailto:bennur.yilmaz@atalitix.com" className="text-sm text-slate-400 hover:text-white transition-colors">
-                  bennur.yilmaz@atalitix.com
-                </a>
-              </li>
-              <li>
-                <a href="#iletisim" className="text-sm text-slate-400 hover:text-white transition-colors">
-                  Görüşme Planla
-                </a>
-              </li>
-            </ul>
+            <address className="not-italic">
+              <div className="mb-4">
+                <p className="text-sm font-semibold text-white">Bennur GÜNER YILMAZ</p>
+                <p className="text-xs text-slate-500 mt-0.5">Founder & Managing Partner</p>
+              </div>
+              <ul className="space-y-2.5">
+                <li>
+                  <a href="tel:+905053752992" className="text-sm text-slate-400 hover:text-white transition-colors">
+                    +90 505 375 2992
+                  </a>
+                </li>
+                <li>
+                  <a href="mailto:bennur.yilmaz@atalitix.com" className="text-sm text-slate-400 hover:text-white transition-colors">
+                    bennur.yilmaz@atalitix.com
+                  </a>
+                </li>
+                <li>
+                  <a href="#iletisim" className="text-sm text-slate-400 hover:text-white transition-colors">
+                    Görüşme Planla
+                  </a>
+                </li>
+              </ul>
+            </address>
           </div>
         </div>
 

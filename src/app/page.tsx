@@ -1,6 +1,7 @@
 import { Header, Footer } from "@/components/layout";
 import { HeroSection, TechTagsBar, SolutionsSection, ApproachSection, ContactSection } from "@/components/sections";
 import { createClient } from "@/lib/supabase/server";
+import { SITE_CONFIG } from "@/lib/constants";
 
 export const revalidate = 60; // Revalidate cache every 60 seconds
 
@@ -31,8 +32,83 @@ export default async function HomePage() {
     { data: experienceItems },
   ] = results;
 
+  // JSON-LD Structured Data
+  const organizationJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Atalitix",
+    url: SITE_CONFIG.url,
+    logo: `${SITE_CONFIG.url}/atalitixlogo.png`,
+    description: SITE_CONFIG.description,
+    founder: {
+      "@type": "Person",
+      name: "Bennur Güner Yılmaz",
+      jobTitle: "Founder & Managing Partner",
+    },
+    contactPoint: {
+      "@type": "ContactPoint",
+      telephone: "+90-505-375-2992",
+      email: "bennur.yilmaz@atalitix.com",
+      contactType: "sales",
+      availableLanguage: ["Turkish", "English"],
+    },
+    sameAs: [],
+  };
+
+  const websiteJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Atalitix",
+    url: SITE_CONFIG.url,
+    description: SITE_CONFIG.description,
+    inLanguage: "tr",
+  };
+
+  const professionalServiceJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    name: "Atalitix",
+    url: SITE_CONFIG.url,
+    description: SITE_CONFIG.description,
+    image: `${SITE_CONFIG.url}/atalitixlogo.png`,
+    telephone: "+90-505-375-2992",
+    email: "bennur.yilmaz@atalitix.com",
+    serviceType: [
+      "ERP Danışmanlığı",
+      "Dijital Dönüşüm",
+      "Veri Analitiği",
+      "Süreç Otomasyonu",
+      "İş Zekası",
+    ],
+    areaServed: {
+      "@type": "Country",
+      name: "Turkey",
+    },
+    knowsLanguage: ["tr", "en"],
+  };
+
   return (
     <>
+      {/* JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(organizationJsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(websiteJsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(professionalServiceJsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
+
       <Header />
       <main className="pt-20">
         {hero && (
@@ -61,3 +137,4 @@ export default async function HomePage() {
     </>
   );
 }
+

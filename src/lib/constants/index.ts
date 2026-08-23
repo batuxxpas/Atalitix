@@ -5,19 +5,36 @@ import type { NavItem } from "@/types";
  */
 
 export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || "Atalitix";
-export const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+export const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://atalitix.com";
 
 /**
  * Site meta bilgileri
  */
 export const SITE_CONFIG = {
   name: APP_NAME,
-  description: "Atalitix - Modern Analitik ve Yönetim Platformu",
+  description:
+    "Atalitix — ERP danışmanlığı, dijital dönüşüm, veri analitiği ve süreç otomasyonu çözümleriyle iş süreçlerinizi akıllı, ölçülebilir ve sürdürülebilir hale getiren teknoloji ve danışmanlık markası.",
   url: APP_URL,
-  ogImage: `${APP_URL}/og.png`,
+  ogImage: `${APP_URL}/opengraph-image`,
   links: {
     github: "https://github.com/atalitix",
   },
+  keywords: [
+    "ERP danışmanlığı",
+    "dijital dönüşüm",
+    "veri analitiği",
+    "süreç otomasyonu",
+    "iş zekası",
+    "Atalitix",
+    "ERP entegrasyonu",
+    "dijitalleşme yol haritası",
+    "veri görselleştirme",
+    "non-ERP otomasyon",
+    "süreç tasarımı",
+    "üretim planlama",
+    "otomotiv ERP",
+    "Türkiye ERP danışmanlık",
+  ],
 } as const;
 
 /**
