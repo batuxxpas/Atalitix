@@ -22,7 +22,7 @@ function AnimatedCounter({ from, to }: { from: number; to: number }) {
     if (!node) return;
     const observer = new IntersectionObserver(
       ([entry]) => { if (entry.isIntersecting && !started) setStarted(true); },
-      { threshold: 0.1, rootMargin: "-100px" }
+      { threshold: 0.1, rootMargin: "-50px" }
     );
     observer.observe(node);
     return () => observer.disconnect();
