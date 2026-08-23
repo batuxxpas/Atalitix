@@ -21,7 +21,7 @@ export function Footer() {
           <nav aria-label="Çözümler navigasyonu">
             <h4 className="text-sm font-semibold text-white mb-4">Çözümler</h4>
             <ul className="space-y-2.5">
-              {["ERP Danışmanlığı", "Dijitalleşme Yol Haritası", "Veri Görselleştirme", "Non-ERP Otomasyon", "Süreç Tasarımı", "Danışmanlık"].map((item) => (
+              {["ERP Danışmanlığı", "Dijitalleşme Yol Haritası", "Veri Görselleştirme", "Non-ERP Otomasyon", "Süreç Tasarımı", "Danışmanlık & Eğitim"].map((item) => (
                 <li key={item}>
                   <Link href="#cozumler" className="text-sm text-slate-400 hover:text-white transition-colors">
                     {item}
