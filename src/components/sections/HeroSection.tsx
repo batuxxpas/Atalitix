@@ -115,9 +115,6 @@ export function HeroSection({ hero, processSteps, processCategories }: HeroSecti
                 className="btn-primary"
               >
                 <InlineEditable section="hero" field="cta_primary_text" defaultValue={hero.cta_primary_text} tagName="span" />
-                <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
               </motion.a>
               <motion.a 
                 whileHover={{ scale: 1.05 }}
