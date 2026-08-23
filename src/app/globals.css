@@ -14,7 +14,7 @@
   --color-accent: #3b82f6;
   --color-dark: #0f172a;
   --color-dark-surface: #1a2744;
-  --color-bg: #f0f3f8;
+  --color-bg: #ffffff;
   --color-bg-card: #ffffff;
   --color-text: #1e293b;
   --color-text-secondary: #64748b;
@@ -120,10 +120,8 @@ body {
    Grid background pattern
    =================================== */
 .grid-bg {
-  background-image:
-    linear-gradient(rgba(45, 58, 140, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(45, 58, 140, 0.04) 1px, transparent 1px);
-  background-size: 40px 40px;
+  background-color: #ffffff;
+  background-image: none;
 }
 
 /* ===================================

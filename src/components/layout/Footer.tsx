@@ -34,7 +34,11 @@ export function Footer() {
           <div>
             <h4 className="text-sm font-semibold text-white mb-4">İletişim</h4>
             <ul className="space-y-2.5">
-              <li className="text-sm text-slate-400">info@atalitix.com</li>
+              <li>
+                <a href="mailto:bennur.yilmaz@atalitix.com" className="text-sm text-slate-400 hover:text-white transition-colors">
+                  bennur.yilmaz@atalitix.com
+                </a>
+              </li>
               <li>
                 <a href="#iletisim" className="text-sm text-slate-400 hover:text-white transition-colors">
                   Görüşme Planla
