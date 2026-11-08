@@ -51,7 +51,7 @@ export function ErpModuleMap({ play = true }: { play?: boolean }) {
         viewBox="-70 -30 660 580"
         className="w-full h-auto overflow-visible select-none"
         role="img"
-        aria-label="ERP modül haritası: merkezde ERP çekirdeği, çevresinde finans, satınalma, stok, üretim, satış ve insan kaynakları modülleri, dış katmanda saha verisi, onay akışları, entegrasyon ve KPI panelleri."
+        aria-label="ERP modül haritası: merkezde ERP, çevresinde finans, satınalma, stok, üretim, satış ve insan kaynakları modülleri, dış katmanda saha verisi, onay akışları, entegrasyon ve KPI panelleri."
       >
         <style>{`
           @keyframes erp-dash { to { stroke-dashoffset: -60; } }
@@ -140,8 +140,7 @@ export function ErpModuleMap({ play = true }: { play?: boolean }) {
         >
           <circle cx={C} cy={C} r={R_CORE + 14} fill="none" stroke="var(--brand-navy)" strokeOpacity={0.12} />
           <circle cx={C} cy={C} r={R_CORE} fill="var(--brand-navy)" />
-          <text x={C} y={C - 4} textAnchor="middle" className="font-serif" fontSize={34} fill="#fff" letterSpacing="-0.5">ERP</text>
-          <text x={C} y={C + 22} textAnchor="middle" fontSize={12} fill="#ffffff" fillOpacity={0.65} letterSpacing="1.5">ÇEKİRDEK</text>
+          <text x={C} y={C} textAnchor="middle" dominantBaseline="central" className="font-serif" fontSize={36} fill="#fff" letterSpacing="-0.5">ERP</text>
         </motion.g>
 
         {/* Module nodes + labels */}
