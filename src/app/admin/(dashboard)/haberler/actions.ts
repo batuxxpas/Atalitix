@@ -3,7 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireAdmin, getAdminClient } from "@/lib/admin/auth";
-import { slugify } from "@/lib/news-utils";
+import { slugify, isHtml, legacyToHtml } from "@/lib/news-utils";
+import { sanitizeNewsHtml } from "@/lib/sanitize";
 
 function clean(v: FormDataEntryValue | null): string | null {
   const s = String(v ?? "").trim();
@@ -53,13 +54,19 @@ async function readForm(formData: FormData, excludeId?: string) {
   let link = clean(formData.get("link"));
   if (link && !/^https?:\/\//i.test(link)) link = null;
 
-  // Image: an uploaded file wins over a pasted URL
-  let gorsel_url = clean(formData.get("gorsel_url"));
-  if (gorsel_url && !/^https:\/\//i.test(gorsel_url)) gorsel_url = null;
+  // Cover image: new upload > pasted URL > explicit removal > unchanged (undefined)
+  let gorsel_url: string | null | undefined = undefined;
+  const pasted = clean(formData.get("gorsel_url"));
+  if (pasted && /^https:\/\//i.test(pasted)) gorsel_url = pasted;
   const file = formData.get("gorsel");
   if (file instanceof File && file.size > 0) {
     gorsel_url = (await uploadImage(file)) ?? gorsel_url;
   }
+  if (gorsel_url === undefined && formData.get("gorsel_kaldir") === "1") gorsel_url = null;
+
+  // Body: editor HTML (sanitized); old plain-text format is converted
+  const rawBody = clean(formData.get("icerik"));
+  const icerik = rawBody ? sanitizeNewsHtml(isHtml(rawBody) ? rawBody : legacyToHtml(rawBody)) : null;
 
   const slug = await uniqueSlug(slugify(clean(formData.get("slug")) ?? baslik), excludeId);
 
@@ -67,10 +74,10 @@ async function readForm(formData: FormData, excludeId?: string) {
     tur,
     baslik,
     ozet: clean(formData.get("ozet")),
-    icerik: clean(formData.get("icerik")),
+    icerik,
     kaynak_adi: clean(formData.get("kaynak_adi")),
     link,
-    gorsel_url,
+    ...(gorsel_url !== undefined ? { gorsel_url } : {}),
     slug,
     tarih: clean(formData.get("tarih")) ?? new Date().toISOString().slice(0, 10),
   };
@@ -81,6 +88,15 @@ function withoutDetailColumns<T extends Record<string, unknown>>(row: T) {
   const { slug: _slug, icerik: _icerik, ...rest } = row;
   void _slug; void _icerik;
   return rest;
+}
+
+/** Image upload for pictures placed inside the article body (editor toolbar). */
+export async function uploadEditorImage(formData: FormData): Promise<{ url?: string; error?: string }> {
+  await requireAdmin();
+  const file = formData.get("gorsel");
+  if (!(file instanceof File) || file.size === 0) return { error: "Dosya bulunamadı." };
+  const url = await uploadImage(file);
+  return url ? { url } : { error: "Görsel yüklenemedi." };
 }
 
 function refresh() {
@@ -98,6 +114,7 @@ export async function createNews(formData: FormData) {
   if (error?.code === "PGRST204") await db.from("haberler").insert(withoutDetailColumns(row));
   else if (error) console.error("Haber eklenemedi:", error.message);
   refresh();
+  redirect("/admin/haberler");
 }
 
 export async function updateNews(formData: FormData) {

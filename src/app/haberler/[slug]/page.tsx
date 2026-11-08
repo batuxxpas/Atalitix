@@ -3,7 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Header, Footer } from "@/components/layout";
 import { NewsCover, NewsCard, NewsBody } from "@/components/news/NewsCards";
-import { getNews, getRelatedNews, newsHref, formatNewsDate, safeHref } from "@/lib/news";
+import { getNews, getRelatedNews, newsHref, formatNewsDate, safeHref, isHtml } from "@/lib/news";
+import { sanitizeNewsHtml } from "@/lib/sanitize";
 import { SITE_CONFIG } from "@/lib/constants";
 
 export const revalidate = 60;
@@ -87,7 +88,12 @@ export default async function NewsDetailPage({ params }: { params: Params }) {
           <div className="container mt-14 md:mt-20">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
               <div className="lg:col-span-8 lg:col-start-3 max-w-[44rem]">
-                {news.icerik && <NewsBody text={news.icerik} />}
+                {news.icerik &&
+                  (isHtml(news.icerik) ? (
+                    <div className="news-prose" dangerouslySetInnerHTML={{ __html: sanitizeNewsHtml(news.icerik) }} />
+                  ) : (
+                    <NewsBody text={news.icerik} />
+                  ))}
 
                 {(news.kaynak_adi || source) && (
                   <p className="mt-10 border-t border-[var(--rule)] pt-5 text-[14px] text-[var(--ink-muted)]">

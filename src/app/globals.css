@@ -92,7 +92,8 @@ body {
    =================================== */
 .container {
   max-width: 1200px;
-  margin: 0 auto;
+  margin-left: auto;
+  margin-right: auto;
   padding-left: 1.25rem;
   padding-right: 1.25rem;
 }
@@ -333,3 +334,36 @@ html[data-intro="playing"] .intro-overlay { animation: intro-failsafe 0s linear 
 .loader-logo {
   animation: loader-in 0.6s ease-out both;
 }
+
+/* ===================================
+   News article body (site + admin editor share the same look)
+   =================================== */
+.news-prose { color: var(--ink-body); font-size: 17px; line-height: 1.8; }
+.news-prose > * + * { margin-top: 1.1em; }
+.news-prose h2 { font-family: var(--font-serif); font-size: 1.6rem; line-height: 1.3; color: var(--ink); font-weight: 400; margin-top: 1.8em; }
+.news-prose h3 { font-family: var(--font-serif); font-size: 1.3rem; line-height: 1.35; color: var(--ink); font-weight: 400; margin-top: 1.5em; }
+.news-prose strong, .news-prose b { color: var(--ink); font-weight: 600; }
+.news-prose a { color: var(--brand-navy-700); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(29, 108, 242, .45); }
+.news-prose a:hover { color: var(--brand-blue); }
+.news-prose ul, .news-prose ol { padding-left: 1.35em; }
+.news-prose ul { list-style: disc; }
+.news-prose ol { list-style: decimal; }
+.news-prose li { padding-left: .25em; }
+.news-prose li + li { margin-top: .4em; }
+.news-prose li::marker { color: var(--brand-blue); }
+.news-prose li p { margin: 0; }
+.news-prose blockquote { border-left: 2px solid var(--brand-blue); padding: .2em 0 .2em 1.2em; font-family: var(--font-serif); font-size: 1.25rem; line-height: 1.5; color: var(--ink); font-style: italic; }
+.news-prose hr { border: 0; height: 1px; background: var(--rule-strong); margin: 2.2em 0; }
+.news-prose img { width: 100%; height: auto; margin: 1.8em 0; outline: 1px solid var(--rule); outline-offset: -1px; }
+.news-prose > :first-child { margin-top: 0; }
+
+/* Admin editor specifics */
+.news-editor { font-size: 16px; }
+.news-editor p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: #a3a8b6;
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+.news-editor img.ProseMirror-selectednode { outline: 3px solid #6366f1; }

@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { requireAdmin, getAdminClient } from "@/lib/admin/auth";
 import { newsHref, type News } from "@/lib/news-utils";
-import { createNews, toggleNews, deleteNews } from "./actions";
-import { NewsForm } from "./NewsForm";
+import { toggleNews, deleteNews } from "./actions";
 
 export const revalidate = 0;
 
@@ -18,14 +17,17 @@ export default async function AdminNewsPage() {
   const rows = (data ?? []) as unknown as Row[];
 
   return (
-    <div className="max-w-5xl mx-auto">
+    <div className="max-w-6xl mx-auto">
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
+        <div className="order-2 sm:order-1">
           <h2 className="text-2xl font-bold text-slate-900">Haberler</h2>
           <p className="text-slate-500 text-sm mt-1">
             Sitedeki <Link href="/haberler" target="_blank" className="text-indigo-600 hover:underline">/haberler</Link> sayfası ve ana sayfadaki Gündem bölümü buradan yönetilir.
           </p>
         </div>
+        <Link href="/admin/haberler/yeni" className="order-1 sm:order-2 rounded-lg bg-[#0b1a4f] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#1d6cf2] transition-colors">
+          + Yeni haber
+        </Link>
       </div>
 
       {error && (
@@ -82,9 +84,6 @@ export default async function AdminNewsPage() {
         ))}
       </div>
 
-      {/* New item */}
-      <h3 className="mt-12 mb-4 text-lg font-bold text-slate-900">Yeni haber ekle</h3>
-      <NewsForm action={createNews} submitLabel="Yayınla" />
     </div>
   );
 }

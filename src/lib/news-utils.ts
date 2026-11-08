@@ -62,3 +62,35 @@ export function safeHref(link: string | null | undefined): string | null {
     return null;
   }
 }
+
+/** True when the stored body is rich-text HTML (from the admin editor). */
+export function isHtml(text: string | null | undefined): boolean {
+  return !!text && /^\s*</.test(text);
+}
+
+function escapeHtml(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+/**
+ * Converts the old plain-text body format to HTML
+ * (blank line = paragraph, "## " = heading, "- " = list item).
+ */
+export function legacyToHtml(text: string): string {
+  const blocks = text.replace(/\r\n/g, "\n").split(/\n\s*\n/).map((b) => b.trim()).filter(Boolean);
+  const out: string[] = [];
+  for (const block of blocks) {
+    let lines = block.split("\n");
+    if (lines[0].startsWith("## ")) {
+      out.push(`<h2>${escapeHtml(lines[0].slice(3))}</h2>`);
+      lines = lines.slice(1);
+      if (!lines.length) continue;
+    }
+    if (lines.every((l) => /^\s*[-•]\s+/.test(l))) {
+      out.push(`<ul>${lines.map((l) => `<li><p>${escapeHtml(l.replace(/^\s*[-•]\s+/, ""))}</p></li>`).join("")}</ul>`);
+    } else {
+      out.push(`<p>${lines.map(escapeHtml).join("<br>")}</p>`);
+    }
+  }
+  return out.join("");
+}
