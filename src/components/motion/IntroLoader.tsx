@@ -28,8 +28,8 @@ export function useIntroReady() {
 }
 
 /**
- * Short, quiet opening: the logo is unveiled, a single rule is drawn beneath it,
- * then the white sheet wipes upward to reveal the page.
+ * Continues the loading screen: the rule under the logo completes,
+ * the logo lifts away and the white sheet wipes upward to reveal the page.
  */
 export function IntroLoader() {
   const [phase, setPhase] = useState<"run" | "exit" | "done">("run");
@@ -39,13 +39,13 @@ export function IntroLoader() {
     // Not playing: the overlay stays hidden by CSS
     if (root.dataset.intro !== "playing") return;
 
-    const tExit = setTimeout(() => setPhase("exit"), 1300);
-    const tReady = setTimeout(releaseIntro, 1550);
+    const tExit = setTimeout(() => setPhase("exit"), 1150);
+    const tReady = setTimeout(releaseIntro, 1400);
     const tDone = setTimeout(() => {
       root.dataset.intro = "done";
       try { sessionStorage.setItem(INTRO_STORAGE_KEY, "1"); } catch {}
       setPhase("done");
-    }, 2250);
+    }, 2100);
     return () => {
       clearTimeout(tExit);
       clearTimeout(tReady);
@@ -70,19 +70,17 @@ export function IntroLoader() {
           animate={{ opacity: exiting ? 0 : 1, y: exiting ? -16 : 0 }}
           transition={{ duration: 0.35, ease: "easeIn" }}
         >
-          <motion.div
-            initial={{ clipPath: "inset(0 100% 0 0)" }}
-            animate={{ clipPath: "inset(0 0% 0 0)" }}
-            transition={{ duration: 0.8, delay: 0.1, ease: [0.65, 0, 0.35, 1] }}
-          >
-            <Image src="/atalitixlogo.png" alt="" width={260} height={70} priority className="h-12 md:h-14 w-auto" />
-          </motion.div>
-          <motion.span
-            className="mt-6 block h-px w-48 origin-left bg-[var(--brand-navy)]"
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ duration: 0.9, delay: 0.35, ease: [0.65, 0, 0.35, 1] }}
-          />
+          {/* Same position and size as app/loading.tsx — the logo is already there */}
+          <Image src="/atalitixlogo.png" alt="" width={260} height={70} priority className="h-12 md:h-14 w-auto" />
+          {/* The loading track completes: navy fills the rule from left to right */}
+          <span className="relative mt-6 block h-px w-48 overflow-hidden bg-[var(--rule)]">
+            <motion.span
+              className="absolute inset-0 origin-left bg-[var(--brand-navy)]"
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ duration: 0.9, delay: 0.1, ease: [0.65, 0, 0.35, 1] }}
+            />
+          </span>
         </motion.div>
       </div>
     </motion.div>
