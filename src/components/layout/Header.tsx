@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
-  { title: "Çözümler", href: "#cozumler" },
+  { title: "Hizmetler", href: "#cozumler" },
   { title: "Yaklaşım", href: "#yaklasim" },
   { title: "Deneyim", href: "#deneyim" },
   { title: "İletişim", href: "#iletisim" },
@@ -27,8 +27,8 @@ export function Header() {
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
         scrolled
-          ? "bg-white/90 backdrop-blur-xl shadow-sm border-b border-slate-200/50"
-          : "bg-transparent"
+          ? "bg-white/85 backdrop-blur-xl border-b border-slate-200/70"
+          : "bg-white/0 border-b border-transparent"
       )}
     >
       <div className="container flex h-20 items-center justify-between">
@@ -49,38 +49,37 @@ export function Header() {
             alt="Atalitix Logo"
             width={160}
             height={45}
-            className="h-10 w-auto object-contain"
+            className="h-9 w-auto object-contain"
             priority
           />
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center">
-          <div className="flex items-center gap-1 bg-white/80 backdrop-blur-sm rounded-full border border-slate-200 px-2 py-1.5">
-            {NAV_ITEMS.map((item) => (
-              <a
-                key={item.href}
-                href={item.href}
-                className="px-5 py-2 rounded-full text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all"
-              >
-                {item.title}
-              </a>
-            ))}
-          </div>
+        <nav className="hidden md:flex items-center gap-1" aria-label="Ana menü">
+          {NAV_ITEMS.map((item) => (
+            <a
+              key={item.href}
+              href={item.href}
+              className="relative px-4 py-2 text-sm font-medium text-slate-600 hover:text-[var(--brand-navy)] transition-colors after:absolute after:left-4 after:right-4 after:-bottom-0.5 after:h-px after:bg-[var(--brand-blue)] after:scale-x-0 after:origin-left after:transition-transform hover:after:scale-x-100"
+            >
+              {item.title}
+            </a>
+          ))}
         </nav>
 
         {/* CTA */}
         <div className="hidden md:block">
-          <a href="#iletisim" className="btn-primary text-sm py-2.5 px-6">
+          <a href="#iletisim" className="btn-primary text-sm py-2.5 px-5">
             Görüşme Planla
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M13 6l6 6-6 6" /></svg>
           </a>
         </div>
 
         {/* Mobile Toggle */}
         <button
-          className="md:hidden p-2 text-slate-600"
+          className="md:hidden p-2 -mr-2 text-slate-700"
           onClick={() => setMobileOpen(!mobileOpen)}
-          aria-label="Menü"
+          aria-label="Menü" aria-expanded={mobileOpen}
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             {mobileOpen ? (
@@ -94,7 +93,7 @@ export function Header() {
 
       {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="md:hidden bg-white border-t border-slate-200 animate-slide-down">
+        <div className="md:hidden bg-white border-t border-b border-slate-200 animate-slide-down">
           <nav className="container py-4 flex flex-col gap-1">
             {NAV_ITEMS.map((item) => (
               <a

@@ -28,17 +28,9 @@ interface SolutionsSectionProps {
 
 function SolutionIcon({ name }: { name: string }) {
   const IconComp = CUSTOM_ICONS[name || "erp"];
-  if (IconComp) {
-    return (
-      <div className="solution-icon">
-        <div className="w-6 h-6">{IconComp}</div>
-      </div>
-    );
-  }
-  
   return (
     <div className="solution-icon">
-      <div className="text-xl flex items-center justify-center w-full h-full">{name}</div>
+      {IconComp ? <div className="w-6 h-6">{IconComp}</div> : <div className="text-xl flex items-center justify-center w-full h-full">{name}</div>}
     </div>
   );
 }
@@ -53,8 +45,8 @@ function SortableSolutionCard({ sol, index, isEditorMode, sortId, onUpdateIcon }
   };
 
   const cardVariants: Variants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+    hidden: { opacity: 0, y: 16 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: "easeOut" } },
   };
 
   return (
@@ -62,9 +54,11 @@ function SortableSolutionCard({ sol, index, isEditorMode, sortId, onUpdateIcon }
       ref={setNodeRef}
       style={style}
       variants={cardVariants}
-      whileHover={isEditorMode ? undefined : { y: -5, transition: { duration: 0.2 } }}
-      className={`card-corporate relative group ${isDragging ? 'opacity-80 scale-[1.02] shadow-2xl ring-2 ring-indigo-400' : ''} ${isEditorMode ? 'border-2 border-transparent hover:border-emerald-200/60 transition-colors' : ''}`}
+      className={`relative group h-full bg-white p-7 md:p-8 transition-colors duration-300 hover:bg-[var(--color-bg-soft)] ${isDragging ? 'opacity-80 shadow-2xl ring-2 ring-[var(--brand-blue)]' : ''} ${isEditorMode ? 'outline outline-1 outline-transparent hover:outline-emerald-300' : ''}`}
     >
+      {/* Accent bar */}
+      <span className="absolute left-0 top-0 h-[2px] w-full origin-left scale-x-0 bg-[var(--brand-blue)] transition-transform duration-500 group-hover:scale-x-100" aria-hidden="true" />
+
       {/* Drag Handle */}
       {isEditorMode && (
         <div
@@ -84,14 +78,19 @@ function SortableSolutionCard({ sol, index, isEditorMode, sortId, onUpdateIcon }
         </div>
       )}
 
-      {isEditorMode ? (
-        <IconPicker value={sol.icon_name} onChange={(iconName) => onUpdateIcon(index, iconName)} className="mb-4" />
-      ) : (
-        <SolutionIcon name={sol.icon_name} />
-      )}
-      <InlineEditable section="solutions" field="category_label" index={index} defaultValue={sol.category_label} tagName="p" className="text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-1" />
-      <InlineEditable section="solutions" field="title" index={index} defaultValue={sol.title} tagName="h3" className="text-lg font-bold text-slate-900 mb-2" />
-      <InlineEditable section="solutions" field="description" index={index} defaultValue={sol.description} tagName="p" className="text-sm text-slate-500 leading-relaxed" />
+      <div className="flex items-start justify-between mb-8">
+        {isEditorMode ? (
+          <IconPicker value={sol.icon_name} onChange={(iconName) => onUpdateIcon(index, iconName)} />
+        ) : (
+          <SolutionIcon name={sol.icon_name} />
+        )}
+        <span className="font-mono text-xs text-slate-300 group-hover:text-[var(--brand-blue)] transition-colors">
+          {String(index + 1).padStart(2, "0")}
+        </span>
+      </div>
+      <InlineEditable section="solutions" field="title" index={index} defaultValue={sol.title} tagName="h3" className="text-xl font-semibold tracking-tight text-[var(--brand-navy)] mb-2" />
+      <InlineEditable section="solutions" field="category_label" index={index} defaultValue={sol.category_label} tagName="p" className="font-mono text-[10.5px] font-medium tracking-wider text-[var(--brand-blue)] uppercase mb-4 leading-relaxed" />
+      <InlineEditable section="solutions" field="description" index={index} defaultValue={sol.description} tagName="p" className="text-[14.5px] text-slate-500 leading-relaxed" />
     </motion.div>
   );
 }
@@ -126,7 +125,7 @@ export function SolutionsSection({ solutions: initialSolutions, hero }: Solution
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.1, delayChildren: 0.2 },
+      transition: { staggerChildren: 0.08, delayChildren: 0.1 },
     },
   };
 
@@ -144,44 +143,44 @@ export function SolutionsSection({ solutions: initialSolutions, hero }: Solution
     );
   });
 
-  return (
-    <section ref={sectionRef} id="cozumler" className="py-24 grid-bg relative">
-      <div className="container">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-          {/* Left title */}
-          <motion.div 
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            className="lg:col-span-4"
-          >
-            <InlineEditable section="hero" field="solutions_label" defaultValue={hero?.solutions_label || "ÇÖZÜM ALANLARI"} tagName="p" className="section-label mb-4" />
-            <InlineEditable section="hero" field="solutions_title" defaultValue={hero?.solutions_title || "ERP içinde standart, ERP dışında esnek dijital katman."} tagName="h2" className="section-title mb-6" />
-            <InlineEditable section="hero" field="solutions_desc" defaultValue={hero?.solutions_desc || "Her süreci tek bir araca zorlamayız. Önce iş akışını ve hedeflenen değeri netleştirir, sonra çözümü doğru katmana yerleştiririz: ERP, otomasyon, AI, low-code/no-code veya özel yazılım."} tagName="p" className="text-slate-500 leading-relaxed" />
-          </motion.div>
+  const gridClass = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-slate-200 border border-slate-200 rounded-2xl overflow-hidden";
 
-          {/* Solution Cards */}
-          {isEditorMode ? (
-            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-              <SortableContext items={sortIds} strategy={rectSortingStrategy}>
-                <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-5">
-                  {solutionCards}
-                </div>
-              </SortableContext>
-            </DndContext>
-          ) : (
-            <motion.div 
-              variants={containerVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
-              className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-5"
-            >
-              {solutionCards}
-            </motion.div>
-          )}
-        </div>
+  return (
+    <section ref={sectionRef} id="cozumler" className="py-24 md:py-28 bg-white relative">
+      <div className="container">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-end mb-12 md:mb-14"
+        >
+          <div className="lg:col-span-7">
+            <InlineEditable section="hero" field="solutions_label" defaultValue={hero?.solutions_label || "ÇÖZÜM ALANLARI"} tagName="p" className="section-label mb-4" />
+            <InlineEditable section="hero" field="solutions_title" defaultValue={hero?.solutions_title || "ERP içinde standart, ERP dışında esnek dijital katman."} tagName="h2" className="section-title" />
+          </div>
+          <div className="lg:col-span-5">
+            <InlineEditable section="hero" field="solutions_desc" defaultValue={hero?.solutions_desc || ""} tagName="p" className="text-slate-500 leading-relaxed" />
+          </div>
+        </motion.div>
+
+        {isEditorMode ? (
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={sortIds} strategy={rectSortingStrategy}>
+              <div className={gridClass}>{solutionCards}</div>
+            </SortableContext>
+          </DndContext>
+        ) : (
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-80px" }}
+            className={gridClass}
+          >
+            {solutionCards}
+          </motion.div>
+        )}
       </div>
     </section>
   );
