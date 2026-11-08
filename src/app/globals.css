@@ -112,7 +112,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 0.75rem;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 500;
   letter-spacing: 0.01em;
   color: var(--ink-muted);
@@ -136,25 +136,25 @@ body {
 .section-title {
   font-family: var(--font-serif);
   font-optical-sizing: auto;
-  font-size: clamp(2.1rem, 4vw, 3.25rem);
+  font-size: clamp(1.75rem, 2.8vw, 2.4rem);
   font-weight: 400;
-  line-height: 1.08;
-  letter-spacing: -0.02em;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
   color: var(--ink);
 }
 
 .section-title-light {
   font-family: var(--font-serif);
   font-optical-sizing: auto;
-  font-size: clamp(2.1rem, 4vw, 3.25rem);
+  font-size: clamp(1.75rem, 2.8vw, 2.4rem);
   font-weight: 400;
-  line-height: 1.08;
-  letter-spacing: -0.02em;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
   color: #ffffff;
 }
 
 .lead {
-  font-size: 1.1875rem;
+  font-size: 1.0625rem;
   line-height: 1.6;
   color: var(--ink-body);
 }
@@ -169,12 +169,12 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 0.625rem;
-  padding: 0.9rem 1.5rem;
+  padding: 0.8rem 1.35rem;
   background: var(--brand-navy);
   color: #ffffff;
   border-radius: 3px;
   font-weight: 500;
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   transition: background 0.25s ease;
   border: none;
   cursor: pointer;
@@ -185,11 +185,11 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 0.625rem;
-  padding: 0.9rem 0;
+  padding: 0.6rem 0;
   background: transparent;
   color: var(--ink);
   font-weight: 500;
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   border: none;
   border-bottom: 1px solid var(--rule-strong);
   border-radius: 0;
@@ -227,7 +227,7 @@ button:focus-visible,
   border-radius: 0;
   background: transparent;
   color: var(--ink);
-  font-size: 1.0625rem;
+  font-size: 0.9875rem;
   transition: border-color 0.25s ease;
 }
 .field::placeholder { color: #a3a8b6; }
@@ -289,3 +289,28 @@ html[data-intro="playing"] .intro-overlay { display: block; }
 html[data-intro="playing"] body { overflow: hidden; }
 @keyframes intro-failsafe { to { visibility: hidden; } }
 html[data-intro="playing"] .intro-overlay { animation: intro-failsafe 0s linear 4.5s forwards; }
+
+/* Pulse travelling along the hero process line */
+@keyframes process-pulse {
+  0% { left: 0%; opacity: 0; }
+  8% { opacity: 1; }
+  92% { opacity: 1; }
+  100% { left: 100%; opacity: 0; }
+}
+.process-pulse {
+  animation: process-pulse 5s cubic-bezier(0.45, 0, 0.55, 1) 2s infinite;
+  opacity: 0;
+  box-shadow: 0 0 0 4px rgba(29, 108, 242, 0.15);
+}
+
+/* Pulse travelling down a vertical divider */
+@keyframes divider-pulse {
+  0% { top: 0%; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+.divider-pulse {
+  animation: divider-pulse 4.5s cubic-bezier(0.45, 0, 0.55, 1) 1.5s infinite;
+  opacity: 0;
+}

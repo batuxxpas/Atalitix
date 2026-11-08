@@ -35,9 +35,9 @@ const COLUMNS = [
 /** Where each need belongs: the line Atalitix draws for every client. */
 export function ErpScopeSection() {
   return (
-    <section id="kapsam" className="relative bg-[var(--paper)] py-24 md:py-36">
+    <section id="kapsam" className="relative bg-[var(--paper)] py-20 md:py-28">
       <div className="container">
-        <div className="max-w-3xl mb-16 md:mb-24">
+        <div className="max-w-3xl mb-12 md:mb-16">
           <FadeIn className="mb-6">
             <p className="section-label">Kapsam</p>
           </FadeIn>
@@ -57,18 +57,20 @@ export function ErpScopeSection() {
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 1.4, ease: [0.65, 0, 0.35, 1] }}
             aria-hidden="true"
-          />
+          >
+            <span className="divider-pulse absolute -left-[3px] h-[7px] w-[7px] rounded-full bg-[var(--brand-blue)]" />
+          </motion.div>
 
           {COLUMNS.map((col, c) => (
             <div key={col.heading} className={c === 0 ? "md:pr-14 lg:pr-20" : "mt-16 md:mt-0 md:pl-14 lg:pl-20"}>
               <FadeIn delay={0.1 + c * 0.15}>
-                <h3 className="font-serif text-[2rem] md:text-[2.4rem] leading-tight text-[var(--ink)]">
+                <h3 className="font-serif text-[1.5rem] md:text-[1.75rem] leading-tight text-[var(--ink)]">
                   {c === 1 ? <em className="text-[var(--brand-blue)]">{col.heading}</em> : col.heading}
                 </h3>
-                <p className="mt-2 text-[15px] text-[var(--ink-muted)]">{col.sub}</p>
+                <p className="mt-1.5 text-[14px] text-[var(--ink-muted)]">{col.sub}</p>
               </FadeIn>
 
-              <ul className="mt-10 border-t border-[var(--rule-strong)]">
+              <ul className="mt-8 border-t border-[var(--rule-strong)]">
                 {col.items.map((item, i) => (
                   <motion.li
                     key={item}
@@ -76,9 +78,9 @@ export function ErpScopeSection() {
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true, margin: "-40px" }}
                     transition={{ duration: 0.7, delay: 0.2 + i * 0.07 + c * 0.1, ease: EASE_OUT }}
-                    className="flex items-baseline gap-5 border-b border-[var(--rule)] py-5 text-[17px] text-[var(--ink)]"
+                    className="flex items-baseline gap-5 border-b border-[var(--rule)] py-4 text-[15.5px] text-[var(--ink)]"
                   >
-                    <span className="w-6 shrink-0 text-[13px] tabular-nums text-[var(--ink-muted)]">{String(i + 1).padStart(2, "0")}</span>
+                    <span className="w-6 shrink-0 text-[12px] tabular-nums text-[var(--ink-muted)]">{String(i + 1).padStart(2, "0")}</span>
                     {item}
                   </motion.li>
                 ))}
@@ -87,8 +89,8 @@ export function ErpScopeSection() {
           ))}
         </div>
 
-        <FadeIn delay={0.2} className="mt-16 md:mt-24 max-w-3xl">
-          <p className="font-serif text-[1.5rem] md:text-[1.85rem] leading-snug text-[var(--ink)]">
+        <FadeIn delay={0.2} className="mt-12 md:mt-16 max-w-2xl">
+          <p className="font-serif text-[1.2rem] md:text-[1.4rem] leading-snug text-[var(--ink)]">
             Sınırı her şirket için yeniden çizeriz: süreç, maliyet ve sürdürülebilirlik birlikte değerlendirilir; çözüm doğru katmana yerleşir.
           </p>
         </FadeIn>

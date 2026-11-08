@@ -22,7 +22,7 @@ export function ContactSection() {
   const label = "block text-[13px] font-medium text-[var(--ink-muted)]";
 
   return (
-    <section id="iletisim" className="relative bg-[var(--paper)] py-24 md:py-36">
+    <section id="iletisim" className="relative bg-[var(--paper)] py-20 md:py-28">
       <div className="container">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-14 lg:gap-16">
           {/* Left — intro & direct contact */}
@@ -34,25 +34,25 @@ export function ContactSection() {
               <h2 className="section-title">Görüşme planlayın.</h2>
             </InViewMask>
             <FadeIn delay={0.1}>
-              <p className="text-[16.5px] leading-relaxed text-[var(--ink-muted)] max-w-md">
+              <p className="text-[15px] leading-relaxed text-[var(--ink-muted)] max-w-md">
                 İş süreçlerinizi ve mevcut sistemlerinizi birlikte değerlendirelim; ERP ve dijitalleşme yol haritanızı netleştirelim.
               </p>
             </FadeIn>
 
-            <FadeIn delay={0.2} className="mt-14">
+            <FadeIn delay={0.2} className="mt-10">
               <dl className="border-t border-[var(--rule-strong)]">
                 <div className="border-b border-[var(--rule)] py-5">
                   <dt className="sr-only">Yetkili</dt>
-                  <dd className="font-serif text-[1.35rem] text-[var(--ink)]">Bennur Güner Yılmaz</dd>
-                  <dd className="text-[14px] text-[var(--ink-muted)] mt-1">Founder & Managing Partner</dd>
+                  <dd className="font-serif text-[1.15rem] text-[var(--ink)]">Bennur Güner Yılmaz</dd>
+                  <dd className="text-[13px] text-[var(--ink-muted)] mt-1">Founder & Managing Partner</dd>
                 </div>
                 <div className="flex items-baseline justify-between gap-6 border-b border-[var(--rule)] py-5">
                   <dt className="text-[13px] text-[var(--ink-muted)]">Telefon</dt>
-                  <dd><a href="tel:+905053752992" className="link-underline text-[16px] text-[var(--ink)]">+90 505 375 2992</a></dd>
+                  <dd><a href="tel:+905053752992" className="link-underline text-[15px] text-[var(--ink)]">+90 505 375 2992</a></dd>
                 </div>
                 <div className="flex items-baseline justify-between gap-6 border-b border-[var(--rule)] py-5">
                   <dt className="text-[13px] text-[var(--ink-muted)]">E-posta</dt>
-                  <dd className="min-w-0"><a href="mailto:bennur.yilmaz@atalitix.com" className="link-underline text-[16px] text-[var(--ink)] break-all">bennur.yilmaz@atalitix.com</a></dd>
+                  <dd className="min-w-0"><a href="mailto:bennur.yilmaz@atalitix.com" className="link-underline text-[15px] text-[var(--ink)] break-all">bennur.yilmaz@atalitix.com</a></dd>
                 </div>
               </dl>
             </FadeIn>

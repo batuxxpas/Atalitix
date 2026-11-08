@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { motion, Variants, useInView } from "framer-motion";
 import { InlineEditable, useEditor } from "@/components/editor";
 import { useIntroReady, MaskLine } from "@/components/motion";
+import { ErpModuleMap } from "@/components/ui";
 
 interface ProcessStep {
   step_number: number;
@@ -61,61 +62,69 @@ export function HeroSection({ hero, processSteps: initialSteps }: HeroSectionPro
 
   return (
     <section className="relative bg-white">
-      <div className="container pt-16 md:pt-24 lg:pt-28">
-        {/* Eyebrow */}
-        <motion.div {...anim(0.05)} className="mb-10 md:mb-14">
-          <span className="section-label">
-            <InlineEditable section="hero" field="badge_text" defaultValue={hero.badge_text} tagName="span" />
-          </span>
-        </motion.div>
+      <div className="container pt-12 md:pt-16 lg:pt-20">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-center">
+          {/* Left — copy */}
+          <div className="lg:col-span-6">
+            <motion.div {...anim(0.05)} className="mb-8">
+              <span className="section-label">
+                <InlineEditable section="hero" field="badge_text" defaultValue={hero.badge_text} tagName="span" />
+              </span>
+            </motion.div>
 
-        {/* Headline */}
-        <h1 className="display text-[2.9rem] sm:text-[4rem] lg:text-[5.6rem] max-w-5xl">
-          <MaskLine show={show} delay={0.1} instant={isEditorMode}>
-            <InlineEditable section="hero" field="title_line1" defaultValue={hero.title_line1} tagName="span" />
-          </MaskLine>
-          <MaskLine show={show} delay={0.2} instant={isEditorMode}>
-            <InlineEditable section="hero" field="title_line2" defaultValue={hero.title_line2} tagName="span" />{" "}
-            <InlineEditable section="hero" field="title_highlight" defaultValue={hero.title_highlight} tagName="span" className="italic text-[var(--brand-blue)]" />
-            <InlineEditable section="hero" field="title_line3" defaultValue={hero.title_line3} tagName="span" />
-          </MaskLine>
-          <MaskLine show={show} delay={0.3} instant={isEditorMode}>
-            <InlineEditable section="hero" field="title_line4" defaultValue={hero.title_line4} tagName="span" />
-          </MaskLine>
-        </h1>
+            <h1 className="display text-[2.4rem] sm:text-[3rem] lg:text-[3.6rem]">
+              <MaskLine show={show} delay={0.1} instant={isEditorMode}>
+                <InlineEditable section="hero" field="title_line1" defaultValue={hero.title_line1} tagName="span" />
+              </MaskLine>
+              <MaskLine show={show} delay={0.2} instant={isEditorMode}>
+                <InlineEditable section="hero" field="title_line2" defaultValue={hero.title_line2} tagName="span" />{" "}
+                <InlineEditable section="hero" field="title_highlight" defaultValue={hero.title_highlight} tagName="span" className="italic text-[var(--brand-blue)]" />
+                <InlineEditable section="hero" field="title_line3" defaultValue={hero.title_line3} tagName="span" />
+              </MaskLine>
+              <MaskLine show={show} delay={0.3} instant={isEditorMode}>
+                <InlineEditable section="hero" field="title_line4" defaultValue={hero.title_line4} tagName="span" />
+              </MaskLine>
+            </h1>
 
-        {/* Rule */}
-        <motion.div
-          className="mt-14 md:mt-20 h-px origin-left bg-[var(--rule)]"
-          initial={isEditorMode ? false : { scaleX: 0 }}
-          animate={show ? { scaleX: 1 } : { scaleX: 0 }}
-          transition={{ duration: 1.3, delay: 0.45, ease: [0.65, 0, 0.35, 1] }}
-        />
+            <motion.div
+              className="mt-8 mb-8 h-px max-w-md origin-left bg-[var(--rule)]"
+              initial={isEditorMode ? false : { scaleX: 0 }}
+              animate={show ? { scaleX: 1 } : { scaleX: 0 }}
+              transition={{ duration: 1.2, delay: 0.45, ease: [0.65, 0, 0.35, 1] }}
+            />
 
-        {/* Copy + actions */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 pt-10 md:pt-12">
-          <motion.div {...anim(0.6)} className="lg:col-span-5">
-            <InlineEditable section="hero" field="description" defaultValue={hero.description} tagName="p" className="lead" />
-          </motion.div>
-          <motion.div {...anim(0.7)} className="lg:col-span-4">
-            <InlineEditable section="hero" field="description2" defaultValue={hero.description2} tagName="p" className="text-[15.5px] leading-relaxed text-[var(--ink-muted)]" />
-          </motion.div>
-          <motion.div {...anim(0.8)} className="lg:col-span-3 flex flex-col items-start gap-5">
-            <a href="#cozumler" onClick={(e) => isEditorMode && e.preventDefault()} className="btn-primary">
-              <InlineEditable section="hero" field="cta_primary_text" defaultValue={hero.cta_primary_text} tagName="span" />
-            </a>
-            <a href="#deneyim" onClick={(e) => isEditorMode && e.preventDefault()} className="btn-outline">
-              <InlineEditable section="hero" field="cta_secondary_text" defaultValue={hero.cta_secondary_text} tagName="span" />
-            </a>
+            <motion.div {...anim(0.55)} className="max-w-xl space-y-4">
+              <InlineEditable section="hero" field="description" defaultValue={hero.description} tagName="p" className="lead" />
+              <InlineEditable section="hero" field="description2" defaultValue={hero.description2} tagName="p" className="text-[14.5px] leading-relaxed text-[var(--ink-muted)]" />
+            </motion.div>
+
+            <motion.div {...anim(0.7)} className="mt-9 flex flex-wrap items-center gap-x-8 gap-y-4">
+              <a href="#cozumler" onClick={(e) => isEditorMode && e.preventDefault()} className="btn-primary">
+                <InlineEditable section="hero" field="cta_primary_text" defaultValue={hero.cta_primary_text} tagName="span" />
+              </a>
+              <a href="#deneyim" onClick={(e) => isEditorMode && e.preventDefault()} className="btn-outline">
+                <InlineEditable section="hero" field="cta_secondary_text" defaultValue={hero.cta_secondary_text} tagName="span" />
+              </a>
+            </motion.div>
+          </div>
+
+          {/* Right — ERP module map */}
+          <motion.div
+            className="lg:col-span-6"
+            initial={isEditorMode ? false : { opacity: 0 }}
+            animate={show ? { opacity: 1 } : { opacity: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
+            <ErpModuleMap play={show} />
           </motion.div>
         </div>
       </div>
 
       {/* Process line — the operating map, drawn as a single line */}
-      <div className="container pt-24 md:pt-32 pb-24 md:pb-28">
+      <div className="container pt-20 md:pt-24 pb-20 md:pb-24">
         <motion.div {...anim(0.9)} className="flex flex-col md:flex-row md:items-baseline md:justify-between gap-2 mb-10 md:mb-12">
-          <InlineEditable section="hero" field="map_title" defaultValue={hero.map_title} tagName="p" className="font-serif text-2xl md:text-[1.75rem] text-[var(--ink)]" />
-          <InlineEditable section="hero" field="map_badge" defaultValue={hero.map_badge} tagName="p" className="text-sm tracking-[0.08em] uppercase text-[var(--ink-muted)]" />
+          <InlineEditable section="hero" field="map_title" defaultValue={hero.map_title} tagName="p" className="font-serif text-xl md:text-[1.4rem] text-[var(--ink)]" />
+          <InlineEditable section="hero" field="map_badge" defaultValue={hero.map_badge} tagName="p" className="text-[12px] tracking-[0.1em] uppercase text-[var(--ink-muted)]" />
         </motion.div>
         <ProcessLine steps={steps} play={show} instant={isEditorMode} />
       </div>
@@ -142,6 +151,10 @@ function ProcessLine({ steps, play, instant }: { steps: ProcessStep[]; play: boo
         className="hidden md:block absolute left-0 right-0 top-[7px] h-px origin-left bg-[var(--rule-strong)]"
         variants={{ hidden: { scaleX: 0 }, visible: { scaleX: 1, transition: { duration: 1.6, ease: [0.65, 0, 0.35, 1] } } }}
       />
+      {/* Travelling pulse once the line is drawn */}
+      {!instant && play && inView && (
+        <span className="process-pulse hidden md:block absolute top-[4px] left-0 h-[7px] w-[7px] rounded-full bg-[var(--brand-blue)]" aria-hidden="true" />
+      )}
       {/* Vertical line (mobile) */}
       <motion.div
         className="md:hidden absolute left-[7px] top-2 bottom-2 w-px origin-top bg-[var(--rule-strong)]"
@@ -168,8 +181,8 @@ function ProcessLine({ steps, play, instant }: { steps: ProcessStep[]; play: boo
                 variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0, transition: { delay: delay + 0.1, duration: 0.8, ease: EASE_OUT } } }}
               >
                 <p className="text-[13px] text-[var(--ink-muted)] mb-2 tabular-nums">{String(step.step_number ?? i + 1).padStart(2, "0")}</p>
-                <InlineEditable section="processSteps" field="title" index={i} defaultValue={step.title} tagName="h3" className="font-serif text-[1.5rem] leading-tight text-[var(--ink)] mb-3" />
-                <InlineEditable section="processSteps" field="description" index={i} defaultValue={step.description} tagName="p" className="text-[15px] leading-relaxed text-[var(--ink-muted)]" />
+                <InlineEditable section="processSteps" field="title" index={i} defaultValue={step.title} tagName="h3" className="font-serif text-[1.2rem] leading-tight text-[var(--ink)] mb-2" />
+                <InlineEditable section="processSteps" field="description" index={i} defaultValue={step.description} tagName="p" className="text-[14px] leading-relaxed text-[var(--ink-muted)]" />
               </motion.div>
             </li>
           );

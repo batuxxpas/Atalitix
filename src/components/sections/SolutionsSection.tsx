@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { InlineEditable, useEditor } from "@/components/editor";
+import { InlineEditable, useEditor, CUSTOM_ICONS } from "@/components/editor";
 import {
   DndContext, closestCenter, PointerSensor, KeyboardSensor,
   useSensor, useSensors, type DragEndEvent
@@ -73,26 +73,31 @@ function SolutionRow({ sol, index, isEditorMode, sortId }: { sol: Solution; inde
       {isEditorMode && <DragHandle {...attributes} {...listeners} />}
 
       <motion.div
-        className="grid grid-cols-12 gap-x-6 gap-y-3 py-9 md:py-11"
+        className="grid grid-cols-12 gap-x-6 gap-y-3 py-7 md:py-8"
         variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, delay: 0.15, ease: EASE_OUT } } }}
       >
-        <span className="col-span-2 md:col-span-1 pt-2 text-sm tabular-nums text-[var(--ink-muted)] transition-colors group-hover:text-[var(--brand-blue)]">
+        <span className="col-span-2 md:col-span-1 pt-1.5 text-[13px] tabular-nums text-[var(--ink-muted)] transition-colors group-hover:text-[var(--brand-blue)]">
           {String(index + 1).padStart(2, "0")}
         </span>
-        <div className="col-span-10 md:col-span-5">
+        <div className="col-span-10 md:col-span-5 flex items-start gap-4">
+          {CUSTOM_ICONS[sol.icon_name] && (
+            <span className="mt-0.5 h-6 w-6 shrink-0 text-[var(--ink-muted)] transition-all duration-500 group-hover:text-[var(--brand-blue)] group-hover:-rotate-6" aria-hidden="true">
+              {CUSTOM_ICONS[sol.icon_name]}
+            </span>
+          )}
           <InlineEditable
             section="solutions" field="title" index={index} defaultValue={sol.title} tagName="h3"
-            className="font-serif text-[1.85rem] md:text-[2.25rem] leading-[1.1] tracking-[-0.015em] text-[var(--ink)] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] md:group-hover:translate-x-2"
+            className="font-serif text-[1.4rem] md:text-[1.55rem] leading-[1.2] tracking-[-0.01em] text-[var(--ink)] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] md:group-hover:translate-x-1.5"
           />
         </div>
-        <div className="col-span-10 col-start-3 md:col-span-6 md:col-start-auto md:pt-2">
+        <div className="col-span-10 col-start-3 md:col-span-6 md:col-start-auto md:pt-1">
           <InlineEditable
             section="solutions" field="category_label" index={index} defaultValue={sol.category_label} tagName="p"
-            className="text-[12px] font-medium tracking-[0.08em] uppercase text-[var(--brand-navy-700)] mb-3"
+            className="text-[11px] font-medium tracking-[0.09em] uppercase text-[var(--brand-navy-700)] mb-2"
           />
           <InlineEditable
             section="solutions" field="description" index={index} defaultValue={sol.description} tagName="p"
-            className="text-[16px] leading-relaxed text-[var(--ink-body)] max-w-xl"
+            className="text-[15px] leading-relaxed text-[var(--ink-body)] max-w-xl"
           />
         </div>
       </motion.div>
@@ -127,9 +132,9 @@ export function SolutionsSection({ solutions: initialSolutions, hero }: Solution
   const list = <ul className="border-b border-[var(--rule)]">{rows}</ul>;
 
   return (
-    <section id="cozumler" className="relative bg-white py-24 md:py-36">
+    <section id="cozumler" className="relative bg-white py-20 md:py-28">
       <div className="container">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 mb-16 md:mb-20">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 mb-12 md:mb-16">
           <div className="lg:col-span-7">
             <FadeIn instant={isEditorMode} className="mb-6">
               <InlineEditable section="hero" field="solutions_label" defaultValue={hero?.solutions_label || "ÇÖZÜM ALANLARI"} tagName="p" className="section-label" />
@@ -138,8 +143,8 @@ export function SolutionsSection({ solutions: initialSolutions, hero }: Solution
               <InlineEditable section="hero" field="solutions_title" defaultValue={hero?.solutions_title || ""} tagName="h2" className="section-title" />
             </InViewMask>
           </div>
-          <FadeIn instant={isEditorMode} delay={0.15} className="lg:col-span-5 lg:pt-14">
-            <InlineEditable section="hero" field="solutions_desc" defaultValue={hero?.solutions_desc || ""} tagName="p" className="text-[16.5px] leading-relaxed text-[var(--ink-muted)]" />
+          <FadeIn instant={isEditorMode} delay={0.15} className="lg:col-span-5 lg:pt-12">
+            <InlineEditable section="hero" field="solutions_desc" defaultValue={hero?.solutions_desc || ""} tagName="p" className="text-[15px] leading-relaxed text-[var(--ink-muted)]" />
           </FadeIn>
         </div>
 

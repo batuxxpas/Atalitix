@@ -5,3 +5,4 @@ export { Badge } from "./Badge";
 export { Avatar } from "./Avatar";
 export { Spinner, PageLoader } from "./Spinner";
 export { ScrollToTop } from "./ScrollToTop";
+export { ErpModuleMap } from "./ErpModuleMap";

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useScroll, useSpring } from "framer-motion";
 import { InlineEditable, useEditor } from "@/components/editor";
 import {
   DndContext, closestCenter, PointerSensor, KeyboardSensor,
@@ -100,15 +100,15 @@ function ApproachRow({ step, index, isEditorMode, sortId }: { step: ApproachStep
       whileInView={{ opacity: 1 }}
       viewport={{ once: false, margin: "-38% 0px -38% 0px" }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="group relative grid grid-cols-12 gap-x-6 border-t border-white/15 py-10 md:py-12"
+      className="group relative grid grid-cols-12 gap-x-6 border-t border-white/15 py-7 md:py-8"
     >
       {isEditorMode && <DragHandle dark {...attributes} {...listeners} />}
-      <span className="col-span-2 font-serif text-[2rem] md:text-[2.6rem] leading-none text-[var(--brand-blue-400)] tabular-nums">
+      <span className="col-span-2 font-serif text-[1.5rem] md:text-[1.75rem] leading-none text-[var(--brand-blue-400)] tabular-nums">
         {String(index + 1).padStart(2, "0")}
       </span>
       <div className="col-span-10 pr-8">
-        <InlineEditable section="approachSteps" field="title" index={index} defaultValue={step.title} tagName="h3" className="font-serif text-[1.65rem] md:text-[2rem] leading-tight text-white mb-3" />
-        <InlineEditable section="approachSteps" field="description" index={index} defaultValue={step.description} tagName="p" className="text-[16px] leading-relaxed text-slate-300/90 max-w-xl" />
+        <InlineEditable section="approachSteps" field="title" index={index} defaultValue={step.title} tagName="h3" className="font-serif text-[1.3rem] md:text-[1.45rem] leading-tight text-white mb-2" />
+        <InlineEditable section="approachSteps" field="description" index={index} defaultValue={step.description} tagName="p" className="text-[15px] leading-relaxed text-slate-300/90 max-w-xl" />
       </div>
     </motion.li>
   );
@@ -126,11 +126,11 @@ function ExperienceRow({ item, index, isEditorMode, sortId }: { item: Experience
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.8, delay: index * 0.08, ease: EASE_OUT }}
-      className={`group relative flex items-baseline gap-6 border-b border-[var(--rule)] py-7 ${isDragging ? "bg-white shadow-xl" : ""}`}
+      className={`group relative flex items-baseline gap-6 border-b border-[var(--rule)] py-5 ${isDragging ? "bg-white shadow-xl" : ""}`}
     >
       {isEditorMode && <DragHandle {...attributes} {...listeners} />}
       <span className="h-px w-6 shrink-0 translate-y-[-0.3em] bg-[var(--brand-blue)]" aria-hidden="true" />
-      <InlineEditable section="experienceItems" field="title" index={index} defaultValue={item.title} tagName="p" className="font-serif text-[1.35rem] md:text-[1.5rem] leading-snug text-[var(--ink)] pr-8" />
+      <InlineEditable section="experienceItems" field="title" index={index} defaultValue={item.title} tagName="p" className="font-serif text-[1.1rem] md:text-[1.2rem] leading-snug text-[var(--ink)] pr-8" />
     </motion.li>
   );
 }
@@ -166,6 +166,10 @@ export function ApproachSection({ approachSteps: initialApproach, experienceItem
     reorderData("experienceItems", arrayMove(activeExperience, oldIdx, newIdx));
   };
 
+  const railRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: railP } = useScroll({ target: railRef, offset: ["start 65%", "end 55%"] });
+  const railFill = useSpring(railP, { stiffness: 120, damping: 30, mass: 0.4 });
+
   const approachList = (
     <ol className="border-b border-white/15">
       {activeApproach.map((step, index) => (
@@ -185,7 +189,7 @@ export function ApproachSection({ approachSteps: initialApproach, experienceItem
   return (
     <>
       {/* Approach — full-bleed navy */}
-      <section id="yaklasim" className="relative bg-[var(--brand-navy-900)] text-white py-24 md:py-36">
+      <section id="yaklasim" className="relative bg-[var(--brand-navy-900)] text-white py-20 md:py-28">
         <div className="container">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
             <div className="lg:col-span-5">
@@ -197,12 +201,16 @@ export function ApproachSection({ approachSteps: initialApproach, experienceItem
                   <InlineEditable section="hero" field="approach_title" defaultValue={hero?.approach_title || ""} tagName="h2" className="section-title-light" />
                 </InViewMask>
                 <FadeIn instant={isEditorMode} delay={0.15} className="mt-8">
-                  <InlineEditable section="hero" field="approach_desc" defaultValue={hero?.approach_desc || ""} tagName="p" className="text-[16.5px] leading-relaxed text-slate-300/80" />
+                  <InlineEditable section="hero" field="approach_desc" defaultValue={hero?.approach_desc || ""} tagName="p" className="text-[15px] leading-relaxed text-slate-300/80" />
                 </FadeIn>
               </div>
             </div>
 
-            <div className="lg:col-span-7">
+            <div ref={railRef} className="lg:col-span-7 relative md:pl-10">
+              {/* Progress rail fills as the steps are read */}
+              <div className="hidden md:block absolute left-0 top-0 bottom-0 w-px bg-white/10" aria-hidden="true">
+                <motion.div className="h-full w-full origin-top bg-[var(--brand-blue)]" style={{ scaleY: isEditorMode ? 1 : railFill }} />
+              </div>
               {isEditorMode ? (
                 <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleApproachDragEnd}>
                   <SortableContext items={approachIds} strategy={verticalListSortingStrategy}>
@@ -218,30 +226,30 @@ export function ApproachSection({ approachSteps: initialApproach, experienceItem
       </section>
 
       {/* Experience */}
-      <section id="deneyim" className="relative bg-white py-24 md:py-36">
+      <section id="deneyim" className="relative bg-white py-20 md:py-28">
         <div className="container">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
             <div className="lg:col-span-5">
               <FadeIn instant={isEditorMode} className="mb-8">
                 <p className="section-label">Deneyim</p>
               </FadeIn>
-              <div className="display flex items-start text-[7rem] md:text-[10rem] leading-[0.85] mb-8">
+              <div className="display flex items-start text-[5rem] md:text-[6.5rem] leading-[0.9] mb-6">
                 {isEditorMode ? (
                   <InlineEditable section="hero" field="experience_years" defaultValue={hero?.experience_years || "20"} tagName="span" />
                 ) : (
                   <AnimatedCounter from={0} to={parseInt(hero?.experience_years || "20") || 20} />
                 )}
-                <span className="text-[var(--brand-blue)] text-[4rem] md:text-[5.5rem] ml-1">+</span>
+                <span className="text-[var(--brand-blue)] text-[3rem] md:text-[3.75rem] ml-1">+</span>
               </div>
               <InViewMask instant={isEditorMode} className="mb-6">
-                <InlineEditable section="hero" field="experience_title" defaultValue={hero?.experience_title || ""} tagName="h2" className="font-serif text-[1.75rem] md:text-[2.1rem] leading-snug text-[var(--ink)]" />
+                <InlineEditable section="hero" field="experience_title" defaultValue={hero?.experience_title || ""} tagName="h2" className="font-serif text-[1.4rem] md:text-[1.6rem] leading-snug text-[var(--ink)]" />
               </InViewMask>
               <FadeIn instant={isEditorMode} delay={0.1}>
-                <InlineEditable section="hero" field="experience_desc" defaultValue={hero?.experience_desc || ""} tagName="p" className="text-[16.5px] leading-relaxed text-[var(--ink-muted)]" />
+                <InlineEditable section="hero" field="experience_desc" defaultValue={hero?.experience_desc || ""} tagName="p" className="text-[15px] leading-relaxed text-[var(--ink-muted)]" />
               </FadeIn>
             </div>
 
-            <div className="lg:col-span-7 lg:pt-24">
+            <div className="lg:col-span-7 lg:pt-16">
               {isEditorMode ? (
                 <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleExperienceDragEnd}>
                   <SortableContext items={experienceIds} strategy={verticalListSortingStrategy}>
