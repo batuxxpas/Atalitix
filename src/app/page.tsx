@@ -1,5 +1,6 @@
 import { Header, Footer } from "@/components/layout";
-import { HeroSection, TechTagsBar, SolutionsSection, ApproachSection, ContactSection } from "@/components/sections";
+import { HeroSection, SolutionsSection, ApproachSection, ContactSection, CapabilityMarquee, EngineeringSection } from "@/components/sections";
+import { IntroLoader, ScrollProgress, INTRO_BOOT_SCRIPT } from "@/components/motion";
 import { createClient } from "@/lib/supabase/server";
 import { SITE_CONFIG } from "@/lib/constants";
 
@@ -19,14 +20,11 @@ export default async function HomePage() {
     (supabase.from("deneyim_maddeleri") as any).select("*").eq("is_active", true).order("sort_order"),
   ]);
 
-  console.log("Supabase Fetch Results (hero):", results[0]);
-  console.log("Supabase Fetch Results (processSteps):", results[1]);
-
   const [
     { data: hero },
     { data: processSteps },
     { data: processCategories },
-    { data: techTags },
+    , // teknoloji_etiketleri (şu an gösterilmiyor)
     { data: solutions },
     { data: approachSteps },
     { data: experienceItems },
@@ -109,6 +107,11 @@ export default async function HomePage() {
         }}
       />
 
+      {/* Decide before first paint whether the intro plays (first visit per session) */}
+      <script dangerouslySetInnerHTML={{ __html: INTRO_BOOT_SCRIPT }} />
+      <IntroLoader />
+      <ScrollProgress />
+
       <Header />
       <main className="pt-20">
         {hero && (
@@ -119,9 +122,11 @@ export default async function HomePage() {
           />
         )}
         
-        {/* {techTags && techTags.length > 0 && <TechTagsBar tags={techTags} />} */}
-        
+        <CapabilityMarquee />
+
         {solutions && solutions.length > 0 && <SolutionsSection solutions={solutions} hero={hero} />}
+
+        <EngineeringSection />
         
         {approachSteps && experienceItems && (
           <ApproachSection

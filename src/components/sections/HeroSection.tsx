@@ -3,6 +3,7 @@
 import { AtalitixGraphicMap } from "@/components/ui";
 import { motion, Variants } from "framer-motion";
 import { InlineEditable, useEditor } from "@/components/editor";
+import { useIntroReady, MaskLine, Magnetic } from "@/components/motion";
 
 interface ProcessStep {
   step_number: number;
@@ -42,11 +43,13 @@ interface HeroSectionProps {
 
 export function HeroSection({ hero, processSteps }: HeroSectionProps) {
   const { isEditorMode } = useEditor();
+  const introReady = useIntroReady();
+  const show = isEditorMode || introReady;
   const years = parseInt(hero?.experience_years || "20") || 20;
 
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.05 } },
+    visible: { opacity: 1, transition: { staggerChildren: 0.09, delayChildren: 0.45 } },
   };
 
   const itemVariants: Variants = {
@@ -78,8 +81,8 @@ export function HeroSection({ hero, processSteps }: HeroSectionProps) {
           {/* Left — copy */}
           <motion.div
             variants={containerVariants}
-            initial="hidden"
-            animate="visible"
+            initial={isEditorMode ? false : "hidden"}
+            animate={show ? "visible" : "hidden"}
             className="lg:col-span-6 flex flex-col"
           >
             <motion.div variants={itemVariants} className="mb-7">
@@ -95,18 +98,19 @@ export function HeroSection({ hero, processSteps }: HeroSectionProps) {
               </span>
             </motion.div>
 
-            <motion.h1
-              variants={itemVariants}
-              className="text-[2.6rem] sm:text-5xl lg:text-[3.6rem] font-bold leading-[1.05] tracking-[-0.03em] text-[var(--brand-navy)] mb-7"
-            >
-              <InlineEditable section="hero" field="title_line1" defaultValue={hero.title_line1} tagName="span" />
-              <br />
-              <InlineEditable section="hero" field="title_line2" defaultValue={hero.title_line2} tagName="span" />{" "}
-              <InlineEditable section="hero" field="title_highlight" defaultValue={hero.title_highlight} tagName="span" className="text-[var(--brand-blue)]" />
-              <InlineEditable section="hero" field="title_line3" defaultValue={hero.title_line3} tagName="span" />
-              <br />
-              <InlineEditable section="hero" field="title_line4" defaultValue={hero.title_line4} tagName="span" />
-            </motion.h1>
+            <h1 className="text-[2.6rem] sm:text-5xl lg:text-[3.6rem] font-bold leading-[1.05] tracking-[-0.03em] text-[var(--brand-navy)] mb-7">
+              <MaskLine show={show} delay={0} instant={isEditorMode}>
+                <InlineEditable section="hero" field="title_line1" defaultValue={hero.title_line1} tagName="span" />
+              </MaskLine>
+              <MaskLine show={show} delay={0.08} instant={isEditorMode}>
+                <InlineEditable section="hero" field="title_line2" defaultValue={hero.title_line2} tagName="span" />{" "}
+                <InlineEditable section="hero" field="title_highlight" defaultValue={hero.title_highlight} tagName="span" className="text-[var(--brand-blue)]" />
+                <InlineEditable section="hero" field="title_line3" defaultValue={hero.title_line3} tagName="span" />
+              </MaskLine>
+              <MaskLine show={show} delay={0.16} instant={isEditorMode}>
+                <InlineEditable section="hero" field="title_line4" defaultValue={hero.title_line4} tagName="span" />
+              </MaskLine>
+            </h1>
 
             <motion.div variants={itemVariants} className="max-w-xl space-y-3 mb-8">
               <InlineEditable section="hero" field="description" defaultValue={hero.description} tagName="p" className="text-[17px] text-slate-600 leading-relaxed" />
@@ -114,12 +118,16 @@ export function HeroSection({ hero, processSteps }: HeroSectionProps) {
             </motion.div>
 
             <motion.div variants={itemVariants} className="flex flex-wrap items-center gap-3 mb-10">
-              <a href="#cozumler" onClick={(e) => isEditorMode && e.preventDefault()} className="btn-primary">
-                <InlineEditable section="hero" field="cta_primary_text" defaultValue={hero.cta_primary_text} tagName="span" />
-              </a>
-              <a href="#deneyim" onClick={(e) => isEditorMode && e.preventDefault()} className="btn-outline">
-                <InlineEditable section="hero" field="cta_secondary_text" defaultValue={hero.cta_secondary_text} tagName="span" />
-              </a>
+              <Magnetic>
+                <a href="#cozumler" onClick={(e) => isEditorMode && e.preventDefault()} className="btn-primary">
+                  <InlineEditable section="hero" field="cta_primary_text" defaultValue={hero.cta_primary_text} tagName="span" />
+                </a>
+              </Magnetic>
+              <Magnetic>
+                <a href="#deneyim" onClick={(e) => isEditorMode && e.preventDefault()} className="btn-outline">
+                  <InlineEditable section="hero" field="cta_secondary_text" defaultValue={hero.cta_secondary_text} tagName="span" />
+                </a>
+              </Magnetic>
             </motion.div>
 
             <motion.div variants={itemVariants} className="border-l-2 border-[var(--brand-blue)] pl-4">
@@ -130,21 +138,20 @@ export function HeroSection({ hero, processSteps }: HeroSectionProps) {
 
           {/* Right — architecture diagram */}
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.2, ease: [0.21, 0.47, 0.32, 0.98] }}
+            initial={isEditorMode ? false : { opacity: 0, y: 40, scale: 0.98 }}
+            animate={show ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 40, scale: 0.98 }}
+            transition={{ duration: 1, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
             className="lg:col-span-6"
           >
-            <AtalitixGraphicMap steps={processSteps} mapTitle={hero.map_title} mapBadge={hero.map_badge} />
+            <AtalitixGraphicMap steps={processSteps} mapTitle={hero.map_title} mapBadge={hero.map_badge} play={show} />
           </motion.div>
         </div>
 
         {/* Highlights strip */}
         <motion.dl
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
+          initial={isEditorMode ? false : { opacity: 0, y: 24 }}
+          animate={show ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
+          transition={{ duration: 0.8, delay: 0.9, ease: [0.22, 1, 0.36, 1] }}
           className="mt-16 md:mt-20 grid grid-cols-2 lg:grid-cols-4 rounded-xl border border-slate-200 bg-white overflow-hidden"
         >
           {highlights.map((h, i) => (

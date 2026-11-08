@@ -12,6 +12,7 @@ import {
   arrayMove, sortableKeyboardCoordinates
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { InViewMask } from "@/components/motion";
 
 interface Solution {
   id?: string | number;
@@ -143,7 +144,18 @@ export function SolutionsSection({ solutions: initialSolutions, hero }: Solution
     );
   });
 
-  const gridClass = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-slate-200 border border-slate-200 rounded-2xl overflow-hidden";
+  const gridClass = "spotlight-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px border border-slate-200 rounded-2xl overflow-hidden";
+
+  // Light up the 1px gaps around the cursor
+  const onGridMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    e.currentTarget.style.setProperty("--mx", `${e.clientX - r.left}px`);
+    e.currentTarget.style.setProperty("--my", `${e.clientY - r.top}px`);
+  };
+  const onGridLeave = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.currentTarget.style.setProperty("--mx", "-500px");
+    e.currentTarget.style.setProperty("--my", "-500px");
+  };
 
   return (
     <section ref={sectionRef} id="cozumler" className="py-24 md:py-28 bg-white relative">
@@ -157,7 +169,9 @@ export function SolutionsSection({ solutions: initialSolutions, hero }: Solution
         >
           <div className="lg:col-span-7">
             <InlineEditable section="hero" field="solutions_label" defaultValue={hero?.solutions_label || "ÇÖZÜM ALANLARI"} tagName="p" className="section-label mb-4" />
-            <InlineEditable section="hero" field="solutions_title" defaultValue={hero?.solutions_title || "ERP içinde standart, ERP dışında esnek dijital katman."} tagName="h2" className="section-title" />
+            <InViewMask instant={isEditorMode}>
+              <InlineEditable section="hero" field="solutions_title" defaultValue={hero?.solutions_title || "ERP içinde standart, ERP dışında esnek dijital katman."} tagName="h2" className="section-title" />
+            </InViewMask>
           </div>
           <div className="lg:col-span-5">
             <InlineEditable section="hero" field="solutions_desc" defaultValue={hero?.solutions_desc || ""} tagName="p" className="text-slate-500 leading-relaxed" />
@@ -177,6 +191,8 @@ export function SolutionsSection({ solutions: initialSolutions, hero }: Solution
             whileInView="visible"
             viewport={{ once: true, margin: "-80px" }}
             className={gridClass}
+            onMouseMove={onGridMove}
+            onMouseLeave={onGridLeave}
           >
             {solutionCards}
           </motion.div>

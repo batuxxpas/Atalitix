@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useRef, useEffect, useState } from "react";
-import { motion, Variants } from "framer-motion";
+import { motion, Variants, useScroll, useTransform, useMotionValueEvent, useSpring } from "framer-motion";
+import { InViewMask } from "@/components/motion";
 import { InlineEditable, useEditor } from "@/components/editor";
 import {
   DndContext, closestCenter, PointerSensor, KeyboardSensor,
@@ -67,7 +68,7 @@ interface ApproachSectionProps {
   hero?: any;
 }
 
-function SortableApproachCard({ step, index, total, isEditorMode, sortId }: { step: ApproachStep; index: number; total: number; isEditorMode: boolean; sortId: string }) {
+function SortableApproachCard({ step, index, isEditorMode, sortId, active }: { step: ApproachStep; index: number; isEditorMode: boolean; sortId: string; active: boolean }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: sortId });
 
   const style: React.CSSProperties = {
@@ -81,14 +82,13 @@ function SortableApproachCard({ step, index, total, isEditorMode, sortId }: { st
     visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
   };
 
-  const isLast = index === total - 1;
 
   return (
     <motion.div
       ref={setNodeRef}
       style={style}
       variants={variants}
-      className={`relative group ${isDragging ? 'opacity-80 ring-2 ring-[var(--brand-blue-400)] rounded-xl' : ''}`}
+      className={`relative group flex gap-5 lg:block ${isDragging ? 'opacity-80 ring-2 ring-[var(--brand-blue-400)] rounded-xl' : ''}`}
     >
       {isEditorMode && (
         <div
@@ -104,14 +104,19 @@ function SortableApproachCard({ step, index, total, isEditorMode, sortId }: { st
           </svg>
         </div>
       )}
-      {/* Marker + connector line */}
-      <div className="flex items-center mb-5">
-        <div className="step-circle-light">{String(index + 1).padStart(2, "0")}</div>
-        {!isLast && (
-          <div className="hidden lg:block flex-1 h-px ml-3 bg-gradient-to-r from-[var(--brand-blue-400)]/70 to-white/10" aria-hidden="true" />
-        )}
+      {/* Marker — sits on the progress track */}
+      <div className="relative z-10 shrink-0 lg:mb-6">
+        <div
+          className={`flex h-10 w-10 items-center justify-center rounded-[0.625rem] font-mono text-[13px] font-medium transition-all duration-500 ${
+            active
+              ? "bg-[var(--brand-blue)] text-white shadow-[0_0_0_6px_rgba(29,108,242,0.18)]"
+              : "bg-[var(--brand-navy-900)] text-slate-500 border border-white/15"
+          }`}
+        >
+          {String(index + 1).padStart(2, "0")}
+        </div>
       </div>
-      <div className="pr-4">
+      <div className={`pr-4 pb-2 transition-opacity duration-500 ${active ? "opacity-100" : "opacity-45"}`}>
         <InlineEditable section="approachSteps" field="title" index={index} defaultValue={step.title} tagName="h3" className="text-lg font-semibold text-white mb-2" />
         <InlineEditable section="approachSteps" field="description" index={index} defaultValue={step.description} tagName="p" className="text-sm text-slate-400 leading-relaxed" />
       </div>
@@ -163,11 +168,28 @@ function SortableExperienceCard({ item, index, isEditorMode, sortId }: { item: E
 }
 
 export function ApproachSection({ approachSteps: initialApproach, experienceItems: initialExperience, hero }: ApproachSectionProps) {
-  const sectionRef = useRef<HTMLElement>(null);
   const { isEditorMode, data, reorderData } = useEditor();
 
   const activeApproach = isEditorMode && data?.approachSteps ? data.approachSteps : initialApproach;
   const activeExperience = isEditorMode && data?.experienceItems ? data.experienceItems : initialExperience;
+
+  // Dark panel expands from an inset card to full-bleed as it scrolls in
+  const panelRef = useRef<HTMLElement>(null);
+  const { scrollYProgress: panelP } = useScroll({ target: panelRef, offset: ["start end", "start 15%"] });
+  const clipPath = useTransform(panelP, (v) => {
+    const k = 1 - v;
+    return `inset(0px ${(k * 4).toFixed(2)}% 0px ${(k * 4).toFixed(2)}% round ${(k * 32).toFixed(1)}px)`;
+  });
+
+  // Steps light up along a scroll-linked track
+  const stepsRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: stepsP } = useScroll({ target: stepsRef, offset: ["start 80%", "end 60%"] });
+  const fill = useSpring(stepsP, { stiffness: 120, damping: 28, mass: 0.4 });
+  const [activeStep, setActiveStep] = useState(-1);
+  useMotionValueEvent(stepsP, "change", (v) => {
+    const n = activeApproach.length;
+    setActiveStep(v <= 0.001 ? -1 : Math.min(n - 1, Math.floor(v * n)));
+  });
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -207,21 +229,38 @@ export function ApproachSection({ approachSteps: initialApproach, experienceItem
   };
 
   const approachCards = activeApproach.map((step: ApproachStep, index: number) => (
-    <SortableApproachCard key={approachIds[index]} step={step} index={index} total={activeApproach.length} isEditorMode={isEditorMode} sortId={approachIds[index]} />
+    <SortableApproachCard key={approachIds[index]} step={step} index={index} isEditorMode={isEditorMode} sortId={approachIds[index]} active={isEditorMode || index <= activeStep} />
   ));
 
   const experienceCards = activeExperience.map((item: ExperienceItem, index: number) => (
     <SortableExperienceCard key={experienceIds[index]} item={item} index={index} isEditorMode={isEditorMode} sortId={experienceIds[index]} />
   ));
 
-  const approachGrid = "grid grid-cols-1 sm:grid-cols-2 lg:[grid-template-columns:repeat(var(--cols),minmax(0,1fr))] gap-x-6 gap-y-10";
-  const approachGridStyle = { ["--cols" as string]: Math.max(activeApproach.length, 1) } as React.CSSProperties;
+  const nSteps = Math.max(activeApproach.length, 1);
+  const approachGrid = "relative grid grid-cols-1 lg:[grid-template-columns:repeat(var(--cols),minmax(0,1fr))] gap-x-6 gap-y-10";
+  const approachGridStyle = { ["--cols" as string]: nSteps } as React.CSSProperties;
+  // Horizontal track runs from the first to the last marker centre (gap-x-6 = 24px, marker = 40px)
+  const trackRight = `calc((100% - ${24 * (nSteps - 1)}px) / ${nSteps} - 20px)`;
+  const track = (
+    <>
+      <div className="hidden lg:block absolute top-5 left-5 h-px bg-white/10" style={{ right: trackRight }} aria-hidden="true">
+        <motion.div className="h-full origin-left bg-[var(--brand-blue)]" style={{ scaleX: isEditorMode ? 1 : fill }} />
+      </div>
+      <div className="lg:hidden absolute left-5 top-5 bottom-8 w-px bg-white/10" aria-hidden="true">
+        <motion.div className="w-full h-full origin-top bg-[var(--brand-blue)]" style={{ scaleY: isEditorMode ? 1 : fill }} />
+      </div>
+    </>
+  );
   const experienceList = "rounded-2xl border border-slate-200 bg-slate-200 grid grid-cols-1 gap-px overflow-hidden shadow-[0_20px_50px_-30px_rgba(11,26,79,0.3)]";
 
   return (
     <>
-      <section ref={sectionRef} id="yaklasim" className="relative py-24 md:py-28 blueprint-bg-dark text-white overflow-hidden">
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[var(--brand-blue)]/60 to-transparent" aria-hidden="true" />
+      <section ref={panelRef} id="yaklasim" className="relative bg-white">
+        <motion.div
+          style={isEditorMode ? undefined : { clipPath }}
+          className="relative py-24 md:py-32 blueprint-bg-dark text-white overflow-hidden"
+        >
+        <div className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 h-80 w-[60rem] max-w-full rounded-full bg-[var(--brand-blue)]/15 blur-3xl" aria-hidden="true" />
         <div className="container relative">
           <motion.div
             initial="hidden" whileInView="visible"
@@ -231,7 +270,9 @@ export function ApproachSection({ approachSteps: initialApproach, experienceItem
           >
             <div className="lg:col-span-7">
               <InlineEditable section="hero" field="approach_label" defaultValue={hero?.approach_label || "YAKLAŞIM"} tagName="p" className="section-label !text-[var(--brand-blue-400)] mb-4" />
-              <InlineEditable section="hero" field="approach_title" defaultValue={hero?.approach_title || ""} tagName="h2" className="section-title-light" />
+              <InViewMask instant={isEditorMode}>
+                <InlineEditable section="hero" field="approach_title" defaultValue={hero?.approach_title || ""} tagName="h2" className="section-title-light" />
+              </InViewMask>
             </div>
             <div className="lg:col-span-5">
               <InlineEditable section="hero" field="approach_desc" defaultValue={hero?.approach_desc || ""} tagName="p" className="text-slate-400 leading-relaxed" />
@@ -241,15 +282,17 @@ export function ApproachSection({ approachSteps: initialApproach, experienceItem
           {isEditorMode ? (
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleApproachDragEnd}>
               <SortableContext items={approachIds} strategy={rectSortingStrategy}>
-                <div className={approachGrid} style={approachGridStyle}>{approachCards}</div>
+                <div className={approachGrid} style={approachGridStyle}>{track}{approachCards}</div>
               </SortableContext>
             </DndContext>
           ) : (
-            <motion.div variants={staggerVariants} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} className={approachGrid} style={approachGridStyle}>
+            <motion.div ref={stepsRef} variants={staggerVariants} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} className={approachGrid} style={approachGridStyle}>
+              {track}
               {approachCards}
             </motion.div>
           )}
         </div>
+        </motion.div>
       </section>
 
       <section id="deneyim" className="relative py-24 md:py-28 bg-[var(--color-bg-soft)] overflow-hidden">
@@ -270,7 +313,9 @@ export function ApproachSection({ approachSteps: initialApproach, experienceItem
                 )}
                 <span className="text-[var(--brand-blue)] text-5xl md:text-6xl ml-1 mt-1">+</span>
               </div>
-              <InlineEditable section="hero" field="experience_title" defaultValue={hero?.experience_title || ""} tagName="h2" className="text-2xl md:text-3xl font-semibold tracking-tight text-[var(--brand-navy)] leading-snug mb-5" />
+              <InViewMask instant={isEditorMode} className="mb-5">
+                <InlineEditable section="hero" field="experience_title" defaultValue={hero?.experience_title || ""} tagName="h2" className="text-2xl md:text-3xl font-semibold tracking-tight text-[var(--brand-navy)] leading-snug" />
+              </InViewMask>
               <InlineEditable section="hero" field="experience_desc" defaultValue={hero?.experience_desc || ""} tagName="p" className="text-slate-500 leading-relaxed" />
             </motion.div>
 

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { motion } from "framer-motion";
+import { InViewMask } from "@/components/motion";
 
 export function ContactSection() {
   const [form, setForm] = useState({ full_name: "", email: "", phone: "", company: "", message: "" });
@@ -46,7 +47,7 @@ export function ContactSection() {
             className="lg:col-span-5"
           >
             <p className="section-label mb-4">İLETİŞİM</p>
-            <h2 className="section-title mb-5">Görüşme planlayın.</h2>
+            <InViewMask className="mb-5"><h2 className="section-title">Görüşme planlayın.</h2></InViewMask>
             <p className="text-slate-500 leading-relaxed mb-10 max-w-md">
               İş süreçlerinizi ve mevcut sistemlerinizi birlikte değerlendirelim; ERP ve dijitalleşme yol haritanızı netleştirelim.
             </p>

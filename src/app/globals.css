@@ -34,11 +34,13 @@
 }
 
 html {
+  position: relative;
   scroll-behavior: smooth;
   scroll-padding-top: 5rem;
 }
 
 body {
+  position: relative;
   font-family: var(--font-sans);
   background-color: var(--color-bg);
   color: var(--color-text);
@@ -386,4 +388,77 @@ button:focus-visible {
   outline: none;
   border-color: var(--brand-blue);
   box-shadow: 0 0 0 3px rgba(29, 108, 242, 0.15);
+}
+
+/* ===================================
+   Intro sequence
+   html[data-intro="playing"] is set by an inline script before paint,
+   only on the first visit of a session.
+   =================================== */
+.intro-overlay { display: none; }
+html[data-intro="playing"] .intro-overlay { display: block; }
+html[data-intro="playing"] body { overflow: hidden; }
+
+/* Failsafe: never let the overlay trap the page if JS fails */
+@keyframes intro-failsafe { to { visibility: hidden; } }
+html[data-intro="playing"] .intro-overlay { animation: intro-failsafe 0s linear 5s forwards; }
+
+/* ===================================
+   Marquee
+   =================================== */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee-track {
+  animation: marquee 40s linear infinite;
+}
+.marquee:hover .marquee-track { animation-play-state: paused; }
+
+.text-outline {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(11, 26, 79, 0.35);
+}
+
+/* ===================================
+   Data packets on diagram connectors
+   =================================== */
+@keyframes packet {
+  0% { transform: translate(-50%, 0); opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { transform: translate(-50%, var(--travel, 28px)); opacity: 0; }
+}
+.packet {
+  position: absolute;
+  top: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--brand-blue);
+  box-shadow: 0 0 0 3px rgba(29, 108, 242, 0.15);
+  animation: packet 1.6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+/* ===================================
+   Spotlight grid — gaps light up under the cursor
+   =================================== */
+.spotlight-grid {
+  --mx: -500px;
+  --my: -500px;
+  background:
+    radial-gradient(320px circle at var(--mx) var(--my), rgba(29, 108, 242, 0.85), transparent 65%),
+    #e3e8f0;
+}
+
+/* Blinking caret for the code window */
+@keyframes caret { 50% { opacity: 0; } }
+.caret {
+  display: inline-block;
+  width: 7px;
+  height: 1.05em;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  background: var(--brand-blue-400);
+  animation: caret 1s steps(1) infinite;
 }

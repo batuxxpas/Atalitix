@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { motion, Variants } from "framer-motion";
+import { motion, Variants, useMotionValue, useSpring, useTransform, useReducedMotion } from "framer-motion";
 import { InlineEditable, useEditor } from "@/components/editor";
 
 interface ProcessStep {
@@ -14,6 +14,8 @@ interface AtalitixGraphicMapProps {
   steps: ProcessStep[];
   mapTitle?: string;
   mapBadge?: string;
+  /** Start the build-up animation (synced with the intro). */
+  play?: boolean;
 }
 
 type Tone = "base" | "core" | "flex" | "insight";
@@ -28,8 +30,22 @@ type Tone = "base" | "core" | "flex" | "insight";
  *   [ Görünürlük ]
  * Any other count falls back to a vertical stack.
  */
-export function AtalitixGraphicMap({ steps: initialSteps, mapTitle, mapBadge }: AtalitixGraphicMapProps) {
+export function AtalitixGraphicMap({ steps: initialSteps, mapTitle, mapBadge, play = true }: AtalitixGraphicMapProps) {
   const { isEditorMode, data } = useEditor();
+  const reduce = useReducedMotion();
+
+  // Subtle 3D tilt toward the cursor
+  const px = useMotionValue(0);
+  const py = useMotionValue(0);
+  const rotateY = useSpring(useTransform(px, [-0.5, 0.5], [-5, 5]), { stiffness: 120, damping: 18 });
+  const rotateX = useSpring(useTransform(py, [-0.5, 0.5], [4, -4]), { stiffness: 120, damping: 18 });
+  const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (reduce || isEditorMode) return;
+    const r = e.currentTarget.getBoundingClientRect();
+    px.set((e.clientX - r.left) / r.width - 0.5);
+    py.set((e.clientY - r.top) / r.height - 0.5);
+  };
+  const onLeave = () => { px.set(0); py.set(0); };
   const steps: ProcessStep[] = isEditorMode && data?.processSteps ? data.processSteps : initialSteps;
 
   const isArchitecture = steps.length === 4;
@@ -41,15 +57,19 @@ export function AtalitixGraphicMap({ steps: initialSteps, mapTitle, mapBadge }: 
 
   const container: Variants = {
     hidden: {},
-    visible: { transition: { staggerChildren: 0.12, delayChildren: 0.35 } },
+    visible: { transition: { staggerChildren: 0.16, delayChildren: 0.7 } },
   };
   const item: Variants = {
-    hidden: { opacity: 0, y: 12 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+    hidden: { opacity: 0, y: 14, filter: "blur(4px)" },
+    visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
   };
 
   return (
-    <div className="relative rounded-2xl border border-slate-200 bg-white shadow-[0_24px_60px_-24px_rgba(11,26,79,0.25)] overflow-hidden">
+    <div style={{ perspective: 1400 }} onMouseMove={onMove} onMouseLeave={onLeave}>
+    <motion.div
+      style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+      className="relative rounded-2xl border border-slate-200 bg-white shadow-[0_30px_70px_-30px_rgba(11,26,79,0.35)] overflow-hidden"
+    >
       {/* Panel header */}
       <div className="flex items-center justify-between gap-4 border-b border-slate-200 bg-[var(--color-bg-soft)] px-5 py-3.5 md:px-6">
         <div className="min-w-0">
@@ -77,9 +97,8 @@ export function AtalitixGraphicMap({ steps: initialSteps, mapTitle, mapBadge }: 
       {/* Diagram */}
       <motion.div
         variants={container}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true }}
+        initial={isEditorMode ? false : "hidden"}
+        animate={play || isEditorMode ? "visible" : "hidden"}
         className="relative p-5 md:p-6"
       >
         {rows.map((row, r) => {
@@ -93,11 +112,16 @@ export function AtalitixGraphicMap({ steps: initialSteps, mapTitle, mapBadge }: 
                   </motion.div>
                 ))}
               </div>
-              {next && <Connector from={row.length} to={next.length} />}
+              {next && (
+                <motion.div variants={item}>
+                  <Connector from={row.length} to={next.length} />
+                </motion.div>
+              )}
             </React.Fragment>
           );
         })}
       </motion.div>
+    </motion.div>
     </div>
   );
 }
@@ -184,28 +208,54 @@ function LayerGlyph({ tone }: { tone: Tone }) {
   );
 }
 
-/** Thin connector between rows; splits or merges when column counts differ. */
+/**
+ * Connector between rows with travelling data packets.
+ * Built from divs (not a stretched SVG) so dots stay round at any width.
+ * Split: 1 → 2 columns, merge: 2 → 1. On mobile the split row stacks, so it collapses to a straight line.
+ */
 function Connector({ from, to }: { from: number; to: number }) {
   const split = from === 1 && to === 2;
   const merge = from === 2 && to === 1;
-  const flow = { strokeDasharray: "4 4", animation: "flow-x 1.2s linear infinite" } as React.CSSProperties;
+  const line = "absolute bg-[repeating-linear-gradient(to_bottom,#b9c7e3_0_3px,transparent_3px_6px)] w-px";
+  const hline = "absolute h-px bg-[repeating-linear-gradient(to_right,#b9c7e3_0_3px,transparent_3px_6px)]";
+  const L = "calc(25% - 3px)";
+  const R = "calc(75% + 3px)";
 
-  let d = "M50 0 V28";
-  if (split) d = "M50 0 V12 M25 12 H75 M25 12 V28 M75 12 V28";
-  if (merge) d = "M25 0 V16 M75 0 V16 M25 16 H75 M50 16 V28";
+  const Straight = (
+    <div className="relative h-8">
+      <span className={`${line} left-1/2 top-0 bottom-0`} />
+      <span className="packet left-1/2" style={{ ["--travel" as string]: "32px" }} />
+    </div>
+  );
+
+  if (!split && !merge) return <div aria-hidden="true">{Straight}</div>;
 
   return (
-    <div className="relative h-7" aria-hidden="true">
-      {/* On mobile the split row stacks, so only draw a straight line */}
-      <svg className={`absolute inset-0 w-full h-full ${split || merge ? "hidden sm:block" : ""}`} viewBox="0 0 100 28" preserveAspectRatio="none">
-        <path d={d} fill="none" stroke="#c7d3ea" strokeWidth="1.5" vectorEffect="non-scaling-stroke" />
-        <path d={d} fill="none" stroke="var(--brand-blue)" strokeWidth="1.5" vectorEffect="non-scaling-stroke" style={flow} />
-      </svg>
-      {(split || merge) && (
-        <svg className="absolute inset-0 w-full h-full sm:hidden" viewBox="0 0 100 28" preserveAspectRatio="none">
-          <path d="M50 0 V28" fill="none" stroke="var(--brand-blue)" strokeWidth="1.5" vectorEffect="non-scaling-stroke" style={flow} />
-        </svg>
-      )}
+    <div aria-hidden="true">
+      <div className="sm:hidden">{Straight}</div>
+      <div className="relative h-8 hidden sm:block">
+        {split ? (
+          <>
+            <span className={`${line} left-1/2 top-0 h-1/2`} />
+            <span className={`${hline} top-1/2`} style={{ left: L, right: `calc(100% - ${R})` }} />
+            <span className={`${line} top-1/2 bottom-0`} style={{ left: L }} />
+            <span className={`${line} top-1/2 bottom-0`} style={{ left: R }} />
+            <span className="packet left-1/2" style={{ ["--travel" as string]: "16px", animationDuration: "0.9s" }} />
+            <span className="packet" style={{ left: L, top: "50%", ["--travel" as string]: "16px", animationDelay: "0.45s", animationDuration: "0.9s" }} />
+            <span className="packet" style={{ left: R, top: "50%", ["--travel" as string]: "16px", animationDelay: "0.6s", animationDuration: "0.9s" }} />
+          </>
+        ) : (
+          <>
+            <span className={`${line} top-0 h-1/2`} style={{ left: L }} />
+            <span className={`${line} top-0 h-1/2`} style={{ left: R }} />
+            <span className={`${hline} top-1/2`} style={{ left: L, right: `calc(100% - ${R})` }} />
+            <span className={`${line} left-1/2 top-1/2 bottom-0`} />
+            <span className="packet" style={{ left: L, ["--travel" as string]: "16px", animationDuration: "0.9s" }} />
+            <span className="packet" style={{ left: R, ["--travel" as string]: "16px", animationDelay: "0.2s", animationDuration: "0.9s" }} />
+            <span className="packet left-1/2" style={{ top: "50%", ["--travel" as string]: "16px", animationDelay: "0.5s", animationDuration: "0.9s" }} />
+          </>
+        )}
+      </div>
     </div>
   );
 }

@@ -4,9 +4,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+import { useIntroReady } from "@/components/motion";
 
 const NAV_ITEMS = [
   { title: "Hizmetler", href: "#cozumler" },
+  { title: "Mühendislik", href: "#muhendislik" },
   { title: "Yaklaşım", href: "#yaklasim" },
   { title: "Deneyim", href: "#deneyim" },
   { title: "İletişim", href: "#iletisim" },
@@ -15,6 +18,7 @@ const NAV_ITEMS = [
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const ready = useIntroReady();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -23,7 +27,10 @@ export function Header() {
   }, []);
 
   return (
-    <header
+    <motion.header
+      initial={false}
+      animate={ready ? { y: 0, opacity: 1 } : { y: -24, opacity: 0 }}
+      transition={{ duration: 0.7, delay: ready ? 0.25 : 0, ease: [0.22, 1, 0.36, 1] }}
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
         scrolled
@@ -111,6 +118,6 @@ export function Header() {
           </nav>
         </div>
       )}
-    </header>
+    </motion.header>
   );
 }
