@@ -8,8 +8,8 @@ import { motion } from "framer-motion";
 import { useIntroReady } from "@/components/motion";
 
 const NAV_ITEMS = [
-  { title: "Hizmetler", href: "#cozumler" },
-  { title: "Kapsam", href: "#kapsam" },
+  { title: "Çözümler", href: "#cozumler" },
+  { title: "ERP", href: "#erp" },
   { title: "Yaklaşım", href: "#yaklasim" },
   { title: "Deneyim", href: "#deneyim" },
   { title: "Haberler", href: "#haberler" },

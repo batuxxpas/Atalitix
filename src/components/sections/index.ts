@@ -4,5 +4,5 @@ export { SolutionsSection } from "./SolutionsSection";
 export { ApproachSection } from "./ApproachSection";
 export { ContactSection } from "./ContactSection";
 export { ErpScopeSection } from "./ErpScopeSection";
-export { OdooSection } from "./OdooSection";
+export { ErpPathSection } from "./ErpPathSection";
 export { NewsSection } from "./NewsSection";

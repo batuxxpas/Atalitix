@@ -99,7 +99,25 @@ create policy "Form gönderimi" on public.iletisim_talepleri for insert to anon,
 -- admin_users ve iletisim_talepleri için okuma politikası YOK → dışarıdan okunamaz.
 
 -- ---------------------------------------------------------------------
--- 5) Kontrol (Run sonrası alttaki sonuçta tüm tablolarda rls = true olmalı)
+-- 5) Çözüm alt başlıkları (sunum: 1.1, 1.2, 2.1) — tekrar eklemez
+-- ---------------------------------------------------------------------
+insert into public.cozum_alt_basliklari (cozum_id, baslik, aciklama, sort_order)
+select c.id, v.baslik, v.aciklama, v.sira
+from (values
+  ('Süreç Analizi ve Hedef Süreç Tasarımı', 'ERP Kapsamı ve Kavramsal Tasarım',
+   'Modül kapsamı, entegrasyon ihtiyacı ve uygun ERP yolu netleştirilir; Odoo, SAP, Logo, Canias vb. alternatifler süreç uyumuna göre değerlendirilir.', 1),
+  ('Süreç Analizi ve Hedef Süreç Tasarımı', 'Odoo Uygulama',
+   'Odoo''nun doğru yol olduğu projelerde kurulum, uyarlama, veri aktarımı ve canlıya geçiş sertifikalı ekibimizle yürütülür.', 2),
+  ('Dijital & AI Olgunluk Değerlendirme', 'Veri, AI ve Otomasyon Fırsatları',
+   'KPI, dashboard, RPA/AI kullanım senaryoları ve otomasyon backlog''u; iş değeri, veri hazırlığı ve uygulanabilirliğe göre önceliklendirilir.', 1)
+) as v(cozum, baslik, aciklama, sira)
+join public.cozumler c on c.title = v.cozum and c.is_active
+where not exists (
+  select 1 from public.cozum_alt_basliklari x where x.cozum_id = c.id and x.baslik = v.baslik
+);
+
+-- ---------------------------------------------------------------------
+-- 6) Kontrol (Run sonrası alttaki sonuçta tüm tablolarda rls = true olmalı)
 -- ---------------------------------------------------------------------
 select c.relname as tablo, c.relrowsecurity as rls
 from pg_class c join pg_namespace n on n.oid = c.relnamespace

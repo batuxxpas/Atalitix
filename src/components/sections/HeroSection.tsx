@@ -60,6 +60,13 @@ export function HeroSection({ hero, processSteps: initialSteps }: HeroSectionPro
     animate: show ? "visible" : "hidden",
   });
 
+  // Split the motto at its first comma into two headline lines
+  const mottoText = (hero.tagline || "Veriden zekâya, süreçten değere.").replace(/<[^>]*>/g, "").trim();
+  const cut = mottoText.indexOf(",");
+  const motto = cut > -1
+    ? { first: mottoText.slice(0, cut + 1), second: mottoText.slice(cut + 1).trim() }
+    : { first: mottoText, second: "" };
+
   return (
     <section className="relative bg-white">
       <div className="container pt-12 md:pt-16 lg:pt-20">
@@ -72,19 +79,24 @@ export function HeroSection({ hero, processSteps: initialSteps }: HeroSectionPro
               </span>
             </motion.div>
 
-            <h1 className="display text-[2.4rem] sm:text-[3rem] lg:text-[3.6rem]">
-              <MaskLine show={show} delay={0.1} instant={isEditorMode}>
-                <InlineEditable section="hero" field="title_line1" defaultValue={hero.title_line1} tagName="span" />
-              </MaskLine>
-              <MaskLine show={show} delay={0.2} instant={isEditorMode}>
-                <InlineEditable section="hero" field="title_line2" defaultValue={hero.title_line2} tagName="span" />{" "}
-                <InlineEditable section="hero" field="title_highlight" defaultValue={hero.title_highlight} tagName="span" className="italic text-[var(--brand-blue)]" />
-                <InlineEditable section="hero" field="title_line3" defaultValue={hero.title_line3} tagName="span" />
-              </MaskLine>
-              <MaskLine show={show} delay={0.3} instant={isEditorMode}>
-                <InlineEditable section="hero" field="title_line4" defaultValue={hero.title_line4} tagName="span" />
-              </MaskLine>
+            {/* Brand motto is the headline: "Veriden zekâya, süreçten değere." */}
+            <h1 className="display text-[2.7rem] sm:text-[3.4rem] lg:text-[4.1rem]">
+              {isEditorMode ? (
+                <InlineEditable section="hero" field="tagline" defaultValue={hero.tagline} tagName="span" />
+              ) : (
+                <>
+                  <MaskLine show={show} delay={0.1}>{motto.first}</MaskLine>
+                  {motto.second && (
+                    <MaskLine show={show} delay={0.22}>
+                      <em className="text-[var(--brand-blue)]">{motto.second}</em>
+                    </MaskLine>
+                  )}
+                </>
+              )}
             </h1>
+            <motion.div {...anim(0.4)}>
+              <InlineEditable section="hero" field="tagline_sub" defaultValue={hero.tagline_sub} tagName="p" className="mt-4 font-serif italic text-[1.15rem] md:text-[1.3rem] text-[var(--ink-muted)]" />
+            </motion.div>
 
             <motion.div
               className="mt-8 mb-8 h-px max-w-md origin-left bg-[var(--rule)]"
@@ -93,9 +105,17 @@ export function HeroSection({ hero, processSteps: initialSteps }: HeroSectionPro
               transition={{ duration: 1.2, delay: 0.45, ease: [0.65, 0, 0.35, 1] }}
             />
 
-            <motion.div {...anim(0.55)} className="max-w-xl space-y-4">
-              <InlineEditable section="hero" field="description" defaultValue={hero.description} tagName="p" className="lead" />
-              <InlineEditable section="hero" field="description2" defaultValue={hero.description2} tagName="p" className="text-[14.5px] leading-relaxed text-[var(--ink-muted)]" />
+            {/* Statement: what we do */}
+            <motion.p {...anim(0.5)} className="font-serif text-[1.35rem] md:text-[1.55rem] leading-snug text-[var(--ink)] max-w-xl">
+              <InlineEditable section="hero" field="title_line1" defaultValue={hero.title_line1} tagName="span" />{" "}
+              <InlineEditable section="hero" field="title_line2" defaultValue={hero.title_line2} tagName="span" />
+              <InlineEditable section="hero" field="title_highlight" defaultValue={hero.title_highlight} tagName="span" />
+              <InlineEditable section="hero" field="title_line3" defaultValue={hero.title_line3} tagName="span" />
+              <InlineEditable section="hero" field="title_line4" defaultValue={hero.title_line4} tagName="span" />
+            </motion.p>
+
+            <motion.div {...anim(0.6)} className="mt-5 max-w-xl">
+              <InlineEditable section="hero" field="description" defaultValue={hero.description} tagName="p" className="text-[15.5px] leading-relaxed text-[var(--ink-body)]" />
             </motion.div>
 
             <motion.div {...anim(0.7)} className="mt-9 flex flex-wrap items-center gap-x-8 gap-y-4">
@@ -105,12 +125,6 @@ export function HeroSection({ hero, processSteps: initialSteps }: HeroSectionPro
               <a href="#deneyim" onClick={(e) => isEditorMode && e.preventDefault()} className="btn-outline">
                 <InlineEditable section="hero" field="cta_secondary_text" defaultValue={hero.cta_secondary_text} tagName="span" />
               </a>
-            </motion.div>
-
-            {/* Motto */}
-            <motion.div {...anim(0.85)} className="mt-10 border-l-2 border-[var(--brand-blue)] pl-5">
-              <InlineEditable section="hero" field="tagline" defaultValue={hero.tagline} tagName="p" className="font-serif italic text-[1.25rem] md:text-[1.35rem] leading-snug text-[var(--ink)]" />
-              <InlineEditable section="hero" field="tagline_sub" defaultValue={hero.tagline_sub} tagName="p" className="mt-1 text-[13px] tracking-[0.04em] text-[var(--ink-muted)]" />
             </motion.div>
           </div>
 

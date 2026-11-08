@@ -2,18 +2,17 @@ import Link from "next/link";
 import Image from "next/image";
 
 const SERVICES = [
-  "ERP Danışmanlığı",
-  "Odoo Uygulamaları",
-  "Dijitalleşme Yol Haritası",
-  "Süreç Tasarımı",
-  "Veri Görselleştirme",
-  "Non-ERP Otomasyon",
-  "Danışmanlık & Eğitim",
+  "Süreç Analizi ve Hedef Süreç Tasarımı",
+  "ERP Kapsamı ve Kavramsal Tasarım",
+  "Odoo Uygulama",
+  "Dijital & AI Olgunluk Değerlendirme",
+  "Veri, AI ve Otomasyon Fırsatları",
+  "Dijital Eğitim ve Adaptasyon",
 ];
 
 const COMPANY = [
-  { title: "Hizmetler", href: "#cozumler" },
-  { title: "Kapsam", href: "#kapsam" },
+  { title: "Çözümler", href: "#cozumler" },
+  { title: "ERP", href: "#erp" },
   { title: "Yaklaşım", href: "#yaklasim" },
   { title: "Deneyim", href: "#deneyim" },
   { title: "Haberler", href: "#haberler" },
@@ -35,8 +34,8 @@ export function Footer() {
             <p className="text-[13px] tracking-[0.04em] text-[var(--ink-muted)] mt-1">From dATA to Intelligence.</p>
           </div>
 
-          <nav aria-label="Hizmetler" className="md:col-span-3">
-            <h4 className="text-[13px] font-medium text-[var(--ink-muted)] mb-5">Hizmetler</h4>
+          <nav aria-label="Çözümler" className="md:col-span-3">
+            <h4 className="text-[13px] font-medium text-[var(--ink-muted)] mb-5">Çözümler</h4>
             <ul className="space-y-3">
               {SERVICES.map((item) => (
                 <li key={item}>

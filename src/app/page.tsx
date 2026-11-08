@@ -1,10 +1,27 @@
 import { Header, Footer } from "@/components/layout";
-import { HeroSection, SolutionsSection, ApproachSection, ContactSection, ErpScopeSection, OdooSection, NewsSection } from "@/components/sections";
+import { HeroSection, SolutionsSection, ApproachSection, ContactSection, ErpScopeSection, ErpPathSection, NewsSection } from "@/components/sections";
 import { IntroLoader, INTRO_BOOT_SCRIPT } from "@/components/motion";
 import { createClient } from "@/lib/supabase/server";
 import { SITE_CONFIG } from "@/lib/constants";
 
 export const revalidate = 60; // Revalidate cache every 60 seconds
+
+// Sunum (ATAlitiX tanıtım sunumu 2026 v2): 1.1, 1.2, 2.1 — Supabase tablosu yoksa kullanılır
+const FALLBACK_SUBS: Record<string, { baslik: string; aciklama: string }[]> = {
+  "Süreç Analizi ve Hedef Süreç Tasarımı": [
+    { baslik: "ERP Kapsamı ve Kavramsal Tasarım", aciklama: "Modül kapsamı, entegrasyon ihtiyacı ve uygun ERP yolu netleştirilir; Odoo, SAP, Logo, Canias vb. alternatifler süreç uyumuna göre değerlendirilir." },
+    { baslik: "Odoo Uygulama", aciklama: "Odoo'nun doğru yol olduğu projelerde kurulum, uyarlama, veri aktarımı ve canlıya geçiş sertifikalı ekibimizle yürütülür." },
+  ],
+  "Dijital & AI Olgunluk Değerlendirme": [
+    { baslik: "Veri, AI ve Otomasyon Fırsatları", aciklama: "KPI, dashboard, RPA/AI kullanım senaryoları ve otomasyon backlog'u; iş değeri, veri hazırlığı ve uygulanabilirliğe göre önceliklendirilir." },
+  ],
+};
+
+function fallbackSubItems(solutions: { id: string; title: string }[]) {
+  return solutions.flatMap((s) =>
+    (FALLBACK_SUBS[s.title] || []).map((sub, i) => ({ id: `${s.id}-${i}`, cozum_id: String(s.id), ...sub })),
+  );
+}
 
 export default async function HomePage() {
   const supabase = await createClient();
@@ -32,8 +49,13 @@ export default async function HomePage() {
     { data: approachSteps },
     { data: experienceItems },
     { data: news },
-    { data: solutionSubItems },
+    { data: subItemsFromDb, error: subItemsError },
   ] = results;
+
+  // Until the cozum_alt_basliklari table exists, fall back to the presentation's sub-areas
+  const solutionSubItems = subItemsError
+    ? fallbackSubItems(solutions || [])
+    : subItemsFromDb || [];
 
   // JSON-LD Structured Data
   const organizationJsonLd = {
@@ -77,12 +99,12 @@ export default async function HomePage() {
     telephone: "+90-505-375-2992",
     email: "bennur.yilmaz@atalitix.com",
     serviceType: [
-      "ERP Danışmanlığı",
-      "Odoo Danışmanlığı",
-      "Dijital Dönüşüm",
-      "Veri Analitiği",
-      "Süreç Otomasyonu",
-      "İş Zekası",
+      "Süreç Analizi ve Hedef Süreç Tasarımı",
+      "ERP Kapsamı ve Kavramsal Tasarım",
+      "Odoo Uygulama",
+      "Dijital ve AI Olgunluk Değerlendirme",
+      "Veri, AI ve Otomasyon Fırsatları",
+      "Dijital Eğitim ve Kullanıcı Adaptasyonu",
     ],
     areaServed: {
       "@type": "Country",
@@ -131,10 +153,10 @@ export default async function HomePage() {
           <SolutionsSection solutions={solutions} hero={hero} subItems={solutionSubItems || []} />
         )}
 
-        <ErpScopeSection />
+        {/* 1.1 ERP kapsamı + 1.2 Odoo (sunum s.7) */}
+        <ErpPathSection />
 
-        {/* Odoo: kurumsal ERP'lerin yanında bir alternatif olarak */}
-        <OdooSection />
+        <ErpScopeSection />
         
         {approachSteps && experienceItems && (
           <ApproachSection

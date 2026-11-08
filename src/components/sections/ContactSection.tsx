@@ -35,8 +35,22 @@ export function ContactSection() {
             </InViewMask>
             <FadeIn delay={0.1}>
               <p className="text-[15px] leading-relaxed text-[var(--ink-muted)] max-w-md">
-                İş süreçlerinizi ve mevcut sistemlerinizi birlikte değerlendirelim; ERP ve dijitalleşme yol haritanızı netleştirelim.
+                Kısa bir keşif çalışmasıyla süreç, sistem, veri ve olgunluk yapınızı değerlendirip ilk fırsat haritasını çıkarabiliriz.
               </p>
+            </FadeIn>
+
+            {/* Birlikte nasıl başlayabiliriz? (sunum s.12) */}
+            <FadeIn delay={0.15} className="mt-10">
+              <p className="text-[13px] font-medium text-[var(--ink-muted)] mb-3">Birlikte nasıl başlayabiliriz?</p>
+              <ol className="relative">
+                <span className="absolute left-[11px] top-3 bottom-3 w-px bg-[var(--rule-strong)]" aria-hidden="true" />
+                {["Tanışma görüşmesi", "Süreç ve olgunluk keşfi", "Öncelikli fırsat portföyü", "Yol haritası ve teklif"].map((step, i) => (
+                  <li key={step} className="relative flex items-center gap-4 py-2.5">
+                    <span className={`relative z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-[11px] tabular-nums ${i === 0 ? "bg-[var(--brand-navy)] border-[var(--brand-navy)] text-white" : "bg-[var(--paper)] border-[var(--brand-navy)] text-[var(--brand-navy)]"}`}>{i + 1}</span>
+                    <span className="font-serif text-[1.08rem] text-[var(--ink)]">{step}</span>
+                  </li>
+                ))}
+              </ol>
             </FadeIn>
 
             <FadeIn delay={0.2} className="mt-10">

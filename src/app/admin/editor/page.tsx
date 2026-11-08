@@ -14,6 +14,7 @@ export default async function VisualEditorPage() {
     (supabase.from("cozumler") as any).select("*").eq("is_active", true).order("sort_order"),
     (supabase.from("yaklasim_adimlari") as any).select("*").eq("is_active", true).order("sort_order"),
     (supabase.from("deneyim_maddeleri") as any).select("*").eq("is_active", true).order("sort_order"),
+    (supabase.from("cozum_alt_basliklari") as any).select("id,cozum_id,baslik,aciklama,sort_order").eq("is_active", true).order("sort_order"),
   ]);
 
   const [
@@ -23,6 +24,7 @@ export default async function VisualEditorPage() {
     { data: solutions },
     { data: approachSteps },
     { data: experienceItems },
+    { data: solutionSubItems },
   ] = results;
 
   return (
@@ -34,7 +36,8 @@ export default async function VisualEditorPage() {
           processCategories: processCategories || [],
           solutions: solutions || [],
           approachSteps: approachSteps || [],
-          experienceItems: experienceItems || []
+          experienceItems: experienceItems || [],
+          solutionSubItems: solutionSubItems || []
         }}
       />
     </>
