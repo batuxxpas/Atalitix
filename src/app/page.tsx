@@ -1,5 +1,5 @@
 import { Header, Footer } from "@/components/layout";
-import { HeroSection, SolutionsSection, ApproachSection, ContactSection, ErpScopeSection, ErpPathSection, NewsSection } from "@/components/sections";
+import { HeroSection, SolutionsSection, ApproachSection, ContactSection, ErpPathSection, NewsSection } from "@/components/sections";
 import { IntroLoader, INTRO_BOOT_SCRIPT } from "@/components/motion";
 import { createClient } from "@/lib/supabase/server";
 import { SITE_CONFIG } from "@/lib/constants";
@@ -156,7 +156,6 @@ export default async function HomePage() {
         {/* 1.1 ERP kapsamı + 1.2 Odoo (sunum s.7) */}
         <ErpPathSection />
 
-        <ErpScopeSection />
         
         {approachSteps && experienceItems && (
           <ApproachSection
