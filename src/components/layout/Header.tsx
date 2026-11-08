@@ -8,12 +8,12 @@ import { motion } from "framer-motion";
 import { useIntroReady } from "@/components/motion";
 
 const NAV_ITEMS = [
-  { title: "Çözümler", href: "#cozumler" },
-  { title: "ERP", href: "#erp" },
-  { title: "Yaklaşım", href: "#yaklasim" },
-  { title: "Deneyim", href: "#deneyim" },
-  { title: "Haberler", href: "#haberler" },
-  { title: "İletişim", href: "#iletisim" },
+  { title: "Çözümler", href: "/#cozumler" },
+  { title: "ERP", href: "/#erp" },
+  { title: "Yaklaşım", href: "/#yaklasim" },
+  { title: "Deneyim", href: "/#deneyim" },
+  { title: "Haberler", href: "/haberler" },
+  { title: "İletişim", href: "/#iletisim" },
 ];
 
 export function Header() {
@@ -77,7 +77,7 @@ export function Header() {
 
         {/* CTA */}
         <div className="hidden md:block">
-          <a href="#iletisim" className="btn-primary text-[14px] py-2.5 px-5">
+          <a href="/#iletisim" className="btn-primary text-[14px] py-2.5 px-5">
             Görüşme Planla
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M13 6l6 6-6 6" /></svg>
           </a>
@@ -113,7 +113,7 @@ export function Header() {
                 {item.title}
               </a>
             ))}
-            <a href="#iletisim" onClick={() => setMobileOpen(false)} className="btn-primary text-sm mt-2 justify-center">
+            <a href="/#iletisim" onClick={() => setMobileOpen(false)} className="btn-primary text-sm mt-2 justify-center">
               Görüşme Planla
             </a>
           </nav>

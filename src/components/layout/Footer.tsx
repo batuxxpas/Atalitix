@@ -11,12 +11,12 @@ const SERVICES = [
 ];
 
 const COMPANY = [
-  { title: "Çözümler", href: "#cozumler" },
-  { title: "ERP", href: "#erp" },
-  { title: "Yaklaşım", href: "#yaklasim" },
-  { title: "Deneyim", href: "#deneyim" },
-  { title: "Haberler", href: "#haberler" },
-  { title: "İletişim", href: "#iletisim" },
+  { title: "Çözümler", href: "/#cozumler" },
+  { title: "ERP", href: "/#erp" },
+  { title: "Yaklaşım", href: "/#yaklasim" },
+  { title: "Deneyim", href: "/#deneyim" },
+  { title: "Haberler", href: "/haberler" },
+  { title: "İletişim", href: "/#iletisim" },
 ];
 
 export function Footer() {
@@ -39,7 +39,7 @@ export function Footer() {
             <ul className="space-y-3">
               {SERVICES.map((item) => (
                 <li key={item}>
-                  <Link href="#cozumler" className="link-underline text-[15px] text-[var(--ink)] hover:text-[var(--brand-blue)]">
+                  <Link href="/#cozumler" className="link-underline text-[15px] text-[var(--ink)] hover:text-[var(--brand-blue)]">
                     {item}
                   </Link>
                 </li>

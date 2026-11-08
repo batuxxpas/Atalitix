@@ -1,22 +1,12 @@
+import Link from "next/link";
 import { requireAdmin, getAdminClient } from "@/lib/admin/auth";
+import { newsHref, type News } from "@/lib/news-utils";
 import { createNews, toggleNews, deleteNews } from "./actions";
+import { NewsForm } from "./NewsForm";
 
 export const revalidate = 0;
 
-type Row = {
-  id: string;
-  tur: "bizden" | "dunyadan";
-  baslik: string;
-  ozet: string | null;
-  kaynak_adi: string | null;
-  link: string | null;
-  gorsel_url: string | null;
-  tarih: string;
-  is_active: boolean;
-};
-
-const input = "w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400";
-const label = "block text-xs font-semibold text-slate-600 mb-1.5";
+type Row = News & { is_active: boolean };
 
 export default async function AdminNewsPage() {
   await requireAdmin();
@@ -25,72 +15,27 @@ export default async function AdminNewsPage() {
     .select("*")
     .order("tarih", { ascending: false });
 
-  const rows = (data ?? []) as Row[];
-  const today = new Date().toISOString().slice(0, 10);
+  const rows = (data ?? []) as unknown as Row[];
 
   return (
     <div className="max-w-5xl mx-auto">
-      <h2 className="text-2xl font-bold text-slate-900">Haberler</h2>
-      <p className="text-slate-500 text-sm mt-1 mb-8">
-        Ana sayfadaki &quot;Bizden Haberler&quot; ve &quot;Dünyadan Haberler&quot; sekmeleri buradan yönetilir. Yayındaki haber yoksa bölüm sitede görünmez.
-      </p>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold text-slate-900">Haberler</h2>
+          <p className="text-slate-500 text-sm mt-1">
+            Sitedeki <Link href="/haberler" target="_blank" className="text-indigo-600 hover:underline">/haberler</Link> sayfası ve ana sayfadaki Gündem bölümü buradan yönetilir.
+          </p>
+        </div>
+      </div>
 
       {error && (
-        <div className="mb-8 rounded-lg bg-amber-50 border border-amber-200 p-4 text-sm text-amber-800">
-          Haberler tablosu bulunamadı. Supabase SQL Editor&apos;de <code className="font-mono">supabase/2026-11-08-guvenlik-ve-haberler.sql</code> dosyasının çalıştırılması gerekiyor.
+        <div className="mt-6 rounded-lg bg-amber-50 border border-amber-200 p-4 text-sm text-amber-800">
+          Haberler tablosuna erişilemedi ({error.message}). <code className="font-mono">supabase/2026-11-08-haber-modulu.sql</code> dosyasının SQL Editor&apos;de çalıştırılması gerekiyor.
         </div>
       )}
 
-      {/* New item */}
-      <form action={createNews} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm mb-10 space-y-4">
-        <h3 className="font-semibold text-slate-900">Yeni haber ekle</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label className={label} htmlFor="tur">Tür</label>
-            <select id="tur" name="tur" className={input} defaultValue="bizden">
-              <option value="bizden">Bizden Haberler</option>
-              <option value="dunyadan">Dünyadan Haberler</option>
-            </select>
-          </div>
-          <div>
-            <label className={label} htmlFor="tarih">Tarih</label>
-            <input id="tarih" name="tarih" type="date" defaultValue={today} className={input} />
-          </div>
-          <div>
-            <label className={label} htmlFor="kaynak_adi">Kaynak adı (opsiyonel)</label>
-            <input id="kaynak_adi" name="kaynak_adi" placeholder="örn. Harvard Business Review" className={input} />
-          </div>
-        </div>
-        <div>
-          <label className={label} htmlFor="baslik">Başlık *</label>
-          <input id="baslik" name="baslik" required className={input} placeholder="Haber başlığı" />
-        </div>
-        <div>
-          <label className={label} htmlFor="ozet">Kısa özet</label>
-          <textarea id="ozet" name="ozet" rows={3} className={`${input} resize-y`} placeholder="2-3 cümlelik özet" />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className={label} htmlFor="gorsel">Görsel yükle (JPG, PNG, WebP · en fazla 5 MB)</label>
-            <input id="gorsel" name="gorsel" type="file" accept="image/jpeg,image/png,image/webp" className={`${input} file:mr-3 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-slate-700`} />
-          </div>
-          <div>
-            <label className={label} htmlFor="gorsel_url">…veya görsel bağlantısı</label>
-            <input id="gorsel_url" name="gorsel_url" type="url" className={input} placeholder="https://..." />
-          </div>
-        </div>
-        <p className="text-xs text-slate-400 -mt-1">En iyi görünüm için 16:9 yatay görsel (örn. 1600×900) kullanın.</p>
-        <div>
-          <label className={label} htmlFor="link">Haber bağlantısı (opsiyonel)</label>
-          <input id="link" name="link" type="url" className={input} placeholder="https://..." />
-        </div>
-        <button type="submit" className="rounded-lg bg-[#0b1a4f] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#1d6cf2] transition-colors">
-          Yayınla
-        </button>
-      </form>
-
       {/* List */}
-      <div className="rounded-2xl border border-slate-200 bg-white shadow-sm divide-y divide-slate-100">
+      <div className="mt-8 rounded-2xl border border-slate-200 bg-white shadow-sm divide-y divide-slate-100">
         {rows.length === 0 && <p className="p-6 text-sm text-slate-500">Henüz haber yok.</p>}
         {rows.map((r) => (
           <div key={r.id} className="flex flex-col md:flex-row md:items-start gap-4 p-5">
@@ -105,11 +50,20 @@ export default async function AdminNewsPage() {
                 </span>
                 <span className="text-xs text-slate-400">{new Date(r.tarih).toLocaleDateString("tr-TR")}</span>
                 {!r.is_active && <span className="text-[11px] font-semibold rounded px-2 py-0.5 bg-slate-100 text-slate-500">Yayında değil</span>}
+                {!r.icerik && <span className="text-[11px] font-semibold rounded px-2 py-0.5 bg-amber-50 text-amber-700">Metin yok</span>}
               </div>
               <p className="font-semibold text-slate-900">{r.baslik}</p>
               {r.ozet && <p className="text-sm text-slate-500 mt-1 line-clamp-2">{r.ozet}</p>}
             </div>
-            <div className="flex gap-2 shrink-0">
+            <div className="flex flex-wrap gap-2 shrink-0">
+              <Link href={`/admin/haberler/${r.id}`} className="rounded-lg border border-indigo-200 px-3 py-2 text-xs font-semibold text-indigo-700 hover:bg-indigo-50">
+                Düzenle
+              </Link>
+              {r.is_active && (
+                <Link href={newsHref(r)} target="_blank" className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50">
+                  Görüntüle ↗
+                </Link>
+              )}
               <form action={toggleNews}>
                 <input type="hidden" name="id" value={r.id} />
                 <input type="hidden" name="is_active" value={String(r.is_active)} />
@@ -127,6 +81,10 @@ export default async function AdminNewsPage() {
           </div>
         ))}
       </div>
+
+      {/* New item */}
+      <h3 className="mt-12 mb-4 text-lg font-bold text-slate-900">Yeni haber ekle</h3>
+      <NewsForm action={createNews} submitLabel="Yayınla" />
     </div>
   );
 }
