@@ -9,7 +9,7 @@ import { useIntroReady } from "@/components/motion";
 
 const NAV_ITEMS = [
   { title: "Hizmetler", href: "#cozumler" },
-  { title: "Mühendislik", href: "#muhendislik" },
+  { title: "Kapsam", href: "#kapsam" },
   { title: "Yaklaşım", href: "#yaklasim" },
   { title: "Deneyim", href: "#deneyim" },
   { title: "İletişim", href: "#iletisim" },
@@ -34,8 +34,8 @@ export function Header() {
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
         scrolled
-          ? "bg-white/85 backdrop-blur-xl border-b border-slate-200/70"
-          : "bg-white/0 border-b border-transparent"
+          ? "bg-white/95 backdrop-blur border-b border-[var(--rule)]"
+          : "bg-white border-b border-transparent"
       )}
     >
       <div className="container flex h-20 items-center justify-between">
@@ -67,7 +67,7 @@ export function Header() {
             <a
               key={item.href}
               href={item.href}
-              className="relative px-4 py-2 text-sm font-medium text-slate-600 hover:text-[var(--brand-navy)] transition-colors after:absolute after:left-4 after:right-4 after:-bottom-0.5 after:h-px after:bg-[var(--brand-blue)] after:scale-x-0 after:origin-left after:transition-transform hover:after:scale-x-100"
+              className="relative px-4 py-2 text-[15px] text-[var(--ink-body)] hover:text-[var(--ink)] transition-colors after:absolute after:left-4 after:right-4 after:bottom-1 after:h-px after:bg-[var(--ink)] after:scale-x-0 after:origin-left after:transition-transform after:duration-300 hover:after:scale-x-100"
             >
               {item.title}
             </a>
@@ -76,7 +76,7 @@ export function Header() {
 
         {/* CTA */}
         <div className="hidden md:block">
-          <a href="#iletisim" className="btn-primary text-sm py-2.5 px-5">
+          <a href="#iletisim" className="btn-primary text-[14px] py-2.5 px-5">
             Görüşme Planla
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M13 6l6 6-6 6" /></svg>
           </a>

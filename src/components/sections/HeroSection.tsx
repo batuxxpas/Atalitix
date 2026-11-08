@@ -1,9 +1,9 @@
 "use client";
 
-import { AtalitixGraphicMap } from "@/components/ui";
-import { motion, Variants } from "framer-motion";
+import { useRef } from "react";
+import { motion, Variants, useInView } from "framer-motion";
 import { InlineEditable, useEditor } from "@/components/editor";
-import { useIntroReady, MaskLine, Magnetic } from "@/components/motion";
+import { useIntroReady, MaskLine } from "@/components/motion";
 
 interface ProcessStep {
   step_number: number;
@@ -32,7 +32,6 @@ interface HeroData {
   cta_secondary_text: string;
   map_title: string;
   map_badge: string;
-  experience_years?: string;
 }
 
 interface HeroSectionProps {
@@ -41,131 +40,141 @@ interface HeroSectionProps {
   processCategories: ProcessCategory[];
 }
 
-export function HeroSection({ hero, processSteps }: HeroSectionProps) {
-  const { isEditorMode } = useEditor();
+const EASE_OUT = [0.22, 1, 0.36, 1] as const;
+
+export function HeroSection({ hero, processSteps: initialSteps }: HeroSectionProps) {
+  const { isEditorMode, data } = useEditor();
   const introReady = useIntroReady();
   const show = isEditorMode || introReady;
-  const years = parseInt(hero?.experience_years || "20") || 20;
+  const steps: ProcessStep[] = isEditorMode && data?.processSteps ? data.processSteps : initialSteps;
 
-  const containerVariants: Variants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.09, delayChildren: 0.45 } },
+  const fade: Variants = {
+    hidden: { opacity: 0, y: 14 },
+    visible: (d: number = 0) => ({ opacity: 1, y: 0, transition: { duration: 0.9, delay: d, ease: EASE_OUT } }),
   };
-
-  const itemVariants: Variants = {
-    hidden: { opacity: 0, y: 16 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: "easeOut" } },
-  };
-
-  const highlights = [
-    { value: `${years}+`, label: "Yıllık sektör ve BT deneyimi" },
-    { value: "Uçtan uca", label: "Süreçten sisteme danışmanlık" },
-    { value: "ERP + Non-ERP", label: "Bütünleşik çözüm mimarisi" },
-    { value: "KPI odaklı", label: "Ölçülebilir iş değeri" },
-  ];
+  const anim = (d: number) => ({
+    variants: fade,
+    custom: d,
+    initial: isEditorMode ? false : ("hidden" as const),
+    animate: show ? "visible" : "hidden",
+  });
 
   return (
-    <section className="relative overflow-hidden">
-      {/* Blueprint grid, fading out toward the bottom */}
-      <div
-        className="absolute inset-0 blueprint-bg pointer-events-none"
-        style={{
-          maskImage: "radial-gradient(ellipse 80% 70% at 50% 0%, #000 40%, transparent 100%)",
-          WebkitMaskImage: "radial-gradient(ellipse 80% 70% at 50% 0%, #000 40%, transparent 100%)",
-        }}
-        aria-hidden="true"
-      />
+    <section className="relative bg-white">
+      <div className="container pt-16 md:pt-24 lg:pt-28">
+        {/* Eyebrow */}
+        <motion.div {...anim(0.05)} className="mb-10 md:mb-14">
+          <span className="section-label">
+            <InlineEditable section="hero" field="badge_text" defaultValue={hero.badge_text} tagName="span" />
+          </span>
+        </motion.div>
 
-      <div className="container relative pt-12 md:pt-20 pb-16 md:pb-20">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-center">
-          {/* Left — copy */}
-          <motion.div
-            variants={containerVariants}
-            initial={isEditorMode ? false : "hidden"}
-            animate={show ? "visible" : "hidden"}
-            className="lg:col-span-6 flex flex-col"
-          >
-            <motion.div variants={itemVariants} className="mb-7">
-              <span className="inline-flex items-center gap-2.5 rounded-md border border-slate-200 bg-white px-3 py-1.5">
-                <span className="h-1.5 w-1.5 rounded-sm bg-[var(--brand-blue)]" />
-                <InlineEditable
-                  section="hero"
-                  field="badge_text"
-                  defaultValue={hero.badge_text}
-                  tagName="span"
-                  className="font-mono text-[11px] font-medium tracking-wider uppercase text-slate-600"
-                />
-              </span>
-            </motion.div>
+        {/* Headline */}
+        <h1 className="display text-[2.9rem] sm:text-[4rem] lg:text-[5.6rem] max-w-5xl">
+          <MaskLine show={show} delay={0.1} instant={isEditorMode}>
+            <InlineEditable section="hero" field="title_line1" defaultValue={hero.title_line1} tagName="span" />
+          </MaskLine>
+          <MaskLine show={show} delay={0.2} instant={isEditorMode}>
+            <InlineEditable section="hero" field="title_line2" defaultValue={hero.title_line2} tagName="span" />{" "}
+            <InlineEditable section="hero" field="title_highlight" defaultValue={hero.title_highlight} tagName="span" className="italic text-[var(--brand-blue)]" />
+            <InlineEditable section="hero" field="title_line3" defaultValue={hero.title_line3} tagName="span" />
+          </MaskLine>
+          <MaskLine show={show} delay={0.3} instant={isEditorMode}>
+            <InlineEditable section="hero" field="title_line4" defaultValue={hero.title_line4} tagName="span" />
+          </MaskLine>
+        </h1>
 
-            <h1 className="text-[2.6rem] sm:text-5xl lg:text-[3.6rem] font-bold leading-[1.05] tracking-[-0.03em] text-[var(--brand-navy)] mb-7">
-              <MaskLine show={show} delay={0} instant={isEditorMode}>
-                <InlineEditable section="hero" field="title_line1" defaultValue={hero.title_line1} tagName="span" />
-              </MaskLine>
-              <MaskLine show={show} delay={0.08} instant={isEditorMode}>
-                <InlineEditable section="hero" field="title_line2" defaultValue={hero.title_line2} tagName="span" />{" "}
-                <InlineEditable section="hero" field="title_highlight" defaultValue={hero.title_highlight} tagName="span" className="text-[var(--brand-blue)]" />
-                <InlineEditable section="hero" field="title_line3" defaultValue={hero.title_line3} tagName="span" />
-              </MaskLine>
-              <MaskLine show={show} delay={0.16} instant={isEditorMode}>
-                <InlineEditable section="hero" field="title_line4" defaultValue={hero.title_line4} tagName="span" />
-              </MaskLine>
-            </h1>
+        {/* Rule */}
+        <motion.div
+          className="mt-14 md:mt-20 h-px origin-left bg-[var(--rule)]"
+          initial={isEditorMode ? false : { scaleX: 0 }}
+          animate={show ? { scaleX: 1 } : { scaleX: 0 }}
+          transition={{ duration: 1.3, delay: 0.45, ease: [0.65, 0, 0.35, 1] }}
+        />
 
-            <motion.div variants={itemVariants} className="max-w-xl space-y-3 mb-8">
-              <InlineEditable section="hero" field="description" defaultValue={hero.description} tagName="p" className="text-[17px] text-slate-600 leading-relaxed" />
-              <InlineEditable section="hero" field="description2" defaultValue={hero.description2} tagName="p" className="text-[15px] text-slate-500 leading-relaxed" />
-            </motion.div>
-
-            <motion.div variants={itemVariants} className="flex flex-wrap items-center gap-3 mb-10">
-              <Magnetic>
-                <a href="#cozumler" onClick={(e) => isEditorMode && e.preventDefault()} className="btn-primary">
-                  <InlineEditable section="hero" field="cta_primary_text" defaultValue={hero.cta_primary_text} tagName="span" />
-                </a>
-              </Magnetic>
-              <Magnetic>
-                <a href="#deneyim" onClick={(e) => isEditorMode && e.preventDefault()} className="btn-outline">
-                  <InlineEditable section="hero" field="cta_secondary_text" defaultValue={hero.cta_secondary_text} tagName="span" />
-                </a>
-              </Magnetic>
-            </motion.div>
-
-            <motion.div variants={itemVariants} className="border-l-2 border-[var(--brand-blue)] pl-4">
-              <InlineEditable section="hero" field="tagline" defaultValue={hero.tagline} tagName="p" className="text-base font-semibold text-[var(--brand-navy)]" />
-              <InlineEditable section="hero" field="tagline_sub" defaultValue={hero.tagline_sub} tagName="p" className="font-mono text-xs text-slate-400 mt-1" />
-            </motion.div>
+        {/* Copy + actions */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 pt-10 md:pt-12">
+          <motion.div {...anim(0.6)} className="lg:col-span-5">
+            <InlineEditable section="hero" field="description" defaultValue={hero.description} tagName="p" className="lead" />
           </motion.div>
-
-          {/* Right — architecture diagram */}
-          <motion.div
-            initial={isEditorMode ? false : { opacity: 0, y: 40, scale: 0.98 }}
-            animate={show ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 40, scale: 0.98 }}
-            transition={{ duration: 1, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="lg:col-span-6"
-          >
-            <AtalitixGraphicMap steps={processSteps} mapTitle={hero.map_title} mapBadge={hero.map_badge} play={show} />
+          <motion.div {...anim(0.7)} className="lg:col-span-4">
+            <InlineEditable section="hero" field="description2" defaultValue={hero.description2} tagName="p" className="text-[15.5px] leading-relaxed text-[var(--ink-muted)]" />
+          </motion.div>
+          <motion.div {...anim(0.8)} className="lg:col-span-3 flex flex-col items-start gap-5">
+            <a href="#cozumler" onClick={(e) => isEditorMode && e.preventDefault()} className="btn-primary">
+              <InlineEditable section="hero" field="cta_primary_text" defaultValue={hero.cta_primary_text} tagName="span" />
+            </a>
+            <a href="#deneyim" onClick={(e) => isEditorMode && e.preventDefault()} className="btn-outline">
+              <InlineEditable section="hero" field="cta_secondary_text" defaultValue={hero.cta_secondary_text} tagName="span" />
+            </a>
           </motion.div>
         </div>
+      </div>
 
-        {/* Highlights strip */}
-        <motion.dl
-          initial={isEditorMode ? false : { opacity: 0, y: 24 }}
-          animate={show ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
-          transition={{ duration: 0.8, delay: 0.9, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-16 md:mt-20 grid grid-cols-2 lg:grid-cols-4 rounded-xl border border-slate-200 bg-white overflow-hidden"
-        >
-          {highlights.map((h, i) => (
-            <div
-              key={h.label}
-              className={`p-5 md:p-6 ${i % 2 === 1 ? "border-l" : ""} ${i >= 2 ? "border-t lg:border-t-0" : ""} ${i === 2 ? "lg:border-l" : ""} border-slate-200`}
-            >
-              <dt className="sr-only">{h.label}</dt>
-              <dd className="text-xl md:text-2xl font-bold tracking-tight text-[var(--brand-navy)]">{h.value}</dd>
-              <dd className="mt-1 text-[13px] text-slate-500">{h.label}</dd>
-            </div>
-          ))}
-        </motion.dl>
+      {/* Process line — the operating map, drawn as a single line */}
+      <div className="container pt-24 md:pt-32 pb-24 md:pb-28">
+        <motion.div {...anim(0.9)} className="flex flex-col md:flex-row md:items-baseline md:justify-between gap-2 mb-10 md:mb-12">
+          <InlineEditable section="hero" field="map_title" defaultValue={hero.map_title} tagName="p" className="font-serif text-2xl md:text-[1.75rem] text-[var(--ink)]" />
+          <InlineEditable section="hero" field="map_badge" defaultValue={hero.map_badge} tagName="p" className="text-sm tracking-[0.08em] uppercase text-[var(--ink-muted)]" />
+        </motion.div>
+        <ProcessLine steps={steps} play={show} instant={isEditorMode} />
       </div>
     </section>
+  );
+}
+
+function ProcessLine({ steps, play, instant }: { steps: ProcessStep[]; play: boolean; instant: boolean }) {
+  const n = Math.max(steps.length, 1);
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-80px" });
+  // ERP is the core of the map — give its marker weight
+  const isCore = (s: ProcessStep) => /^erp alan/i.test((s.title || "").replace(/<[^>]*>/g, "").trim());
+
+  return (
+    <motion.div
+      ref={ref}
+      className="relative"
+      initial={instant ? false : "hidden"}
+      animate={instant || (play && inView) ? "visible" : "hidden"}
+    >
+      {/* Horizontal line (desktop) */}
+      <motion.div
+        className="hidden md:block absolute left-0 right-0 top-[7px] h-px origin-left bg-[var(--rule-strong)]"
+        variants={{ hidden: { scaleX: 0 }, visible: { scaleX: 1, transition: { duration: 1.6, ease: [0.65, 0, 0.35, 1] } } }}
+      />
+      {/* Vertical line (mobile) */}
+      <motion.div
+        className="md:hidden absolute left-[7px] top-2 bottom-2 w-px origin-top bg-[var(--rule-strong)]"
+        variants={{ hidden: { scaleY: 0 }, visible: { scaleY: 1, transition: { duration: 1.6, ease: [0.65, 0, 0.35, 1] } } }}
+      />
+
+      <ol
+        className="relative grid grid-cols-1 gap-10 md:gap-8 md:[grid-template-columns:repeat(var(--cols),minmax(0,1fr))]"
+        style={{ ["--cols" as string]: n } as React.CSSProperties}
+      >
+        {steps.map((step, i) => {
+          const delay = 0.35 + (i / n) * 1.3;
+          const core = isCore(step);
+          return (
+            <li key={step.step_number ?? i} className="relative pl-9 md:pl-0">
+              <motion.span
+                className={`absolute left-0 md:static block h-[15px] w-[15px] rounded-full border ${
+                  core ? "bg-[var(--brand-navy)] border-[var(--brand-navy)]" : "bg-white border-[var(--brand-navy)]"
+                }`}
+                variants={{ hidden: { scale: 0 }, visible: { scale: 1, transition: { delay, type: "spring", stiffness: 300, damping: 20 } } }}
+              />
+              <motion.div
+                className="md:pt-7 md:pr-6"
+                variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0, transition: { delay: delay + 0.1, duration: 0.8, ease: EASE_OUT } } }}
+              >
+                <p className="text-[13px] text-[var(--ink-muted)] mb-2 tabular-nums">{String(step.step_number ?? i + 1).padStart(2, "0")}</p>
+                <InlineEditable section="processSteps" field="title" index={i} defaultValue={step.title} tagName="h3" className="font-serif text-[1.5rem] leading-tight text-[var(--ink)] mb-3" />
+                <InlineEditable section="processSteps" field="description" index={i} defaultValue={step.description} tagName="p" className="text-[15px] leading-relaxed text-[var(--ink-muted)]" />
+              </motion.div>
+            </li>
+          );
+        })}
+      </ol>
+    </motion.div>
   );
 }

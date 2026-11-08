@@ -1,6 +1,6 @@
 import { Header, Footer } from "@/components/layout";
-import { HeroSection, SolutionsSection, ApproachSection, ContactSection, CapabilityMarquee, EngineeringSection } from "@/components/sections";
-import { IntroLoader, ScrollProgress, INTRO_BOOT_SCRIPT } from "@/components/motion";
+import { HeroSection, SolutionsSection, ApproachSection, ContactSection, ErpScopeSection } from "@/components/sections";
+import { IntroLoader, INTRO_BOOT_SCRIPT } from "@/components/motion";
 import { createClient } from "@/lib/supabase/server";
 import { SITE_CONFIG } from "@/lib/constants";
 
@@ -110,7 +110,6 @@ export default async function HomePage() {
       {/* Decide before first paint whether the intro plays (first visit per session) */}
       <script dangerouslySetInnerHTML={{ __html: INTRO_BOOT_SCRIPT }} />
       <IntroLoader />
-      <ScrollProgress />
 
       <Header />
       <main className="pt-20">
@@ -122,11 +121,9 @@ export default async function HomePage() {
           />
         )}
         
-        <CapabilityMarquee />
-
         {solutions && solutions.length > 0 && <SolutionsSection solutions={solutions} hero={hero} />}
 
-        <EngineeringSection />
+        <ErpScopeSection />
         
         {approachSteps && experienceItems && (
           <ApproachSection

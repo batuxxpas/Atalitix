@@ -1,18 +1,20 @@
 "use client";
 
 import React, { useRef, useEffect, useState } from "react";
-import { motion, Variants, useScroll, useTransform, useMotionValueEvent, useSpring } from "framer-motion";
-import { InViewMask } from "@/components/motion";
+import { motion } from "framer-motion";
 import { InlineEditable, useEditor } from "@/components/editor";
 import {
   DndContext, closestCenter, PointerSensor, KeyboardSensor,
   useSensor, useSensors, type DragEndEvent
 } from "@dnd-kit/core";
 import {
-  SortableContext, verticalListSortingStrategy, rectSortingStrategy,
+  SortableContext, verticalListSortingStrategy,
   useSortable, arrayMove, sortableKeyboardCoordinates
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { InViewMask, FadeIn } from "@/components/motion";
+
+const EASE_OUT = [0.22, 1, 0.36, 1] as const;
 
 function AnimatedCounter({ from, to }: { from: number; to: number }) {
   const nodeRef = useRef<HTMLSpanElement>(null);
@@ -22,23 +24,22 @@ function AnimatedCounter({ from, to }: { from: number; to: number }) {
     const node = nodeRef.current;
     if (!node) return;
     const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting && !started) setStarted(true); },
+      ([entry]) => { if (entry.isIntersecting) setStarted(true); },
       { threshold: 0.1, rootMargin: "-50px" }
     );
     observer.observe(node);
     return () => observer.disconnect();
-  }, [started]);
+  }, []);
 
   useEffect(() => {
     const node = nodeRef.current;
     if (!started || !node) return;
-    const duration = 2500;
+    const duration = 2200;
     const startTime = performance.now();
     const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
     let rafId: number;
     const tick = (now: number) => {
-      const elapsed = now - startTime;
-      const progress = Math.min(elapsed / duration, 1);
+      const progress = Math.min((now - startTime) / duration, 1);
       node.textContent = Math.round(from + (to - from) * easeOut(progress)).toString();
       if (progress < 1) rafId = requestAnimationFrame(tick);
     };
@@ -68,136 +69,84 @@ interface ApproachSectionProps {
   hero?: any;
 }
 
-function SortableApproachCard({ step, index, isEditorMode, sortId, active }: { step: ApproachStep; index: number; isEditorMode: boolean; sortId: string; active: boolean }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: sortId });
-
-  const style: React.CSSProperties = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    zIndex: isDragging ? 50 : undefined,
-  };
-
-  const variants: Variants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
-  };
-
-
+function DragHandle({ dark, ...props }: React.HTMLAttributes<HTMLDivElement> & { dark?: boolean }) {
   return (
-    <motion.div
-      ref={setNodeRef}
-      style={style}
-      variants={variants}
-      className={`relative group flex gap-5 lg:block ${isDragging ? 'opacity-80 ring-2 ring-[var(--brand-blue-400)] rounded-xl' : ''}`}
+    <div
+      {...props}
+      className={`absolute top-6 right-0 z-20 p-1.5 rounded border cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity ${
+        dark ? "bg-white/10 border-white/20 text-slate-300" : "bg-white border-slate-200 text-slate-400"
+      }`}
+      title="Sürükle"
     >
-      {isEditorMode && (
-        <div
-          {...attributes}
-          {...listeners}
-          className={`absolute top-2 right-2 z-20 p-1.5 rounded-md border cursor-grab active:cursor-grabbing transition-all opacity-0 group-hover:opacity-100 shadow-sm bg-slate-700/80 border-slate-600 text-slate-400 hover:text-white hover:border-indigo-400`}
-          title="Sürükle"
-        >
-          <svg className="w-4 h-4" viewBox="0 0 16 16" fill="currentColor">
-            <circle cx="5" cy="3" r="1.5" /><circle cx="11" cy="3" r="1.5" />
-            <circle cx="5" cy="8" r="1.5" /><circle cx="11" cy="8" r="1.5" />
-            <circle cx="5" cy="13" r="1.5" /><circle cx="11" cy="13" r="1.5" />
-          </svg>
-        </div>
-      )}
-      {/* Marker — sits on the progress track */}
-      <div className="relative z-10 shrink-0 lg:mb-6">
-        <div
-          className={`flex h-10 w-10 items-center justify-center rounded-[0.625rem] font-mono text-[13px] font-medium transition-all duration-500 ${
-            active
-              ? "bg-[var(--brand-blue)] text-white shadow-[0_0_0_6px_rgba(29,108,242,0.18)]"
-              : "bg-[var(--brand-navy-900)] text-slate-500 border border-white/15"
-          }`}
-        >
-          {String(index + 1).padStart(2, "0")}
-        </div>
-      </div>
-      <div className={`pr-4 pb-2 transition-opacity duration-500 ${active ? "opacity-100" : "opacity-45"}`}>
-        <InlineEditable section="approachSteps" field="title" index={index} defaultValue={step.title} tagName="h3" className="text-lg font-semibold text-white mb-2" />
-        <InlineEditable section="approachSteps" field="description" index={index} defaultValue={step.description} tagName="p" className="text-sm text-slate-400 leading-relaxed" />
-      </div>
-    </motion.div>
+      <svg className="w-4 h-4" viewBox="0 0 16 16" fill="currentColor">
+        <circle cx="5" cy="3" r="1.5" /><circle cx="11" cy="3" r="1.5" />
+        <circle cx="5" cy="8" r="1.5" /><circle cx="11" cy="8" r="1.5" />
+        <circle cx="5" cy="13" r="1.5" /><circle cx="11" cy="13" r="1.5" />
+      </svg>
+    </div>
   );
 }
 
-function SortableExperienceCard({ item, index, isEditorMode, sortId }: { item: ExperienceItem; index: number; isEditorMode: boolean; sortId: string }) {
+function ApproachRow({ step, index, isEditorMode, sortId }: { step: ApproachStep; index: number; isEditorMode: boolean; sortId: string }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: sortId });
-
-  const style: React.CSSProperties = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    zIndex: isDragging ? 50 : undefined,
-  };
-
-  const variants: Variants = {
-    hidden: { opacity: 0, y: 14 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: "easeOut" } },
-  };
+  const style: React.CSSProperties = { transform: CSS.Transform.toString(transform), transition, zIndex: isDragging ? 50 : undefined };
 
   return (
-    <motion.div
+    <motion.li
       ref={setNodeRef}
       style={style}
-      variants={variants}
-      className={`relative group flex items-start gap-4 bg-white px-5 py-5 md:px-6 ${isDragging ? 'opacity-80 ring-2 ring-[var(--brand-blue)] shadow-xl' : ''}`}
+      // Reading focus: a step brightens while it sits in the middle of the viewport
+      initial={isEditorMode ? false : { opacity: 0.3 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: false, margin: "-38% 0px -38% 0px" }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+      className="group relative grid grid-cols-12 gap-x-6 border-t border-white/15 py-10 md:py-12"
     >
-      {isEditorMode && (
-        <div
-          {...attributes}
-          {...listeners}
-          className={`absolute top-2 right-2 z-20 p-1.5 rounded-md border cursor-grab active:cursor-grabbing transition-all opacity-0 group-hover:opacity-100 shadow-sm bg-white/90 border-slate-200 text-slate-400 hover:text-indigo-600 hover:border-indigo-300`}
-          title="Sürükle"
-        >
-          <svg className="w-4 h-4" viewBox="0 0 16 16" fill="currentColor">
-            <circle cx="5" cy="3" r="1.5" /><circle cx="11" cy="3" r="1.5" />
-            <circle cx="5" cy="8" r="1.5" /><circle cx="11" cy="8" r="1.5" />
-            <circle cx="5" cy="13" r="1.5" /><circle cx="11" cy="13" r="1.5" />
-          </svg>
-        </div>
-      )}
-      <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-[var(--brand-blue-50)] text-[var(--brand-blue)]" aria-hidden="true">
-        <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
+      {isEditorMode && <DragHandle dark {...attributes} {...listeners} />}
+      <span className="col-span-2 font-serif text-[2rem] md:text-[2.6rem] leading-none text-[var(--brand-blue-400)] tabular-nums">
+        {String(index + 1).padStart(2, "0")}
       </span>
-      <InlineEditable section="experienceItems" field="title" index={index} defaultValue={item.title} tagName="p" className="text-[15px] font-medium text-[var(--brand-navy)] leading-relaxed pr-6" />
-    </motion.div>
+      <div className="col-span-10 pr-8">
+        <InlineEditable section="approachSteps" field="title" index={index} defaultValue={step.title} tagName="h3" className="font-serif text-[1.65rem] md:text-[2rem] leading-tight text-white mb-3" />
+        <InlineEditable section="approachSteps" field="description" index={index} defaultValue={step.description} tagName="p" className="text-[16px] leading-relaxed text-slate-300/90 max-w-xl" />
+      </div>
+    </motion.li>
+  );
+}
+
+function ExperienceRow({ item, index, isEditorMode, sortId }: { item: ExperienceItem; index: number; isEditorMode: boolean; sortId: string }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: sortId });
+  const style: React.CSSProperties = { transform: CSS.Transform.toString(transform), transition, zIndex: isDragging ? 50 : undefined };
+
+  return (
+    <motion.li
+      ref={setNodeRef}
+      style={style}
+      initial={isEditorMode ? false : { opacity: 0, y: 12 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.8, delay: index * 0.08, ease: EASE_OUT }}
+      className={`group relative flex items-baseline gap-6 border-b border-[var(--rule)] py-7 ${isDragging ? "bg-white shadow-xl" : ""}`}
+    >
+      {isEditorMode && <DragHandle {...attributes} {...listeners} />}
+      <span className="h-px w-6 shrink-0 translate-y-[-0.3em] bg-[var(--brand-blue)]" aria-hidden="true" />
+      <InlineEditable section="experienceItems" field="title" index={index} defaultValue={item.title} tagName="p" className="font-serif text-[1.35rem] md:text-[1.5rem] leading-snug text-[var(--ink)] pr-8" />
+    </motion.li>
   );
 }
 
 export function ApproachSection({ approachSteps: initialApproach, experienceItems: initialExperience, hero }: ApproachSectionProps) {
   const { isEditorMode, data, reorderData } = useEditor();
 
-  const activeApproach = isEditorMode && data?.approachSteps ? data.approachSteps : initialApproach;
-  const activeExperience = isEditorMode && data?.experienceItems ? data.experienceItems : initialExperience;
-
-  // Dark panel expands from an inset card to full-bleed as it scrolls in
-  const panelRef = useRef<HTMLElement>(null);
-  const { scrollYProgress: panelP } = useScroll({ target: panelRef, offset: ["start end", "start 15%"] });
-  const clipPath = useTransform(panelP, (v) => {
-    const k = 1 - v;
-    return `inset(0px ${(k * 4).toFixed(2)}% 0px ${(k * 4).toFixed(2)}% round ${(k * 32).toFixed(1)}px)`;
-  });
-
-  // Steps light up along a scroll-linked track
-  const stepsRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress: stepsP } = useScroll({ target: stepsRef, offset: ["start 80%", "end 60%"] });
-  const fill = useSpring(stepsP, { stiffness: 120, damping: 28, mass: 0.4 });
-  const [activeStep, setActiveStep] = useState(-1);
-  useMotionValueEvent(stepsP, "change", (v) => {
-    const n = activeApproach.length;
-    setActiveStep(v <= 0.001 ? -1 : Math.min(n - 1, Math.floor(v * n)));
-  });
+  const activeApproach: ApproachStep[] = isEditorMode && data?.approachSteps ? data.approachSteps : initialApproach;
+  const activeExperience: ExperienceItem[] = isEditorMode && data?.experienceItems ? data.experienceItems : initialExperience;
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
-  // Approach sort IDs
-  const approachIds = activeApproach.map((s: ApproachStep, i: number) => s.id?.toString() || s.title || `ap-${i}`);
+  const approachIds = activeApproach.map((s, i) => s.id?.toString() || s.title || `ap-${i}`);
   const handleApproachDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
@@ -207,8 +156,7 @@ export function ApproachSection({ approachSteps: initialApproach, experienceItem
     reorderData("approachSteps", arrayMove(activeApproach, oldIdx, newIdx));
   };
 
-  // Experience sort IDs
-  const experienceIds = activeExperience.map((s: ExperienceItem, i: number) => s.id?.toString() || s.title || `exp-${i}`);
+  const experienceIds = activeExperience.map((s, i) => s.id?.toString() || s.title || `exp-${i}`);
   const handleExperienceDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
@@ -218,118 +166,90 @@ export function ApproachSection({ approachSteps: initialApproach, experienceItem
     reorderData("experienceItems", arrayMove(activeExperience, oldIdx, newIdx));
   };
 
-  const staggerVariants: Variants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.1 } },
-  };
-
-  const fadeUp: Variants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
-  };
-
-  const approachCards = activeApproach.map((step: ApproachStep, index: number) => (
-    <SortableApproachCard key={approachIds[index]} step={step} index={index} isEditorMode={isEditorMode} sortId={approachIds[index]} active={isEditorMode || index <= activeStep} />
-  ));
-
-  const experienceCards = activeExperience.map((item: ExperienceItem, index: number) => (
-    <SortableExperienceCard key={experienceIds[index]} item={item} index={index} isEditorMode={isEditorMode} sortId={experienceIds[index]} />
-  ));
-
-  const nSteps = Math.max(activeApproach.length, 1);
-  const approachGrid = "relative grid grid-cols-1 lg:[grid-template-columns:repeat(var(--cols),minmax(0,1fr))] gap-x-6 gap-y-10";
-  const approachGridStyle = { ["--cols" as string]: nSteps } as React.CSSProperties;
-  // Horizontal track runs from the first to the last marker centre (gap-x-6 = 24px, marker = 40px)
-  const trackRight = `calc((100% - ${24 * (nSteps - 1)}px) / ${nSteps} - 20px)`;
-  const track = (
-    <>
-      <div className="hidden lg:block absolute top-5 left-5 h-px bg-white/10" style={{ right: trackRight }} aria-hidden="true">
-        <motion.div className="h-full origin-left bg-[var(--brand-blue)]" style={{ scaleX: isEditorMode ? 1 : fill }} />
-      </div>
-      <div className="lg:hidden absolute left-5 top-5 bottom-8 w-px bg-white/10" aria-hidden="true">
-        <motion.div className="w-full h-full origin-top bg-[var(--brand-blue)]" style={{ scaleY: isEditorMode ? 1 : fill }} />
-      </div>
-    </>
+  const approachList = (
+    <ol className="border-b border-white/15">
+      {activeApproach.map((step, index) => (
+        <ApproachRow key={approachIds[index]} step={step} index={index} isEditorMode={isEditorMode} sortId={approachIds[index]} />
+      ))}
+    </ol>
   );
-  const experienceList = "rounded-2xl border border-slate-200 bg-slate-200 grid grid-cols-1 gap-px overflow-hidden shadow-[0_20px_50px_-30px_rgba(11,26,79,0.3)]";
+
+  const experienceList = (
+    <ul className="border-t border-[var(--rule-strong)]">
+      {activeExperience.map((item, index) => (
+        <ExperienceRow key={experienceIds[index]} item={item} index={index} isEditorMode={isEditorMode} sortId={experienceIds[index]} />
+      ))}
+    </ul>
+  );
 
   return (
     <>
-      <section ref={panelRef} id="yaklasim" className="relative bg-white">
-        <motion.div
-          style={isEditorMode ? undefined : { clipPath }}
-          className="relative py-24 md:py-32 blueprint-bg-dark text-white overflow-hidden"
-        >
-        <div className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 h-80 w-[60rem] max-w-full rounded-full bg-[var(--brand-blue)]/15 blur-3xl" aria-hidden="true" />
-        <div className="container relative">
-          <motion.div
-            initial="hidden" whileInView="visible"
-            viewport={{ once: true, margin: "-80px" }}
-            variants={fadeUp}
-            className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-end mb-14 md:mb-16"
-          >
-            <div className="lg:col-span-7">
-              <InlineEditable section="hero" field="approach_label" defaultValue={hero?.approach_label || "YAKLAŞIM"} tagName="p" className="section-label !text-[var(--brand-blue-400)] mb-4" />
-              <InViewMask instant={isEditorMode}>
-                <InlineEditable section="hero" field="approach_title" defaultValue={hero?.approach_title || ""} tagName="h2" className="section-title-light" />
-              </InViewMask>
-            </div>
+      {/* Approach — full-bleed navy */}
+      <section id="yaklasim" className="relative bg-[var(--brand-navy-900)] text-white py-24 md:py-36">
+        <div className="container">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
             <div className="lg:col-span-5">
-              <InlineEditable section="hero" field="approach_desc" defaultValue={hero?.approach_desc || ""} tagName="p" className="text-slate-400 leading-relaxed" />
+              <div className="lg:sticky lg:top-32">
+                <FadeIn instant={isEditorMode} className="mb-6">
+                  <InlineEditable section="hero" field="approach_label" defaultValue={hero?.approach_label || "YAKLAŞIM"} tagName="p" className="section-label !text-slate-400" />
+                </FadeIn>
+                <InViewMask instant={isEditorMode}>
+                  <InlineEditable section="hero" field="approach_title" defaultValue={hero?.approach_title || ""} tagName="h2" className="section-title-light" />
+                </InViewMask>
+                <FadeIn instant={isEditorMode} delay={0.15} className="mt-8">
+                  <InlineEditable section="hero" field="approach_desc" defaultValue={hero?.approach_desc || ""} tagName="p" className="text-[16.5px] leading-relaxed text-slate-300/80" />
+                </FadeIn>
+              </div>
             </div>
-          </motion.div>
 
-          {isEditorMode ? (
-            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleApproachDragEnd}>
-              <SortableContext items={approachIds} strategy={rectSortingStrategy}>
-                <div className={approachGrid} style={approachGridStyle}>{track}{approachCards}</div>
-              </SortableContext>
-            </DndContext>
-          ) : (
-            <motion.div ref={stepsRef} variants={staggerVariants} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} className={approachGrid} style={approachGridStyle}>
-              {track}
-              {approachCards}
-            </motion.div>
-          )}
+            <div className="lg:col-span-7">
+              {isEditorMode ? (
+                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleApproachDragEnd}>
+                  <SortableContext items={approachIds} strategy={verticalListSortingStrategy}>
+                    {approachList}
+                  </SortableContext>
+                </DndContext>
+              ) : (
+                approachList
+              )}
+            </div>
+          </div>
         </div>
-        </motion.div>
       </section>
 
-      <section id="deneyim" className="relative py-24 md:py-28 bg-[var(--color-bg-soft)] overflow-hidden">
+      {/* Experience */}
+      <section id="deneyim" className="relative bg-white py-24 md:py-36">
         <div className="container">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-            <motion.div
-              initial="hidden" whileInView="visible"
-              viewport={{ once: true, margin: "-80px" }}
-              variants={fadeUp}
-              className="lg:col-span-5"
-            >
-              <p className="section-label mb-5">DENEYİM</p>
-              <div className="flex items-start text-7xl md:text-8xl font-bold tracking-tighter text-[var(--brand-navy)] mb-5 leading-none">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
+            <div className="lg:col-span-5">
+              <FadeIn instant={isEditorMode} className="mb-8">
+                <p className="section-label">Deneyim</p>
+              </FadeIn>
+              <div className="display flex items-start text-[7rem] md:text-[10rem] leading-[0.85] mb-8">
                 {isEditorMode ? (
                   <InlineEditable section="hero" field="experience_years" defaultValue={hero?.experience_years || "20"} tagName="span" />
                 ) : (
                   <AnimatedCounter from={0} to={parseInt(hero?.experience_years || "20") || 20} />
                 )}
-                <span className="text-[var(--brand-blue)] text-5xl md:text-6xl ml-1 mt-1">+</span>
+                <span className="text-[var(--brand-blue)] text-[4rem] md:text-[5.5rem] ml-1">+</span>
               </div>
-              <InViewMask instant={isEditorMode} className="mb-5">
-                <InlineEditable section="hero" field="experience_title" defaultValue={hero?.experience_title || ""} tagName="h2" className="text-2xl md:text-3xl font-semibold tracking-tight text-[var(--brand-navy)] leading-snug" />
+              <InViewMask instant={isEditorMode} className="mb-6">
+                <InlineEditable section="hero" field="experience_title" defaultValue={hero?.experience_title || ""} tagName="h2" className="font-serif text-[1.75rem] md:text-[2.1rem] leading-snug text-[var(--ink)]" />
               </InViewMask>
-              <InlineEditable section="hero" field="experience_desc" defaultValue={hero?.experience_desc || ""} tagName="p" className="text-slate-500 leading-relaxed" />
-            </motion.div>
+              <FadeIn instant={isEditorMode} delay={0.1}>
+                <InlineEditable section="hero" field="experience_desc" defaultValue={hero?.experience_desc || ""} tagName="p" className="text-[16.5px] leading-relaxed text-[var(--ink-muted)]" />
+              </FadeIn>
+            </div>
 
-            <div className="lg:col-span-7">
+            <div className="lg:col-span-7 lg:pt-24">
               {isEditorMode ? (
                 <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleExperienceDragEnd}>
                   <SortableContext items={experienceIds} strategy={verticalListSortingStrategy}>
-                    <div className={experienceList}>{experienceCards}</div>
+                    {experienceList}
                   </SortableContext>
                 </DndContext>
               ) : (
-                <motion.div variants={staggerVariants} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }} className={experienceList}>
-                  {experienceCards}
-                </motion.div>
+                experienceList
               )}
             </div>
           </div>
