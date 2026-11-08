@@ -100,12 +100,8 @@ export default async function NewsDetailPage({ params }: { params: Params }) {
                   </p>
                 )}
 
-                <div className="mt-12 flex flex-wrap items-center justify-between gap-6 border-t border-[var(--rule-strong)] pt-8">
+                <div className="mt-12 border-t border-[var(--rule-strong)] pt-8">
                   <Link href="/haberler" className="text-[14px] text-[var(--ink)] link-underline">← Tüm haberler</Link>
-                  <Link href="/#iletisim" className="btn-primary">
-                    Görüşme planla
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.6} d="M5 12h14M13 6l6 6-6 6" /></svg>
-                  </Link>
                 </div>
               </div>
             </div>
