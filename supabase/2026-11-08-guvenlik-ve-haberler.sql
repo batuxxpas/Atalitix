@@ -15,11 +15,14 @@ create table if not exists public.haberler (
   ozet        text,
   kaynak_adi  text,
   link        text,
+  gorsel_url  text,
   tarih       date not null default current_date,
   is_active   boolean not null default true,
   sort_order  integer not null default 0,
   created_at  timestamptz not null default now()
 );
+
+alter table public.haberler add column if not exists gorsel_url text;
 
 create table if not exists public.cozum_alt_basliklari (
   id          uuid primary key default gen_random_uuid(),
@@ -117,7 +120,22 @@ where not exists (
 );
 
 -- ---------------------------------------------------------------------
--- 6) Kontrol (Run sonrası alttaki sonuçta tüm tablolarda rls = true olmalı)
+-- 6) Örnek haberler (görseller Supabase Storage: haberler/kapaklar) — tekrar eklemez
+-- ---------------------------------------------------------------------
+insert into public.haberler (tur, baslik, ozet, tarih, gorsel_url)
+select v.tur, v.baslik, v.ozet, v.tarih, v.gorsel_url
+from (values
+  ('bizden', 'Yeni web sitemiz yayında', 'Süreç tasarımı merkezli dönüşüm yaklaşımımızı, üç çözüm alanımızı ve ERP yolu çalışmalarımızı anlatan yeni web sitemizi yayına aldık. Etkinliklerimizi ve gündem notlarımızı artık Haberler bölümünden takip edebilirsiniz.', date '2026-11-08', 'https://rhjlmhvcpjqmxjyferzi.supabase.co/storage/v1/object/public/haberler/kapaklar/site.jpg'),
+  ('bizden', '2026 tanıtım sunumumuz hazır', 'Süreç analizi, ERP kapsamı, dijital ve AI olgunluk değerlendirmesi ile eğitim ve adaptasyon başlıklarındaki çalışma modelimizi ve çıktı paketlerimizi anlatan tanıtım sunumumuz hazır. Sunumu talep etmek için bizimle iletişime geçebilirsiniz.', date '2026-11-05', 'https://rhjlmhvcpjqmxjyferzi.supabase.co/storage/v1/object/public/haberler/kapaklar/sunum.jpg'),
+  ('bizden', 'Odoo sertifikalı danışmanlık', 'Ekibimiz Odoo sertifikasyonunu tamamladı. Kapsam çalışmasının Odoo''yu işaret ettiği ERP projelerinde kurulum, uyarlama, veri aktarımı ve canlıya geçişi sertifikalı ekibimizle yürütüyoruz.', date '2026-10-29', 'https://rhjlmhvcpjqmxjyferzi.supabase.co/storage/v1/object/public/haberler/kapaklar/odoo.jpg'),
+  ('dunyadan', 'ERP seçiminde odak süreç uyumuna kayıyor', 'Şirketler ERP kararlarında modül listelerinden çok süreç uyumu, entegrasyon ihtiyacı, kullanıcı profili ve ölçeklenebilirliği sorguluyor. Kapsamı süreç haritasından başlatan projeler uyarlama ihtiyacını ve proje riskini azaltıyor.', date '2026-11-06', 'https://rhjlmhvcpjqmxjyferzi.supabase.co/storage/v1/object/public/haberler/kapaklar/erp.jpg'),
+  ('dunyadan', 'Ortak KPI sözlüğü olmadan yönetim kokpiti olmaz', 'Dashboard projelerinin önündeki en büyük engel çoğu zaman teknoloji değil; aynı göstergenin farklı departmanlarda farklı hesaplanması. Ortak KPI tanımları ve aksiyon takibiyle desteklenen ekranlar karar hızını artırıyor.', date '2026-11-02', 'https://rhjlmhvcpjqmxjyferzi.supabase.co/storage/v1/object/public/haberler/kapaklar/kpi.jpg'),
+  ('dunyadan', 'Kurumsal yapay zekâda pilottan yönetişime', 'Yapay zekâ girişimlerinde gündem; tek tek denemelerden, değer üreten kullanım senaryolarının seçilmesine, kullanıcı kabulüne ve KVKK ile uyumlu yönetişim kurallarına kayıyor.', date '2026-10-27', 'https://rhjlmhvcpjqmxjyferzi.supabase.co/storage/v1/object/public/haberler/kapaklar/ai.jpg')
+) as v(tur, baslik, ozet, tarih, gorsel_url)
+where not exists (select 1 from public.haberler h where h.baslik = v.baslik);
+
+-- ---------------------------------------------------------------------
+-- 7) Kontrol (Run sonrası alttaki sonuçta tüm tablolarda rls = true olmalı)
 -- ---------------------------------------------------------------------
 select c.relname as tablo, c.relrowsecurity as rls
 from pg_class c join pg_namespace n on n.oid = c.relnamespace

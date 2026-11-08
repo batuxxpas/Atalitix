@@ -10,6 +10,7 @@ type Row = {
   ozet: string | null;
   kaynak_adi: string | null;
   link: string | null;
+  gorsel_url: string | null;
   tarih: string;
   is_active: boolean;
 };
@@ -68,8 +69,19 @@ export default async function AdminNewsPage() {
           <label className={label} htmlFor="ozet">Kısa özet</label>
           <textarea id="ozet" name="ozet" rows={3} className={`${input} resize-y`} placeholder="2-3 cümlelik özet" />
         </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className={label} htmlFor="gorsel">Görsel yükle (JPG, PNG, WebP · en fazla 5 MB)</label>
+            <input id="gorsel" name="gorsel" type="file" accept="image/jpeg,image/png,image/webp" className={`${input} file:mr-3 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-slate-700`} />
+          </div>
+          <div>
+            <label className={label} htmlFor="gorsel_url">…veya görsel bağlantısı</label>
+            <input id="gorsel_url" name="gorsel_url" type="url" className={input} placeholder="https://..." />
+          </div>
+        </div>
+        <p className="text-xs text-slate-400 -mt-1">En iyi görünüm için 16:9 yatay görsel (örn. 1600×900) kullanın.</p>
         <div>
-          <label className={label} htmlFor="link">Bağlantı (opsiyonel)</label>
+          <label className={label} htmlFor="link">Haber bağlantısı (opsiyonel)</label>
           <input id="link" name="link" type="url" className={input} placeholder="https://..." />
         </div>
         <button type="submit" className="rounded-lg bg-[#0b1a4f] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#1d6cf2] transition-colors">
@@ -82,6 +94,10 @@ export default async function AdminNewsPage() {
         {rows.length === 0 && <p className="p-6 text-sm text-slate-500">Henüz haber yok.</p>}
         {rows.map((r) => (
           <div key={r.id} className="flex flex-col md:flex-row md:items-start gap-4 p-5">
+            {r.gorsel_url && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={r.gorsel_url} alt="" className="h-20 w-36 shrink-0 rounded-lg object-cover border border-slate-200" />
+            )}
             <div className="flex-1 min-w-0">
               <div className="flex flex-wrap items-center gap-2 mb-1">
                 <span className={`text-[11px] font-semibold rounded px-2 py-0.5 ${r.tur === "bizden" ? "bg-indigo-50 text-indigo-700" : "bg-sky-50 text-sky-700"}`}>

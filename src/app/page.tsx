@@ -36,7 +36,7 @@ export default async function HomePage() {
     (supabase.from("yaklasim_adimlari") as any).select("*").eq("is_active", true).order("sort_order"),
     (supabase.from("deneyim_maddeleri") as any).select("*").eq("is_active", true).order("sort_order"),
     // Yeni tablolar: henüz oluşturulmadıysa hata döner, bölümler sessizce gizlenir
-    (supabase.from("haberler") as any).select("id,tur,baslik,ozet,kaynak_adi,link,tarih").eq("is_active", true).order("tarih", { ascending: false }).limit(24),
+    (supabase.from("haberler") as any).select("id,tur,baslik,ozet,kaynak_adi,link,gorsel_url,tarih").eq("is_active", true).order("tarih", { ascending: false }).limit(24),
     (supabase.from("cozum_alt_basliklari") as any).select("id,cozum_id,baslik,aciklama,sort_order").eq("is_active", true).order("sort_order"),
   ]);
 

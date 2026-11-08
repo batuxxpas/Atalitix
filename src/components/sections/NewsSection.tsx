@@ -11,6 +11,7 @@ export interface NewsItem {
   ozet: string | null;
   kaynak_adi: string | null;
   link: string | null;
+  gorsel_url?: string | null;
   tarih: string;
 }
 
@@ -39,12 +40,67 @@ function safeHref(link: string | null): string | null {
   }
 }
 
+/** Image with a slow zoom on hover — no frame, just the picture. */
+function Cover({ src, alt, className = "" }: { src: string; alt: string; className?: string }) {
+  return (
+    <div className={`relative aspect-[16/9] overflow-hidden bg-[var(--paper)] ${className}`}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        decoding="async"
+        className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1.2s] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
+      />
+    </div>
+  );
+}
+
+function StoryLink({ item, children }: { item: NewsItem; children: React.ReactNode }) {
+  const href = safeHref(item.link);
+  return href ? (
+    <a href={href} target="_blank" rel="noopener noreferrer" className="block">{children}</a>
+  ) : (
+    <div>{children}</div>
+  );
+}
+
+function LeadStory({ item }: { item: NewsItem }) {
+  const href = safeHref(item.link);
+  return (
+    <article className="group grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 border-t border-[var(--rule-strong)] pt-8">
+      {item.gorsel_url && (
+        <div className="lg:col-span-7">
+          <StoryLink item={item}>
+            <Cover src={item.gorsel_url} alt={item.baslik} />
+          </StoryLink>
+        </div>
+      )}
+      <div className={item.gorsel_url ? "lg:col-span-5 lg:pt-2" : "lg:col-span-9"}>
+        <time dateTime={item.tarih} className="block text-[13px] tabular-nums text-[var(--ink-muted)] mb-3">{formatDate(item.tarih)}</time>
+        <StoryLink item={item}>
+          <h3 className="font-serif text-[1.7rem] md:text-[2rem] leading-tight text-[var(--ink)] transition-colors group-hover:text-[var(--brand-blue)]">{item.baslik}</h3>
+        </StoryLink>
+        {item.ozet && <p className="mt-4 text-[15.5px] leading-relaxed text-[var(--ink-body)]">{item.ozet}</p>}
+        {(item.kaynak_adi || href) && (
+          <p className="mt-5 text-[13px] text-[var(--ink-muted)]">
+            {item.kaynak_adi && <span>Kaynak: {item.kaynak_adi}</span>}
+            {href && (
+              <a href={href} target="_blank" rel="noopener noreferrer" className="link-underline ml-3 text-[var(--brand-navy-700)]">Habere git ↗</a>
+            )}
+          </p>
+        )}
+      </div>
+    </article>
+  );
+}
+
 export function NewsSection({ items }: { items: NewsItem[] }) {
   const available = TABS.filter((t) => items.some((i) => i.tur === t.key));
   const [active, setActive] = useState<string>(available[0]?.key ?? "bizden");
   if (available.length === 0) return null;
 
-  const list = items.filter((i) => i.tur === active).slice(0, 6);
+  const list = items.filter((i) => i.tur === active).slice(0, 4);
   const tab = TABS.find((t) => t.key === active)!;
 
   return (
@@ -81,55 +137,41 @@ export function NewsSection({ items }: { items: NewsItem[] }) {
           </div>
         </div>
 
-        <p className="text-[14px] text-[var(--ink-muted)] mb-6">{tab.hint}</p>
+        <p className="text-[14px] text-[var(--ink-muted)] mb-8">{tab.hint}</p>
 
         <AnimatePresence mode="wait">
-          <motion.ul
+          <motion.div
             key={active}
-            initial={{ opacity: 0, y: 8 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.35, ease: EASE_OUT }}
-            className="border-t border-[var(--rule-strong)]"
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.4, ease: EASE_OUT }}
           >
-            {list.map((n) => {
-              const href = safeHref(n.link);
-              const Title = (
-                <h3 className="font-serif text-[1.3rem] md:text-[1.45rem] leading-snug text-[var(--ink)] transition-colors group-hover:text-[var(--brand-blue)]">
-                  {n.baslik}
-                </h3>
-              );
-              return (
-                <li key={n.id} className="group border-b border-[var(--rule)]">
-                  <div className="grid grid-cols-12 gap-x-6 gap-y-2 py-7">
-                    <time dateTime={n.tarih} className="col-span-12 md:col-span-3 text-[13px] tabular-nums text-[var(--ink-muted)] md:pt-1.5">
-                      {formatDate(n.tarih)}
-                    </time>
-                    <div className="col-span-12 md:col-span-9">
-                      {href ? (
-                        <a href={href} target="_blank" rel="noopener noreferrer" className="block">
-                          {Title}
-                        </a>
-                      ) : (
-                        Title
-                      )}
-                      {n.ozet && <p className="mt-2 text-[15px] leading-relaxed text-[var(--ink-body)] max-w-2xl">{n.ozet}</p>}
-                      {(n.kaynak_adi || href) && (
-                        <p className="mt-3 text-[13px] text-[var(--ink-muted)]">
-                          {n.kaynak_adi && <span>Kaynak: {n.kaynak_adi}</span>}
-                          {href && (
-                            <a href={href} target="_blank" rel="noopener noreferrer" className="link-underline ml-3 text-[var(--brand-navy-700)]">
-                              Habere git ↗
-                            </a>
-                          )}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </li>
-              );
-            })}
-          </motion.ul>
+            {/* Lead story */}
+            {list[0] && <LeadStory item={list[0]} />}
+
+            {/* More stories */}
+            {list.length > 1 && (
+              <ul className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-12">
+                {list.slice(1).map((n, i) => (
+                  <motion.li
+                    key={n.id}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.1 + i * 0.08, ease: EASE_OUT }}
+                    className="group border-t border-[var(--rule-strong)] pt-5"
+                  >
+                    <StoryLink item={n}>
+                      {n.gorsel_url && <Cover src={n.gorsel_url} alt={n.baslik} className="mb-5" />}
+                      <time dateTime={n.tarih} className="block text-[12.5px] tabular-nums text-[var(--ink-muted)] mb-2">{formatDate(n.tarih)}</time>
+                      <h3 className="font-serif text-[1.25rem] leading-snug text-[var(--ink)] transition-colors group-hover:text-[var(--brand-blue)]">{n.baslik}</h3>
+                      {n.ozet && <p className="mt-2 text-[14px] leading-relaxed text-[var(--ink-muted)] line-clamp-3">{n.ozet}</p>}
+                    </StoryLink>
+                  </motion.li>
+                ))}
+              </ul>
+            )}
+          </motion.div>
         </AnimatePresence>
       </div>
     </section>
