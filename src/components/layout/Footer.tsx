@@ -2,8 +2,8 @@ import Link from "next/link";
 import Image from "next/image";
 
 const SERVICES = [
-  "Odoo Danışmanlığı",
   "ERP Danışmanlığı",
+  "Odoo Uygulamaları",
   "Dijitalleşme Yol Haritası",
   "Süreç Tasarımı",
   "Veri Görselleştirme",
@@ -12,11 +12,11 @@ const SERVICES = [
 ];
 
 const COMPANY = [
-  { title: "Odoo", href: "#odoo" },
   { title: "Hizmetler", href: "#cozumler" },
   { title: "Kapsam", href: "#kapsam" },
   { title: "Yaklaşım", href: "#yaklasim" },
   { title: "Deneyim", href: "#deneyim" },
+  { title: "Haberler", href: "#haberler" },
   { title: "İletişim", href: "#iletisim" },
 ];
 
@@ -29,9 +29,10 @@ export function Footer() {
           <div className="md:col-span-5">
             <Image src="/atalitixlogo.png" alt="Atalitix" width={150} height={40} className="h-9 w-auto object-contain mb-5" />
             <p className="text-[var(--ink-body)] text-[15px] max-w-sm leading-relaxed">
-              Atalitix; Odoo ve ERP danışmanlığı, süreç tasarımı, veri görselleştirme ve süreç otomasyonu ile şirketlerin iş süreçlerini ölçülebilir ve sürdürülebilir hale getiren teknoloji danışmanlık markasıdır.
+              Atalitix; ERP danışmanlığı, süreç tasarımı, veri görselleştirme ve süreç otomasyonu ile şirketlerin iş süreçlerini ölçülebilir ve sürdürülebilir hale getiren teknoloji danışmanlık markasıdır.
             </p>
-            <p className="font-serif italic text-[15px] text-[var(--ink-muted)] mt-6">Sahadan sisteme, sistemden karara.</p>
+            <p className="font-serif italic text-[1.1rem] text-[var(--ink)] mt-6">Veriden zekâya, süreçten değere.</p>
+            <p className="text-[13px] tracking-[0.04em] text-[var(--ink-muted)] mt-1">From dATA to Intelligence.</p>
           </div>
 
           <nav aria-label="Hizmetler" className="md:col-span-3">

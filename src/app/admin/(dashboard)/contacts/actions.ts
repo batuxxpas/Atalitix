@@ -1,15 +1,15 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { requireAdmin, getAdminClient } from "@/lib/admin/auth";
 
 export async function markAsRead(formData: FormData) {
+  await requireAdmin();
   const id = formData.get("id") as string;
   if (!id) return;
 
-  const supabase = await createClient();
-  // @ts-ignore
-  const { error } = await (supabase.from("iletisim_talepleri") as any)
+  const { error } = await getAdminClient()
+    .from("iletisim_talepleri")
     .update({ is_read: true })
     .eq("id", id);
 

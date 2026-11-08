@@ -1,10 +1,11 @@
-import { createClient } from "@/lib/supabase/server";
+import { requireAdmin, getAdminClient } from "@/lib/admin/auth";
 import { markAsRead } from "./actions";
 
 export const revalidate = 0;
 
 export default async function AdminContactsPage() {
-  const supabase = await createClient();
+  await requireAdmin();
+  const supabase = getAdminClient();
   const { data: contacts } = await (supabase.from("iletisim_talepleri") as any).select("*").order("created_at", { ascending: false });
 
   return (

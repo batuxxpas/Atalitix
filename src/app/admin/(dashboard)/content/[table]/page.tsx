@@ -1,13 +1,16 @@
-import { createClient } from "@/lib/supabase/server";
+import { notFound } from "next/navigation";
+import { requireAdmin, getAdminClient, isEditableTable } from "@/lib/admin/auth";
 
 import { EditableTable } from "./EditableTable";
 
 export const revalidate = 0;
 
 export default async function GenericContentPage({ params }: { params: Promise<{ table: string }> }) {
+  await requireAdmin();
   const resolvedParams = await params;
   const tableName = resolvedParams.table;
-  const supabase = await createClient();
+  if (!isEditableTable(tableName)) notFound();
+  const supabase = getAdminClient();
   
   // Fetch data
   const { data, error } = await (supabase.from(tableName) as any).select("*").order("id", { ascending: true });

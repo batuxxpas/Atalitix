@@ -22,9 +22,17 @@ interface Solution {
   icon_name: string;
 }
 
+export interface SolutionSubItem {
+  id: string;
+  cozum_id: string;
+  baslik: string;
+  aciklama: string | null;
+}
+
 interface SolutionsSectionProps {
   solutions: Solution[];
   hero?: any;
+  subItems?: SolutionSubItem[];
 }
 
 const EASE_OUT = [0.22, 1, 0.36, 1] as const;
@@ -45,7 +53,7 @@ function DragHandle(props: React.HTMLAttributes<HTMLDivElement>) {
   );
 }
 
-function SolutionRow({ sol, index, isEditorMode, sortId }: { sol: Solution; index: number; isEditorMode: boolean; sortId: string }) {
+function SolutionRow({ sol, index, isEditorMode, sortId, subs }: { sol: Solution; index: number; isEditorMode: boolean; sortId: string; subs: SolutionSubItem[] }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: sortId });
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
@@ -99,13 +107,30 @@ function SolutionRow({ sol, index, isEditorMode, sortId }: { sol: Solution; inde
             section="solutions" field="description" index={index} defaultValue={sol.description} tagName="p"
             className="text-[15px] leading-relaxed text-[var(--ink-body)] max-w-xl"
           />
+
+          {/* Sub-areas: 1.1, 1.2 … */}
+          {subs.length > 0 && (
+            <ul className="mt-5 border-t border-[var(--rule)]">
+              {subs.map((sub, j) => (
+                <li key={sub.id} className="flex gap-4 border-b border-[var(--rule)] py-3">
+                  <span className="w-8 shrink-0 pt-0.5 text-[12.5px] tabular-nums text-[var(--brand-blue)]">
+                    {index + 1}.{j + 1}
+                  </span>
+                  <div>
+                    <p className="font-serif text-[1.05rem] text-[var(--ink)]">{sub.baslik}</p>
+                    {sub.aciklama && <p className="mt-0.5 text-[13.5px] leading-relaxed text-[var(--ink-muted)]">{sub.aciklama}</p>}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </motion.div>
     </motion.li>
   );
 }
 
-export function SolutionsSection({ solutions: initialSolutions, hero }: SolutionsSectionProps) {
+export function SolutionsSection({ solutions: initialSolutions, hero, subItems = [] }: SolutionsSectionProps) {
   const { isEditorMode, data, reorderData } = useEditor();
   const activeSolutions: Solution[] = isEditorMode && data?.solutions ? data.solutions : initialSolutions;
 
@@ -126,7 +151,7 @@ export function SolutionsSection({ solutions: initialSolutions, hero }: Solution
   };
 
   const rows = activeSolutions.map((sol, index) => (
-    <SolutionRow key={sortIds[index]} sol={sol} index={index} isEditorMode={isEditorMode} sortId={sortIds[index]} />
+    <SolutionRow key={sortIds[index]} sol={sol} index={index} isEditorMode={isEditorMode} sortId={sortIds[index]} subs={subItems.filter((s) => s.cozum_id === String(sol.id))} />
   ));
 
   const list = <ul className="border-b border-[var(--rule)]">{rows}</ul>;

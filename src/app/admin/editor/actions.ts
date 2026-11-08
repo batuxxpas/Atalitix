@@ -1,17 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+import { requireAdmin, getAdminClient } from "@/lib/admin/auth";
 
-// Helper to get admin client that bypasses RLS
-function getAdminClient() {
-  return createSupabaseClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-}
+// Every exported action is a public endpoint: each one checks the admin session first.
 
 export async function saveHeroSection(data: any) {
+  await requireAdmin();
   const supabase = getAdminClient();
   // Using match by id or simply updating the active one.
   // Assuming we only have 1 active row for hero
@@ -29,6 +24,7 @@ export async function saveHeroSection(data: any) {
 }
 
 export async function saveSolutions(solutions: any[]) {
+  await requireAdmin();
   const supabase = getAdminClient();
   
   for (const sol of solutions) {
@@ -47,6 +43,7 @@ export async function saveSolutions(solutions: any[]) {
 }
 
 export async function saveApproachSteps(steps: any[]) {
+  await requireAdmin();
   const supabase = getAdminClient();
   
   for (const step of steps) {
@@ -65,6 +62,7 @@ export async function saveApproachSteps(steps: any[]) {
 }
 
 export async function saveExperienceItems(items: any[]) {
+  await requireAdmin();
   const supabase = getAdminClient();
   
   for (const item of items) {

@@ -1,10 +1,11 @@
-import { createClient } from "@/lib/supabase/server";
+import { requireAdmin, getAdminClient } from "@/lib/admin/auth";
 import VisualEditorClient from "./VisualEditorClient";
 
 export const revalidate = 0; // Don't cache admin page
 
 export default async function VisualEditorPage() {
-  const supabase = await createClient();
+  await requireAdmin();
+  const supabase = getAdminClient();
 
   const results = await Promise.all([
     (supabase.from("ana_sayfa_icerik") as any).select("*").eq("is_active", true).single(),

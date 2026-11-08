@@ -5,3 +5,4 @@ export { ApproachSection } from "./ApproachSection";
 export { ContactSection } from "./ContactSection";
 export { ErpScopeSection } from "./ErpScopeSection";
 export { OdooSection } from "./OdooSection";
+export { NewsSection } from "./NewsSection";

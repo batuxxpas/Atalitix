@@ -1,9 +1,10 @@
-import { createClient } from "@/lib/supabase/server";
+import { requireAdmin, getAdminClient } from "@/lib/admin/auth";
 
 export const revalidate = 0; // Disable caching for admin
 
 export default async function AdminDashboard() {
-  const supabase = await createClient();
+  await requireAdmin();
+  const supabase = getAdminClient();
 
   // Fetch stats
   const [

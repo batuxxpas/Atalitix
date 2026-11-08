@@ -1,5 +1,5 @@
 import { Header, Footer } from "@/components/layout";
-import { HeroSection, SolutionsSection, ApproachSection, ContactSection, ErpScopeSection, OdooSection } from "@/components/sections";
+import { HeroSection, SolutionsSection, ApproachSection, ContactSection, ErpScopeSection, OdooSection, NewsSection } from "@/components/sections";
 import { IntroLoader, INTRO_BOOT_SCRIPT } from "@/components/motion";
 import { createClient } from "@/lib/supabase/server";
 import { SITE_CONFIG } from "@/lib/constants";
@@ -18,6 +18,9 @@ export default async function HomePage() {
     (supabase.from("cozumler") as any).select("*").eq("is_active", true).order("sort_order"),
     (supabase.from("yaklasim_adimlari") as any).select("*").eq("is_active", true).order("sort_order"),
     (supabase.from("deneyim_maddeleri") as any).select("*").eq("is_active", true).order("sort_order"),
+    // Yeni tablolar: henüz oluşturulmadıysa hata döner, bölümler sessizce gizlenir
+    (supabase.from("haberler") as any).select("id,tur,baslik,ozet,kaynak_adi,link,tarih").eq("is_active", true).order("tarih", { ascending: false }).limit(24),
+    (supabase.from("cozum_alt_basliklari") as any).select("id,cozum_id,baslik,aciklama,sort_order").eq("is_active", true).order("sort_order"),
   ]);
 
   const [
@@ -28,6 +31,8 @@ export default async function HomePage() {
     { data: solutions },
     { data: approachSteps },
     { data: experienceItems },
+    { data: news },
+    { data: solutionSubItems },
   ] = results;
 
   // JSON-LD Structured Data
@@ -72,9 +77,8 @@ export default async function HomePage() {
     telephone: "+90-505-375-2992",
     email: "bennur.yilmaz@atalitix.com",
     serviceType: [
-      "Odoo Danışmanlığı",
-      "Odoo Kurulumu ve Uyarlama",
       "ERP Danışmanlığı",
+      "Odoo Danışmanlığı",
       "Dijital Dönüşüm",
       "Veri Analitiği",
       "Süreç Otomasyonu",
@@ -123,11 +127,14 @@ export default async function HomePage() {
           />
         )}
         
-        <OdooSection />
-
-        {solutions && solutions.length > 0 && <SolutionsSection solutions={solutions} hero={hero} />}
+        {solutions && solutions.length > 0 && (
+          <SolutionsSection solutions={solutions} hero={hero} subItems={solutionSubItems || []} />
+        )}
 
         <ErpScopeSection />
+
+        {/* Odoo: kurumsal ERP'lerin yanında bir alternatif olarak */}
+        <OdooSection />
         
         {approachSteps && experienceItems && (
           <ApproachSection
@@ -136,6 +143,8 @@ export default async function HomePage() {
             hero={hero}
           />
         )}
+
+        {news && news.length > 0 && <NewsSection items={news} />}
 
         <ContactSection />
       </main>

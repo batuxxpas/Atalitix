@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { ADMIN_COOKIE, verifySessionToken } from "@/lib/admin/session";
 
 /**
  * Middleware'da kullanılacak Supabase client.
@@ -39,8 +40,8 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Korumalı route'lara erişim kontrolü (Admin)
-  const adminToken = request.cookies.get("admin_token");
+  // Korumalı route'lara erişim kontrolü (Admin) — çerezin imzası ve süresi doğrulanır
+  const adminToken = await verifySessionToken(request.cookies.get(ADMIN_COOKIE)?.value);
 
   if (
     !adminToken &&
@@ -49,7 +50,9 @@ export async function updateSession(request: NextRequest) {
   ) {
     const url = request.nextUrl.clone();
     url.pathname = "/admin/login";
-    return NextResponse.redirect(url);
+    const res = NextResponse.redirect(url);
+    res.cookies.delete(ADMIN_COOKIE);
+    return res;
   }
 
   // Zaten giriş yapmış kullanıcıyı admin login'den panele yönlendir

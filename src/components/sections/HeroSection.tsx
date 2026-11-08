@@ -106,6 +106,12 @@ export function HeroSection({ hero, processSteps: initialSteps }: HeroSectionPro
                 <InlineEditable section="hero" field="cta_secondary_text" defaultValue={hero.cta_secondary_text} tagName="span" />
               </a>
             </motion.div>
+
+            {/* Motto */}
+            <motion.div {...anim(0.85)} className="mt-10 border-l-2 border-[var(--brand-blue)] pl-5">
+              <InlineEditable section="hero" field="tagline" defaultValue={hero.tagline} tagName="p" className="font-serif italic text-[1.25rem] md:text-[1.35rem] leading-snug text-[var(--ink)]" />
+              <InlineEditable section="hero" field="tagline_sub" defaultValue={hero.tagline_sub} tagName="p" className="mt-1 text-[13px] tracking-[0.04em] text-[var(--ink-muted)]" />
+            </motion.div>
           </div>
 
           {/* Right — ERP module map */}

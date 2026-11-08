@@ -1,0 +1,13 @@
+# Local-only files: never upload to Vercel
+.env*
+*.sql
+add-step.mjs
+alter-table.mjs
+create-admin.mjs
+test-supabase.mjs
+test-update.mjs
+update-exp.mjs
+update-solution.mjs
+verify-db.mjs
+Atalitixlogo.jpeg
+tsconfig.tsbuildinfo

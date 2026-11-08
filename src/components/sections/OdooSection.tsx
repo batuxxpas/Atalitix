@@ -116,16 +116,16 @@ export function OdooSection() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-end">
           <div className="lg:col-span-7">
             <FadeIn className="mb-6">
-              <p className="section-label">Odoo Danışmanlığı</p>
+              <p className="section-label">ERP alternatifleri · Odoo</p>
             </FadeIn>
             <InViewMask>
               <h2 className="section-title">
-                Odoo ile uçtan uca ERP; <em className="text-[var(--brand-blue)]">sertifikalı</em> ekipten, süreç odaklı kurulum.
+                Kurumsal ERP&apos;lerin yanında, ölçeğinize uygun bir <em className="text-[var(--brand-blue)]">alternatif</em>: Odoo.
               </h2>
             </InViewMask>
             <FadeIn delay={0.1} className="mt-6">
               <p className="text-[15.5px] leading-relaxed text-[var(--ink-body)] max-w-xl">
-                Odoo&apos;nun modüler yapısını şirketinizin süreçlerine göre kurgularız. Analizden canlıya geçişe ve sonrasındaki iyileştirmelere kadar projeyi tek elden yürütürüz.
+                SAP gibi kurumsal ERP projelerinde süreç kurgusu ve proje yönetimi desteği verirken, ihtiyaca ve ölçeğe göre Odoo&apos;yu da güçlü bir seçenek olarak değerlendiririz. Odoo tercih edildiğinde analizden canlıya geçişe kadar projeyi sertifikalı ekibimizle yürütürüz.
               </p>
             </FadeIn>
           </div>
@@ -187,10 +187,10 @@ export function OdooSection() {
         {/* CTA */}
         <FadeIn className="mt-14 md:mt-20 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8 border-t border-[var(--rule-strong)] pt-10">
           <p className="font-serif text-[1.3rem] md:text-[1.55rem] leading-snug text-[var(--ink)] max-w-2xl">
-            Odoo&apos;ya geçişi ya da mevcut Odoo kurulumunuzu iyileştirmeyi düşünüyorsanız, kapsamı birlikte netleştirelim.
+            Hangi ERP&apos;nin size uygun olduğunu birlikte değerlendirelim; Odoo doğru seçimse kapsamı birlikte netleştirelim.
           </p>
           <a href="#iletisim" className="btn-primary shrink-0 self-start lg:self-auto">
-            Odoo görüşmesi planla
+            ERP görüşmesi planla
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.6} d="M5 12h14M13 6l6 6-6 6" /></svg>
           </a>
         </FadeIn>
