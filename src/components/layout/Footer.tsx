@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 const SERVICES = [
+  "Odoo Danışmanlığı",
   "ERP Danışmanlığı",
   "Dijitalleşme Yol Haritası",
   "Süreç Tasarımı",
@@ -11,6 +12,7 @@ const SERVICES = [
 ];
 
 const COMPANY = [
+  { title: "Odoo", href: "#odoo" },
   { title: "Hizmetler", href: "#cozumler" },
   { title: "Kapsam", href: "#kapsam" },
   { title: "Yaklaşım", href: "#yaklasim" },
@@ -27,7 +29,7 @@ export function Footer() {
           <div className="md:col-span-5">
             <Image src="/atalitixlogo.png" alt="Atalitix" width={150} height={40} className="h-9 w-auto object-contain mb-5" />
             <p className="text-[var(--ink-body)] text-[15px] max-w-sm leading-relaxed">
-              Atalitix; ERP danışmanlığı, süreç tasarımı, veri görselleştirme ve süreç otomasyonu ile şirketlerin iş süreçlerini ölçülebilir ve sürdürülebilir hale getiren teknoloji danışmanlık markasıdır.
+              Atalitix; Odoo ve ERP danışmanlığı, süreç tasarımı, veri görselleştirme ve süreç otomasyonu ile şirketlerin iş süreçlerini ölçülebilir ve sürdürülebilir hale getiren teknoloji danışmanlık markasıdır.
             </p>
             <p className="font-serif italic text-[15px] text-[var(--ink-muted)] mt-6">Sahadan sisteme, sistemden karara.</p>
           </div>

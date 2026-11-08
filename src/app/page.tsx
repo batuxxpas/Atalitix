@@ -1,5 +1,5 @@
 import { Header, Footer } from "@/components/layout";
-import { HeroSection, SolutionsSection, ApproachSection, ContactSection, ErpScopeSection } from "@/components/sections";
+import { HeroSection, SolutionsSection, ApproachSection, ContactSection, ErpScopeSection, OdooSection } from "@/components/sections";
 import { IntroLoader, INTRO_BOOT_SCRIPT } from "@/components/motion";
 import { createClient } from "@/lib/supabase/server";
 import { SITE_CONFIG } from "@/lib/constants";
@@ -72,6 +72,8 @@ export default async function HomePage() {
     telephone: "+90-505-375-2992",
     email: "bennur.yilmaz@atalitix.com",
     serviceType: [
+      "Odoo Danışmanlığı",
+      "Odoo Kurulumu ve Uyarlama",
       "ERP Danışmanlığı",
       "Dijital Dönüşüm",
       "Veri Analitiği",
@@ -121,6 +123,8 @@ export default async function HomePage() {
           />
         )}
         
+        <OdooSection />
+
         {solutions && solutions.length > 0 && <SolutionsSection solutions={solutions} hero={hero} />}
 
         <ErpScopeSection />

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { HeroSection, SolutionsSection, ApproachSection } from "@/components/sections";
+import { HeroSection, SolutionsSection, ApproachSection, OdooSection, ErpScopeSection } from "@/components/sections";
 import { Header, Footer } from "@/components/layout";
 import { saveHeroSection, saveSolutions, saveApproachSteps, saveExperienceItems } from "./actions";
 import { EditorProvider, useEditor } from "@/components/editor";
@@ -57,14 +57,20 @@ function VisualEditorInner({ onSave, isSaving, saveMessage }: { onSave: (data: a
       <Header />
 
       {/* The Actual Homepage Content - rendered exactly as the real site */}
-      <main>
+      <main className="pt-20">
         <HeroSection
           hero={data.hero}
           processSteps={data.processSteps}
           processCategories={data.processCategories}
         />
         
+        {/* Sabit içerik (editörde düzenlenmez) */}
+        <OdooSection />
+
         <SolutionsSection solutions={data.solutions} hero={data.hero} />
+
+        {/* Sabit içerik (editörde düzenlenmez) */}
+        <ErpScopeSection />
         
         <ApproachSection
           approachSteps={data.approachSteps}

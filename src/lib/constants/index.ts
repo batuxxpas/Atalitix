@@ -13,13 +13,17 @@ export const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://atalitix.com"
 export const SITE_CONFIG = {
   name: APP_NAME,
   description:
-    "Atalitix — ERP danışmanlığı, dijital dönüşüm, veri analitiği ve süreç otomasyonu çözümleriyle iş süreçlerinizi akıllı, ölçülebilir ve sürdürülebilir hale getiren teknoloji ve danışmanlık markası.",
+    "Atalitix — Odoo ve ERP danışmanlığı, dijital dönüşüm, veri analitiği ve süreç otomasyonu çözümleriyle iş süreçlerinizi akıllı, ölçülebilir ve sürdürülebilir hale getiren teknoloji ve danışmanlık markası.",
   url: APP_URL,
   ogImage: `${APP_URL}/opengraph-image`,
   links: {
     github: "https://github.com/atalitix",
   },
   keywords: [
+    "Odoo danışmanlığı",
+    "Odoo kurulumu",
+    "Odoo uygulama",
+    "Odoo ERP",
     "ERP danışmanlığı",
     "dijital dönüşüm",
     "veri analitiği",

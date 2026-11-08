@@ -6,7 +6,7 @@ import type { Metadata } from "next";
  */
 export const siteMetadata: Metadata = {
   title: {
-    default: `${SITE_CONFIG.name} — ERP Danışmanlığı & Dijital Dönüşüm`,
+    default: `${SITE_CONFIG.name} — Odoo & ERP Danışmanlığı`,
     template: `%s | ${SITE_CONFIG.name}`,
   },
   description: SITE_CONFIG.description,
@@ -19,7 +19,7 @@ export const siteMetadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: `${SITE_CONFIG.name} — ERP Danışmanlığı & Dijital Dönüşüm`,
+    title: `${SITE_CONFIG.name} — Odoo & ERP Danışmanlığı`,
     description: SITE_CONFIG.description,
     url: SITE_CONFIG.url,
     siteName: SITE_CONFIG.name,
@@ -46,7 +46,7 @@ export const siteMetadata: Metadata = {
     },
   },
   twitter: {
-    title: `${SITE_CONFIG.name} — ERP Danışmanlığı & Dijital Dönüşüm`,
+    title: `${SITE_CONFIG.name} — Odoo & ERP Danışmanlığı`,
     card: "summary_large_image",
     description: SITE_CONFIG.description,
     images: [SITE_CONFIG.ogImage],
