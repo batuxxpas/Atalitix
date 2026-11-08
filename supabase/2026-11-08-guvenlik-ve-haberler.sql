@@ -87,6 +87,9 @@ grant select on public.ana_sayfa_icerik, public.isletim_haritasi_adimlari,
 
 grant insert on public.iletisim_talepleri to anon, authenticated;
 
+-- Admin paneli (sunucu, service_role) yeni tablolara tam erişsin
+grant all on public.haberler, public.cozum_alt_basliklari to service_role;
+
 create policy "Herkes okuyabilir" on public.ana_sayfa_icerik              for select to anon, authenticated using (true);
 create policy "Herkes okuyabilir" on public.isletim_haritasi_adimlari     for select to anon, authenticated using (true);
 create policy "Herkes okuyabilir" on public.isletim_haritasi_kategorileri for select to anon, authenticated using (true);
