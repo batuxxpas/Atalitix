@@ -4,15 +4,19 @@ import { type News, newsHref, formatNewsDate } from "@/lib/news-utils";
 
 /** Cover image with a slow zoom on hover — no frame, just the picture. */
 export function NewsCover({ src, alt, className = "", priority = false }: { src: string; alt: string; className?: string; priority?: boolean }) {
+  // The whole picture is always visible (square/portrait social images are not cropped);
+  // the remaining space is filled with a soft, blurred copy of the same image.
   return (
     <div className={`relative aspect-[16/9] overflow-hidden bg-[var(--paper)] outline outline-1 -outline-offset-1 outline-[var(--rule)] ${className}`}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={src} alt="" aria-hidden="true" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full scale-110 object-cover opacity-40 blur-2xl" />
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={src}
         alt={alt}
         loading={priority ? "eager" : "lazy"}
         decoding="async"
-        className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1.2s] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
+        className="absolute inset-0 h-full w-full object-contain transition-transform duration-[1.2s] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]"
       />
     </div>
   );

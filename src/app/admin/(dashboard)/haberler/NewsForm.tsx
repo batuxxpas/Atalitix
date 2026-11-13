@@ -76,7 +76,7 @@ function CoverPicker({ current, autoUrl, onClearAuto }: { current?: string | nul
       {shown ? (
         <div className="relative overflow-hidden rounded-lg border border-slate-200">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={shown} alt="Kapak önizleme" className="aspect-video w-full object-cover" />
+          <img src={shown} alt="Kapak önizleme" className="aspect-video w-full bg-slate-100 object-contain" />
           {autoUrl && !filePreview && !removed && (
             <span className="absolute left-2 top-2 rounded-md bg-white/95 px-2 py-1 text-[11px] font-semibold text-emerald-700">Bağlantıdan alındı</span>
           )}
@@ -153,7 +153,7 @@ export function NewsForm({
       setOzet(res.description.length > 220 ? res.description.slice(0, 217).replace(/\s+\S*$/, "") + "…" : res.description);
       filled.push("kısa özet");
     }
-    if (res.description && !body.replace(/<[^>]*>/g, "").trim()) {
+    if (res.description && !res.platform && !body.replace(/<[^>]*>/g, "").trim()) {
       setBody(textToHtml(res.description));
       setEditorKey((k) => k + 1);
       filled.push("haber metni");

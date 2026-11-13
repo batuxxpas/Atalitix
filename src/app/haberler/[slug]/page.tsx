@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Header, Footer } from "@/components/layout";
 import { NewsCover, NewsCard, NewsBody } from "@/components/news/NewsCards";
+import { SocialEmbedFrame } from "@/components/news/SocialEmbedFrame";
 import { getNews, getRelatedNews, newsHref, formatNewsDate, safeHref, isHtml, socialEmbed } from "@/lib/news";
 import { sanitizeNewsHtml } from "@/lib/sanitize";
 import { SITE_CONFIG } from "@/lib/constants";
@@ -80,60 +81,83 @@ export default async function NewsDetailPage({ params }: { params: Params }) {
             </div>
           </header>
 
-          {news.gorsel_url && (
+          {/* Cover — for social posts the embedded post itself is the visual */}
+          {news.gorsel_url && !embed && (
             <div className="container mt-12 md:mt-14">
               <NewsCover src={news.gorsel_url} alt={news.baslik} priority />
             </div>
           )}
 
-          {/* Body */}
-          <div className="container mt-14 md:mt-20">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-              <div className="lg:col-span-8 lg:col-start-3 max-w-[44rem]">
-                {news.icerik &&
-                  (isHtml(news.icerik) ? (
-                    <div className="news-prose" dangerouslySetInnerHTML={{ __html: sanitizeNewsHtml(news.icerik) }} />
-                  ) : (
-                    <NewsBody text={news.icerik} />
-                  ))}
+          <div className="container mt-12 md:mt-16">
+            {embed ? (
+              /* Social post: text on the left, the post itself on the right */
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+                <div className="lg:col-span-6 lg:col-start-7 lg:row-start-1 lg:sticky lg:top-28">
+                  <SocialEmbedFrame embed={embed} title={news.baslik} />
+                </div>
+                <div className="lg:col-span-6 lg:col-start-1 lg:row-start-1 max-w-[40rem]">
+                  {news.icerik &&
+                    (isHtml(news.icerik) ? (
+                      <div className="news-prose" dangerouslySetInnerHTML={{ __html: sanitizeNewsHtml(news.icerik) }} />
+                    ) : (
+                      <NewsBody text={news.icerik} />
+                    ))}
 
-                {/* Official LinkedIn / Instagram embed — rendered by the platform itself */}
-                {embed && (
-                  <figure className="mt-12">
-                    <figcaption className="mb-4 text-[13px] text-[var(--ink-muted)]">{embed.platform}&apos;daki paylaşımımız</figcaption>
-                    <iframe
-                      src={embed.src}
-                      title={`${embed.platform} paylaşımı: ${news.baslik}`}
-                      height={embed.height}
-                      loading="lazy"
-                      allowFullScreen
-                      className="w-full max-w-[552px] border border-[var(--rule)] bg-white"
-                    />
-                  </figure>
-                )}
+                  {(news.kaynak_adi || (source && !embed)) && (
+                    <p className="mt-10 border-t border-[var(--rule)] pt-5 text-[14px] text-[var(--ink-muted)]">
+                      {news.kaynak_adi && <span>Kaynak: {news.kaynak_adi}</span>}
+                      {source && !embed && (
+                        <a href={source} target="_blank" rel="noopener noreferrer" className="link-underline ml-3 text-[var(--brand-navy-700)]">
+                          Kaynağa git ↗
+                        </a>
+                      )}
+                    </p>
+                  )}
 
-                {(news.kaynak_adi || (source && !embed)) && (
-                  <p className="mt-10 border-t border-[var(--rule)] pt-5 text-[14px] text-[var(--ink-muted)]">
-                    {news.kaynak_adi && <span>Kaynak: {news.kaynak_adi}</span>}
-                    {source && !embed && (
-                      <a href={source} target="_blank" rel="noopener noreferrer" className="link-underline ml-3 text-[var(--brand-navy-700)]">
-                        Kaynağa git ↗
-                      </a>
-                    )}
-                  </p>
-                )}
-
-                <div className="mt-12 border-t border-[var(--rule-strong)] pt-8">
-                  <div className="flex flex-wrap items-center justify-between gap-4">
-                    <Link href="/haberler" className="text-[14px] text-[var(--ink)] link-underline">← Tüm haberler</Link>
-                    <div className="flex items-center gap-3 text-[13px] text-[var(--ink-muted)]">
-                      <span>Takip edin</span>
-                      <SocialLinks variant="icons" />
+                  <div className="mt-12 border-t border-[var(--rule-strong)] pt-8">
+                    <div className="flex flex-wrap items-center justify-between gap-4">
+                      <Link href="/haberler" className="text-[14px] text-[var(--ink)] link-underline">← Tüm haberler</Link>
+                      <div className="flex items-center gap-3 text-[13px] text-[var(--ink-muted)]">
+                        <span>Takip edin</span>
+                        <SocialLinks variant="icons" />
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                <div className="lg:col-span-8 lg:col-start-3 max-w-[44rem]">
+                  {news.icerik &&
+                    (isHtml(news.icerik) ? (
+                      <div className="news-prose" dangerouslySetInnerHTML={{ __html: sanitizeNewsHtml(news.icerik) }} />
+                    ) : (
+                      <NewsBody text={news.icerik} />
+                    ))}
+
+                  {(news.kaynak_adi || (source && !embed)) && (
+                    <p className="mt-10 border-t border-[var(--rule)] pt-5 text-[14px] text-[var(--ink-muted)]">
+                      {news.kaynak_adi && <span>Kaynak: {news.kaynak_adi}</span>}
+                      {source && !embed && (
+                        <a href={source} target="_blank" rel="noopener noreferrer" className="link-underline ml-3 text-[var(--brand-navy-700)]">
+                          Kaynağa git ↗
+                        </a>
+                      )}
+                    </p>
+                  )}
+
+                  <div className="mt-12 border-t border-[var(--rule-strong)] pt-8">
+                    <div className="flex flex-wrap items-center justify-between gap-4">
+                      <Link href="/haberler" className="text-[14px] text-[var(--ink)] link-underline">← Tüm haberler</Link>
+                      <div className="flex items-center gap-3 text-[13px] text-[var(--ink-muted)]">
+                        <span>Takip edin</span>
+                        <SocialLinks variant="icons" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </article>
 
