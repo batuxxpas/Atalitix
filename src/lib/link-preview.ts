@@ -1,4 +1,4 @@
-import { socialEmbed } from "@/lib/news-utils";
+import { socialEmbed } from "./news-utils";
 
 /**
  * Reads the public link-preview metadata (Open Graph) of a page — the same data
@@ -72,6 +72,32 @@ async function fetchHtml(url: string): Promise<string | null> {
   }
 }
 
+/**
+ * Instagram's link preview (og:image) is a 640×640 centre crop. Its official embed page
+ * carries the original picture in full aspect ratio with a srcset up to 2048 px — take the
+ * largest version from there.
+ */
+function instagramFullImage(embedHtml: string): string | undefined {
+  const tag = embedHtml.match(/<img[^>]+class="[^"]*EmbeddedMediaImage[^"]*"[^>]*>/i)?.[0];
+  if (!tag) return undefined;
+  const srcset = tag.match(/srcset="([^"]+)"/i)?.[1];
+  if (srcset) {
+    const best = decodeEntities(srcset)
+      .split(",")
+      .map((part) => {
+        const [u, w] = part.trim().split(/\s+/);
+        return { u, w: parseInt(w) || 0 };
+      })
+      .filter((c) => c.u?.startsWith("https://"))
+      .sort((a, b) => b.w - a.w);
+    // Largest version up to 1440 px (sharp on the site, small enough to store)
+    const pick = best.find((c) => c.w <= 1440) ?? best[best.length - 1];
+    if (pick) return pick.u;
+  }
+  const src = tag.match(/src="([^"]+)"/i)?.[1];
+  return src ? decodeEntities(src) : undefined;
+}
+
 /** Instagram descriptions look like: '12 likes, 1 comments - atalitix on 5 November 2026: "caption…".' */
 function cleanInstagramCaption(desc: string): string {
   const m = desc.match(/:\s*["“]([\s\S]+?)["”]\.?\s*$/);
@@ -99,6 +125,11 @@ export async function getLinkPreview(raw: string): Promise<LinkPreview | null> {
       if (img) image = decodeEntities(img[1]);
     }
     if (platform === "Instagram" && description) description = cleanInstagramCaption(description);
+    if (platform === "Instagram" && embed) {
+      const embedHtml = await fetchHtml(embed.src);
+      const full = embedHtml ? instagramFullImage(embedHtml) : undefined;
+      if (full) image = full;
+    }
     if (image) {
       try { image = new URL(image, candidate).toString(); } catch { image = undefined; }
     }

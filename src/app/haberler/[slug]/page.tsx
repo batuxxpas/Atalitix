@@ -42,6 +42,7 @@ export default async function NewsDetailPage({ params }: { params: Params }) {
   const related = await getRelatedNews(news);
   const source = safeHref(news.link);
   const embed = socialEmbed(news.link);
+  const hasBody = !!news.icerik && news.icerik.replace(/<[^>]*>/g, "").trim().length > 0;
 
   const articleJsonLd = {
     "@context": "https://schema.org",
@@ -77,7 +78,6 @@ export default async function NewsDetailPage({ params }: { params: Params }) {
                 <time dateTime={news.tarih}>{formatNewsDate(news.tarih)}</time>
               </p>
               <h1 className="display text-[2.2rem] md:text-[3rem] leading-[1.08]">{news.baslik}</h1>
-              {news.ozet && <p className="mt-6 font-serif text-[1.25rem] md:text-[1.4rem] leading-snug text-[var(--ink-muted)]">{news.ozet}</p>}
             </div>
           </header>
 
@@ -89,8 +89,22 @@ export default async function NewsDetailPage({ params }: { params: Params }) {
           )}
 
           <div className="container mt-12 md:mt-16">
-            {embed ? (
-              /* Social post: text on the left, the post itself on the right */
+            {embed && !hasBody ? (
+              /* Social post without extra text: the post itself, right under the title */
+              <div className="max-w-[540px]">
+                <SocialEmbedFrame embed={embed} title={news.baslik} />
+                <div className="mt-12 border-t border-[var(--rule-strong)] pt-8">
+                  <div className="flex flex-wrap items-center justify-between gap-4">
+                    <Link href="/haberler" className="text-[14px] text-[var(--ink)] link-underline">← Tüm haberler</Link>
+                    <div className="flex items-center gap-3 text-[13px] text-[var(--ink-muted)]">
+                      <span>Takip edin</span>
+                      <SocialLinks variant="icons" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : embed ? (
+              /* Social post with extra text: text on the left, the post itself on the right */
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
                 <div className="lg:col-span-6 lg:col-start-7 lg:row-start-1 lg:sticky lg:top-28">
                   <SocialEmbedFrame embed={embed} title={news.baslik} />
