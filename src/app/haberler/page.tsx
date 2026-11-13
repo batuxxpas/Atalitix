@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Header, Footer } from "@/components/layout";
 import { NewsLead, NewsCard } from "@/components/news/NewsCards";
 import { getNewsList, NEWS_TYPES, NEWS_PAGE_SIZE, type NewsType } from "@/lib/news";
+import { SocialLinks } from "@/components/ui/SocialLinks";
 
 export const revalidate = 60;
 
@@ -70,7 +71,13 @@ export default async function NewsIndexPage({ searchParams }: { searchParams: Se
               })}
             </nav>
           </div>
-          <p className="text-[14px] text-[var(--ink-muted)] mb-10">{activeHint}</p>
+          <div className="mb-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <p className="text-[14px] text-[var(--ink-muted)]">{activeHint}</p>
+            <div className="flex items-center gap-4 text-[13px] text-[var(--ink-muted)]">
+              <span>Paylaşımlarımızı takip edin</span>
+              <SocialLinks variant="icons" />
+            </div>
+          </div>
 
           {items.length === 0 ? (
             <div className="border-t border-[var(--rule-strong)] pt-10">

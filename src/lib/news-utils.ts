@@ -94,3 +94,38 @@ export function legacyToHtml(text: string): string {
   }
   return out.join("");
 }
+
+export interface SocialEmbed {
+  platform: "LinkedIn" | "Instagram";
+  /** Official embed URL served by the platform itself (no scraping). */
+  src: string;
+  height: number;
+}
+
+/**
+ * Recognises a LinkedIn or Instagram post link and returns the platform's official embed URL.
+ *   linkedin.com/posts/…_activity-7261…-AbCd   → /embed/feed/update/urn:li:activity:7261…
+ *   linkedin.com/feed/update/urn:li:share:…     → /embed/feed/update/urn:li:share:…
+ *   instagram.com/p/CODE/  ·  /reel/CODE/        → /p/CODE/embed/captioned/
+ */
+export function socialEmbed(link: string | null | undefined): SocialEmbed | null {
+  if (!link) return null;
+  let url: URL;
+  try { url = new URL(link); } catch { return null; }
+  const host = url.hostname.replace(/^www\./, "");
+  const path = decodeURIComponent(url.pathname);
+
+  if (host.endsWith("linkedin.com")) {
+    const urn = path.match(/urn:li:(activity|share|ugcPost):(\d{10,})/);
+    if (urn) return { platform: "LinkedIn", src: `https://www.linkedin.com/embed/feed/update/urn:li:${urn[1]}:${urn[2]}`, height: 620 };
+    const slug = path.match(/[-_](activity|share|ugcPost)-(\d{10,})/);
+    if (slug) return { platform: "LinkedIn", src: `https://www.linkedin.com/embed/feed/update/urn:li:${slug[1]}:${slug[2]}`, height: 620 };
+    return null;
+  }
+
+  if (host === "instagram.com") {
+    const m = path.match(/^\/(p|reel|tv)\/([A-Za-z0-9_-]+)/);
+    if (m) return { platform: "Instagram", src: `https://www.instagram.com/${m[1] === "tv" ? "p" : m[1]}/${m[2]}/embed/captioned/`, height: 760 };
+  }
+  return null;
+}

@@ -187,20 +187,24 @@ export function NewsForm({
           <CoverPicker current={item?.gorsel_url} />
         </div>
 
-        <details className={`${card} group`} open={!!(item?.kaynak_adi || item?.link)}>
+        <div className={card}>
+          <p className="mb-1 text-sm font-semibold text-slate-900">LinkedIn / Instagram paylaşımı</p>
+          <p className="mb-3 text-xs leading-relaxed text-slate-400">
+            Paylaşımın linkini yapıştırın; paylaşım haberin içinde LinkedIn veya Instagram görünümüyle gösterilir. Başka bir haber sitesinin linkini de ekleyebilirsiniz.
+          </p>
+          <input id="link" name="link" type="url" defaultValue={item?.link ?? ""} className={input} placeholder="https://www.linkedin.com/posts/..." />
+          <p className="mt-2 text-[11px] leading-relaxed text-slate-400">
+            LinkedIn&apos;de paylaşımın sağ üstündeki <b>…</b> menüsünden <b>&quot;Gönderinin bağlantısını kopyala&quot;</b>, Instagram&apos;da <b>Paylaş → Bağlantıyı kopyala</b>.
+          </p>
+        </div>
+
+        <details className={`${card} group`} open={!!item?.kaynak_adi}>
           <summary className="cursor-pointer list-none text-sm font-semibold text-slate-900 flex items-center justify-between">
-            Kaynak bilgisi
+            Kaynak adı
             <span className="text-xs font-normal text-slate-400 group-open:hidden">Başka bir siteden haberse</span>
           </summary>
-          <div className="mt-4 space-y-3">
-            <div>
-              <label className={label} htmlFor="kaynak_adi">Kaynak adı</label>
-              <input id="kaynak_adi" name="kaynak_adi" defaultValue={item?.kaynak_adi ?? ""} placeholder="örn. Dünya Gazetesi" className={input} />
-            </div>
-            <div>
-              <label className={label} htmlFor="link">Haberin bağlantısı</label>
-              <input id="link" name="link" type="url" defaultValue={item?.link ?? ""} className={input} placeholder="https://..." />
-            </div>
+          <div className="mt-4">
+            <input id="kaynak_adi" name="kaynak_adi" defaultValue={item?.kaynak_adi ?? ""} placeholder="örn. Dünya Gazetesi" className={input} />
           </div>
         </details>
 

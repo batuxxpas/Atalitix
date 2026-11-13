@@ -77,7 +77,7 @@ export default async function HomePage() {
       contactType: "sales",
       availableLanguage: ["Turkish", "English"],
     },
-    sameAs: [],
+    sameAs: [SITE_CONFIG.links.linkedin, SITE_CONFIG.links.instagram],
   };
 
   const websiteJsonLd = {

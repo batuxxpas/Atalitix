@@ -17,7 +17,8 @@ export const SITE_CONFIG = {
   url: APP_URL,
   ogImage: `${APP_URL}/opengraph-image`,
   links: {
-    github: "https://github.com/atalitix",
+    linkedin: "https://www.linkedin.com/company/atalitix-teknoloji-ve-dan%C4%B1%C5%9Fmanl%C4%B1k/",
+    instagram: "https://www.instagram.com/atalitix/",
   },
   keywords: [
     "Odoo danışmanlığı",

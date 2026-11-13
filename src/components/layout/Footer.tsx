@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { SocialLinks } from "@/components/ui/SocialLinks";
 
 const SERVICES = [
   { title: "Süreç Analizi ve Hedef Süreç Tasarımı", href: "/#erp" },
@@ -32,6 +33,7 @@ export function Footer() {
             </p>
             <p className="font-serif italic text-[1.1rem] text-[var(--ink)] mt-6">Veriden zekâya, süreçten değere.</p>
             <p className="text-[13px] tracking-[0.04em] text-[var(--ink-muted)] mt-1">From dATA to Intelligence.</p>
+            <SocialLinks variant="icons" className="mt-6" />
           </div>
 
           <nav aria-label="Çözümler" className="md:col-span-3">

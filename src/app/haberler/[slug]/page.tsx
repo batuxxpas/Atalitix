@@ -3,9 +3,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Header, Footer } from "@/components/layout";
 import { NewsCover, NewsCard, NewsBody } from "@/components/news/NewsCards";
-import { getNews, getRelatedNews, newsHref, formatNewsDate, safeHref, isHtml } from "@/lib/news";
+import { getNews, getRelatedNews, newsHref, formatNewsDate, safeHref, isHtml, socialEmbed } from "@/lib/news";
 import { sanitizeNewsHtml } from "@/lib/sanitize";
 import { SITE_CONFIG } from "@/lib/constants";
+import { SocialLinks } from "@/components/ui/SocialLinks";
 
 export const revalidate = 60;
 
@@ -39,6 +40,7 @@ export default async function NewsDetailPage({ params }: { params: Params }) {
 
   const related = await getRelatedNews(news);
   const source = safeHref(news.link);
+  const embed = socialEmbed(news.link);
 
   const articleJsonLd = {
     "@context": "https://schema.org",
@@ -95,10 +97,25 @@ export default async function NewsDetailPage({ params }: { params: Params }) {
                     <NewsBody text={news.icerik} />
                   ))}
 
-                {(news.kaynak_adi || source) && (
+                {/* Official LinkedIn / Instagram embed — rendered by the platform itself */}
+                {embed && (
+                  <figure className="mt-12">
+                    <figcaption className="mb-4 text-[13px] text-[var(--ink-muted)]">{embed.platform}&apos;daki paylaşımımız</figcaption>
+                    <iframe
+                      src={embed.src}
+                      title={`${embed.platform} paylaşımı: ${news.baslik}`}
+                      height={embed.height}
+                      loading="lazy"
+                      allowFullScreen
+                      className="w-full max-w-[552px] border border-[var(--rule)] bg-white"
+                    />
+                  </figure>
+                )}
+
+                {(news.kaynak_adi || (source && !embed)) && (
                   <p className="mt-10 border-t border-[var(--rule)] pt-5 text-[14px] text-[var(--ink-muted)]">
                     {news.kaynak_adi && <span>Kaynak: {news.kaynak_adi}</span>}
-                    {source && (
+                    {source && !embed && (
                       <a href={source} target="_blank" rel="noopener noreferrer" className="link-underline ml-3 text-[var(--brand-navy-700)]">
                         Kaynağa git ↗
                       </a>
@@ -107,7 +124,13 @@ export default async function NewsDetailPage({ params }: { params: Params }) {
                 )}
 
                 <div className="mt-12 border-t border-[var(--rule-strong)] pt-8">
-                  <Link href="/haberler" className="text-[14px] text-[var(--ink)] link-underline">← Tüm haberler</Link>
+                  <div className="flex flex-wrap items-center justify-between gap-4">
+                    <Link href="/haberler" className="text-[14px] text-[var(--ink)] link-underline">← Tüm haberler</Link>
+                    <div className="flex items-center gap-3 text-[13px] text-[var(--ink-muted)]">
+                      <span>Takip edin</span>
+                      <SocialLinks variant="icons" />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

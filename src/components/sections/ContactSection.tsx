@@ -4,6 +4,7 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { motion } from "framer-motion";
 import { InViewMask, FadeIn } from "@/components/motion";
+import { SocialLinks } from "@/components/ui/SocialLinks";
 
 export function ContactSection() {
   const [form, setForm] = useState({ full_name: "", email: "", phone: "", company: "", message: "" });
@@ -67,6 +68,10 @@ export function ContactSection() {
                 <div className="flex items-baseline justify-between gap-6 border-b border-[var(--rule)] py-5">
                   <dt className="text-[13px] text-[var(--ink-muted)]">E-posta</dt>
                   <dd className="min-w-0"><a href="mailto:bennur.yilmaz@atalitix.com" className="link-underline text-[15px] text-[var(--ink)] break-all">bennur.yilmaz@atalitix.com</a></dd>
+                </div>
+                <div className="flex items-baseline justify-between gap-6 border-b border-[var(--rule)] py-5">
+                  <dt className="text-[13px] text-[var(--ink-muted)]">Sosyal medya</dt>
+                  <dd><SocialLinks /></dd>
                 </div>
               </dl>
             </FadeIn>

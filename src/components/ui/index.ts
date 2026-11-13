@@ -7,3 +7,4 @@ export { Spinner, PageLoader } from "./Spinner";
 export { ScrollToTop } from "./ScrollToTop";
 export { ErpModuleMap } from "./ErpModuleMap";
 export { StepLine, BackToSolutions } from "./StepLine";
+export { SocialLinks, SOCIALS } from "./SocialLinks";
