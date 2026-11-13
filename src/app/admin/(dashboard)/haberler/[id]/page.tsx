@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireAdmin, getAdminClient } from "@/lib/admin/auth";
 import { newsHref, type News } from "@/lib/news-utils";
-import { updateNews, uploadEditorImage } from "../actions";
+import { updateNews, uploadEditorImage, previewLinkForNews } from "../actions";
 import { NewsForm } from "../NewsForm";
 
 export const revalidate = 0;
@@ -25,7 +25,7 @@ export default async function EditNewsPage({ params }: { params: Promise<{ id: s
           </Link>
         )}
       </div>
-      <NewsForm action={updateNews} uploadImage={uploadEditorImage} item={item} submitLabel="Değişiklikleri kaydet" />
+      <NewsForm action={updateNews} uploadImage={uploadEditorImage} previewLink={previewLinkForNews} item={item} submitLabel="Değişiklikleri kaydet" />
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { requireAdmin, getAdminClient } from "@/lib/admin/auth";
 import { slugify, isHtml, legacyToHtml } from "@/lib/news-utils";
 import { sanitizeNewsHtml } from "@/lib/sanitize";
+import { getLinkPreview, downloadImage } from "@/lib/link-preview";
 
 function clean(v: FormDataEntryValue | null): string | null {
   const s = String(v ?? "").trim();
@@ -97,6 +98,49 @@ export async function uploadEditorImage(formData: FormData): Promise<{ url?: str
   if (!(file instanceof File) || file.size === 0) return { error: "Dosya bulunamadı." };
   const url = await uploadImage(file);
   return url ? { url } : { error: "Görsel yüklenemedi." };
+}
+
+export interface LinkPreviewResult {
+  platform?: "LinkedIn" | "Instagram" | null;
+  imageUrl?: string;
+  description?: string;
+  siteName?: string;
+  date?: string;
+  error?: string;
+}
+
+/**
+ * "Paste a link → fill the form": reads the link's preview data and copies the
+ * preview image into our own storage (social-media image links expire).
+ * The title is intentionally never filled — editors write it themselves.
+ */
+export async function previewLinkForNews(link: string): Promise<LinkPreviewResult> {
+  await requireAdmin();
+  const preview = await getLinkPreview(String(link ?? "").trim());
+  if (!preview) return { error: "Geçerli bir web bağlantısı girin." };
+
+  let imageUrl: string | undefined;
+  if (preview.image) {
+    const img = await downloadImage(preview.image, MAX_IMAGE_BYTES);
+    if (img) {
+      const ext = IMAGE_TYPES[img.type];
+      const path = `baglanti/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+      const storage = getAdminClient().storage.from("haberler");
+      const { error } = await storage.upload(path, img.data, { contentType: img.type, cacheControl: "31536000" });
+      if (!error) imageUrl = storage.getPublicUrl(path).data.publicUrl;
+    }
+  }
+
+  const date = preview.publishedTime && /^\d{4}-\d{2}-\d{2}/.test(preview.publishedTime) ? preview.publishedTime.slice(0, 10) : undefined;
+  if (!imageUrl && !preview.description) {
+    return {
+      platform: preview.platform,
+      error: preview.platform === "LinkedIn" || /linkedin\.com/i.test(String(link))
+        ? "LinkedIn bu paylaşımın önizlemesini paylaşmıyor. Görseli kendiniz yükleyebilirsiniz; paylaşım yine de haberin içinde gösterilecek."
+        : "Bu bağlantıdan görsel veya metin alınamadı. Görseli ve metni kendiniz ekleyebilirsiniz.",
+    };
+  }
+  return { platform: preview.platform, imageUrl, description: preview.description, siteName: preview.siteName, date };
 }
 
 function refresh() {

@@ -231,11 +231,13 @@ export function RichTextEditor({
   name,
   initialHtml,
   onUploadImage,
+  onChange,
   placeholder = "Haberinizi buraya yazın…",
 }: {
   name: string;
   initialHtml: string;
   onUploadImage: (file: File) => Promise<string | null>;
+  onChange?: (html: string) => void;
   placeholder?: string;
 }) {
   const [html, setHtml] = useState(initialHtml);
@@ -258,7 +260,11 @@ export function RichTextEditor({
     editorProps: {
       attributes: { class: "news-prose news-editor min-h-[340px] px-6 py-5 focus:outline-none" },
     },
-    onUpdate: ({ editor: e }) => setHtml(e.isEmpty ? "" : e.getHTML()),
+    onUpdate: ({ editor: e }) => {
+      const next = e.isEmpty ? "" : e.getHTML();
+      setHtml(next);
+      onChange?.(next);
+    },
   });
 
   const words = useEditorState({
