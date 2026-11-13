@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { InViewMask, FadeIn } from "@/components/motion";
+import { StepLine, BackToSolutions } from "@/components/ui/StepLine";
 
 const EASE_OUT = [0.22, 1, 0.36, 1] as const;
 const DRAW = [0.65, 0, 0.35, 1] as const;
@@ -58,52 +59,6 @@ function Seal({ play }: { play: boolean }) {
   );
 }
 
-function Flow() {
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
-  const n = FLOW.length;
-
-  return (
-    <div ref={ref} className="relative">
-      <motion.div
-        className="hidden lg:block absolute left-0 right-0 top-[7px] h-px origin-left bg-[var(--rule-strong)]"
-        initial={{ scaleX: 0 }} animate={{ scaleX: inView ? 1 : 0 }}
-        transition={{ duration: 1.6, ease: DRAW }}
-      />
-      <motion.div
-        className="lg:hidden absolute left-[7px] top-2 bottom-2 w-px origin-top bg-[var(--rule-strong)]"
-        initial={{ scaleY: 0 }} animate={{ scaleY: inView ? 1 : 0 }}
-        transition={{ duration: 1.6, ease: DRAW }}
-      />
-      {inView && <span className="process-pulse hidden lg:block absolute top-[4px] left-0 h-[7px] w-[7px] rounded-full bg-[var(--brand-blue)]" aria-hidden="true" />}
-
-      <ol className="relative grid grid-cols-1 gap-8 lg:grid-cols-5 lg:gap-6">
-        {FLOW.map((s, i) => {
-          const delay = 0.3 + (i / n) * 1.3;
-          return (
-            <li key={s.title} className="relative pl-9 lg:pl-0">
-              <motion.span
-                className={`absolute left-0 lg:static block h-[15px] w-[15px] rounded-full border border-[var(--brand-navy)] ${s.key ? "bg-[var(--brand-navy)]" : "bg-white"}`}
-                initial={{ scale: 0 }} animate={{ scale: inView ? 1 : 0 }}
-                transition={{ delay, type: "spring", stiffness: 300, damping: 20 }}
-              />
-              <motion.div
-                className="lg:pt-6 lg:pr-4"
-                initial={{ opacity: 0, y: 10 }} animate={{ opacity: inView ? 1 : 0, y: inView ? 0 : 10 }}
-                transition={{ delay: delay + 0.1, duration: 0.7, ease: EASE_OUT }}
-              >
-                <p className="text-[12px] tabular-nums text-[var(--ink-muted)] mb-1.5">{String(i + 1).padStart(2, "0")}</p>
-                <h4 className="font-serif text-[1.15rem] leading-tight text-[var(--ink)] mb-1.5">{s.title}</h4>
-                <p className={`text-[13.5px] leading-relaxed ${s.key ? "text-[var(--brand-navy-700)] font-medium" : "text-[var(--ink-muted)]"}`}>{s.desc}</p>
-              </motion.div>
-            </li>
-          );
-        })}
-      </ol>
-    </div>
-  );
-}
-
 /** Çözüm 1.1 (ERP kapsamı) ve 1.2 (Odoo) — sunum s.7 temel alınmıştır. */
 export function ErpPathSection() {
   const sealRef = useRef<HTMLDivElement>(null);
@@ -113,6 +68,7 @@ export function ErpPathSection() {
     <section id="erp" className="relative bg-[var(--paper)] py-20 md:py-28">
       <div className="container">
         {/* 1.1 — header */}
+        <BackToSolutions number="1" title="Süreç Analizi ve Hedef Süreç Tasarımı" />
         <div className="max-w-3xl">
           <FadeIn className="mb-6">
             <p className="section-label">1.1 · ERP Kapsamı ve Kavramsal Tasarım</p>
@@ -130,7 +86,7 @@ export function ErpPathSection() {
             <h3 className="font-serif text-xl md:text-[1.4rem] text-[var(--ink)]">Süreç tasarımından ERP kapsamına</h3>
             <p className="text-[12px] tracking-[0.1em] uppercase text-[var(--ink-muted)]">Doğru ERP yolu</p>
           </FadeIn>
-          <Flow />
+          <StepLine steps={FLOW} surface="paper" />
         </div>
 
         {/* 1.1 — principle + outputs */}

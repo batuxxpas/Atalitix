@@ -53,6 +53,10 @@ function DragHandle(props: React.HTMLAttributes<HTMLDivElement>) {
   );
 }
 
+// Where each solution / sub-area is explained further down the page (by position: 1, 2, 3 · 1.1, 1.2, 2.1)
+const SOLUTION_TARGETS = ["erp", "olgunluk", "egitim"];
+const SUB_TARGETS: Record<string, string> = { "1.1": "erp", "1.2": "odoo", "2.1": "firsatlar" };
+
 function SolutionRow({ sol, index, isEditorMode, sortId, subs }: { sol: Solution; index: number; isEditorMode: boolean; sortId: string; subs: SolutionSubItem[] }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: sortId });
   const style: React.CSSProperties = {
@@ -80,8 +84,13 @@ function SolutionRow({ sol, index, isEditorMode, sortId, subs }: { sol: Solution
 
       {isEditorMode && <DragHandle {...attributes} {...listeners} />}
 
+      {/* Whole row links to the solution's detail section (sub-area links sit above it) */}
+      {!isEditorMode && SOLUTION_TARGETS[index] && (
+        <a href={`#${SOLUTION_TARGETS[index]}`} className="absolute inset-0 z-0" aria-label={`${sol.title}: detayları gör`} />
+      )}
+
       <motion.div
-        className="grid grid-cols-12 gap-x-6 gap-y-3 py-7 md:py-8"
+        className={`relative grid grid-cols-12 gap-x-6 gap-y-3 py-7 md:py-8 ${isEditorMode ? "" : "pointer-events-none"}`}
         variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, delay: 0.15, ease: EASE_OUT } } }}
       >
         <span className="col-span-2 md:col-span-1 pt-1.5 text-[13px] tabular-nums text-[var(--ink-muted)] transition-colors group-hover:text-[var(--brand-blue)]">
@@ -107,21 +116,40 @@ function SolutionRow({ sol, index, isEditorMode, sortId, subs }: { sol: Solution
             section="solutions" field="description" index={index} defaultValue={sol.description} tagName="p"
             className="text-[15px] leading-relaxed text-[var(--ink-body)] max-w-xl"
           />
+          {!isEditorMode && SOLUTION_TARGETS[index] && (
+            <span className="mt-3 inline-flex items-center gap-1.5 text-[13px] font-medium text-[var(--brand-navy-700)] opacity-70 transition-opacity group-hover:opacity-100">
+              Detayları gör <span className="transition-transform group-hover:translate-y-0.5" aria-hidden="true">↓</span>
+            </span>
+          )}
 
           {/* Sub-areas: 1.1, 1.2 … */}
           {subs.length > 0 && (
             <ul className="mt-5 border-t border-[var(--rule)]">
-              {subs.map((sub, j) => (
-                <li key={sub.id} className="flex gap-4 border-b border-[var(--rule)] py-3">
-                  <span className="w-8 shrink-0 pt-0.5 text-[12.5px] tabular-nums text-[var(--brand-blue)]">
-                    {index + 1}.{j + 1}
-                  </span>
-                  <div>
-                    <p className="font-serif text-[1.05rem] text-[var(--ink)]">{sub.baslik}</p>
-                    {sub.aciklama && <p className="mt-0.5 text-[13.5px] leading-relaxed text-[var(--ink-muted)]">{sub.aciklama}</p>}
-                  </div>
-                </li>
-              ))}
+              {subs.map((sub, j) => {
+                const code = `${index + 1}.${j + 1}`;
+                const target = SUB_TARGETS[code] ?? SOLUTION_TARGETS[index];
+                const inner = (
+                  <>
+                    <span className="w-8 shrink-0 pt-0.5 text-[12.5px] tabular-nums text-[var(--brand-blue)]">{code}</span>
+                    <div className="flex-1">
+                      <p className="font-serif text-[1.05rem] text-[var(--ink)] transition-colors group-hover/sub:text-[var(--brand-blue)]">{sub.baslik}</p>
+                      {sub.aciklama && <p className="mt-0.5 text-[13.5px] leading-relaxed text-[var(--ink-muted)]">{sub.aciklama}</p>}
+                    </div>
+                    {!isEditorMode && target && (
+                      <span className="shrink-0 pt-0.5 text-[var(--ink-muted)] transition-all group-hover/sub:translate-y-0.5 group-hover/sub:text-[var(--brand-blue)]" aria-hidden="true">↓</span>
+                    )}
+                  </>
+                );
+                return (
+                  <li key={sub.id} className="border-b border-[var(--rule)]">
+                    {!isEditorMode && target ? (
+                      <a href={`#${target}`} className="group/sub pointer-events-auto relative z-[1] flex gap-4 py-3">{inner}</a>
+                    ) : (
+                      <div className="flex gap-4 py-3">{inner}</div>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           )}
         </div>

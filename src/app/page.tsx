@@ -1,5 +1,5 @@
 import { Header, Footer } from "@/components/layout";
-import { HeroSection, SolutionsSection, ApproachSection, ContactSection, ErpPathSection, NewsSection } from "@/components/sections";
+import { HeroSection, SolutionsSection, ApproachSection, ContactSection, ErpPathSection, MaturitySection, EducationSection, NewsSection } from "@/components/sections";
 import { IntroLoader, INTRO_BOOT_SCRIPT } from "@/components/motion";
 import { createClient } from "@/lib/supabase/server";
 import { SITE_CONFIG } from "@/lib/constants";
@@ -12,7 +12,7 @@ const FALLBACK_SUBS: Record<string, { baslik: string; aciklama: string }[]> = {
     { baslik: "ERP Kapsamı ve Kavramsal Tasarım", aciklama: "Modül kapsamı, entegrasyon ihtiyacı ve uygun ERP yolu netleştirilir; Odoo, SAP, Logo, Canias vb. alternatifler süreç uyumuna göre değerlendirilir." },
     { baslik: "Odoo Uygulama", aciklama: "Odoo'nun doğru yol olduğu projelerde kurulum, uyarlama, veri aktarımı ve canlıya geçiş sertifikalı ekibimizle yürütülür." },
   ],
-  "Dijital & AI Olgunluk Değerlendirme": [
+  "Dijital Olgunluk Değerlendirme": [
     { baslik: "Veri, AI ve Otomasyon Fırsatları", aciklama: "KPI, dashboard, RPA/AI kullanım senaryoları ve otomasyon backlog'u; iş değeri, veri hazırlığı ve uygulanabilirliğe göre önceliklendirilir." },
   ],
 };
@@ -102,7 +102,7 @@ export default async function HomePage() {
       "Süreç Analizi ve Hedef Süreç Tasarımı",
       "ERP Kapsamı ve Kavramsal Tasarım",
       "Odoo Uygulama",
-      "Dijital ve AI Olgunluk Değerlendirme",
+      "Dijital Olgunluk Değerlendirme",
       "Veri, AI ve Otomasyon Fırsatları",
       "Dijital Eğitim ve Kullanıcı Adaptasyonu",
     ],
@@ -155,6 +155,12 @@ export default async function HomePage() {
 
         {/* 1.1 ERP kapsamı + 1.2 Odoo (sunum s.7) */}
         <ErpPathSection />
+
+        {/* 2 + 2.1 Dijital olgunluk (sunum s.8–10) */}
+        <MaturitySection />
+
+        {/* 3 Eğitim ve eğitim kataloğu */}
+        <EducationSection />
 
         
         {approachSteps && experienceItems && (

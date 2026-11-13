@@ -5,3 +5,5 @@ export { ApproachSection } from "./ApproachSection";
 export { ContactSection } from "./ContactSection";
 export { ErpPathSection } from "./ErpPathSection";
 export { NewsSection } from "./NewsSection";
+export { MaturitySection } from "./MaturitySection";
+export { EducationSection } from "./EducationSection";

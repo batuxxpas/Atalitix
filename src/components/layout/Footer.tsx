@@ -2,12 +2,12 @@ import Link from "next/link";
 import Image from "next/image";
 
 const SERVICES = [
-  "Süreç Analizi ve Hedef Süreç Tasarımı",
-  "ERP Kapsamı ve Kavramsal Tasarım",
-  "Odoo Uygulama",
-  "Dijital & AI Olgunluk Değerlendirme",
-  "Veri, AI ve Otomasyon Fırsatları",
-  "Dijital Eğitim ve Adaptasyon",
+  { title: "Süreç Analizi ve Hedef Süreç Tasarımı", href: "/#erp" },
+  { title: "ERP Kapsamı ve Kavramsal Tasarım", href: "/#erp" },
+  { title: "Odoo Uygulama", href: "/#odoo" },
+  { title: "Dijital Olgunluk Değerlendirme", href: "/#olgunluk" },
+  { title: "Veri, AI ve Otomasyon Fırsatları", href: "/#firsatlar" },
+  { title: "Dijital Eğitim ve Eğitim Kataloğu", href: "/#egitim" },
 ];
 
 const COMPANY = [
@@ -38,9 +38,9 @@ export function Footer() {
             <h4 className="text-[13px] font-medium text-[var(--ink-muted)] mb-5">Çözümler</h4>
             <ul className="space-y-3">
               {SERVICES.map((item) => (
-                <li key={item}>
-                  <Link href="/#cozumler" className="link-underline text-[15px] text-[var(--ink)] hover:text-[var(--brand-blue)]">
-                    {item}
+                <li key={item.title}>
+                  <Link href={item.href} className="link-underline text-[15px] text-[var(--ink)] hover:text-[var(--brand-blue)]">
+                    {item.title}
                   </Link>
                 </li>
               ))}

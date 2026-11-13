@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { HeroSection, SolutionsSection, ApproachSection, ErpPathSection } from "@/components/sections";
+import { HeroSection, SolutionsSection, ApproachSection, ErpPathSection, MaturitySection, EducationSection } from "@/components/sections";
 import { Header, Footer } from "@/components/layout";
 import { saveHeroSection, saveSolutions, saveApproachSteps, saveExperienceItems } from "./actions";
 import { EditorProvider, useEditor } from "@/components/editor";
@@ -68,6 +68,8 @@ function VisualEditorInner({ onSave, isSaving, saveMessage }: { onSave: (data: a
 
         {/* Sabit içerik (editörde düzenlenmez) */}
         <ErpPathSection />
+        <MaturitySection />
+        <EducationSection />
 
         {/* Sabit içerik (editörde düzenlenmez) */}
         
