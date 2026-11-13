@@ -150,10 +150,13 @@ export function NewsForm({
     // Never silently replace a cover the editor already chose
     if (res.imageUrl && !hasCover) { setAutoImage(res.imageUrl); filled.push("görsel"); }
     if (res.description && !ozet.trim()) {
-      setOzet(res.description.length > 220 ? res.description.slice(0, 217).replace(/\s+\S*$/, "") + "…" : res.description);
+      // Summary = first paragraph, shortened (cards and home page only)
+      const first = res.description.split(/\n\s*\n/)[0].replace(/\s+/g, " ").trim();
+      setOzet(first.length > 220 ? first.slice(0, 217).replace(/\s+\S*$/, "") + "…" : first);
       filled.push("kısa özet");
     }
-    if (res.description && !res.platform && !body.replace(/<[^>]*>/g, "").trim()) {
+    // Body: full text — except LinkedIn, whose official embed already shows the post text
+    if (res.description && res.platform !== "LinkedIn" && !body.replace(/<[^>]*>/g, "").trim()) {
       setBody(textToHtml(res.description));
       setEditorKey((k) => k + 1);
       filled.push("haber metni");

@@ -98,6 +98,25 @@ function instagramFullImage(embedHtml: string): string | undefined {
   return src ? decodeEntities(src) : undefined;
 }
 
+/**
+ * Full caption from Instagram's official embed page, with its paragraph breaks
+ * (the og:description is flattened and prefixed with like/comment counts).
+ */
+function instagramCaption(embedHtml: string): string | undefined {
+  const m = embedHtml.match(/class="Caption">([\s\S]*?)(?:<div class="CaptionComments"|<\/div>)/i);
+  if (!m) return undefined;
+  const text = decodeEntities(
+    m[1]
+      .replace(/<a[^>]*class="CaptionUsername"[^>]*>[\s\S]*?<\/a>/i, "")
+      .replace(/<br\s*\/?>/gi, "\n")
+      .replace(/<[^>]+>/g, ""),
+  )
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+  return text || undefined;
+}
+
 /** Instagram descriptions look like: '12 likes, 1 comments - atalitix on 5 November 2026: "caption…".' */
 function cleanInstagramCaption(desc: string): string {
   const m = desc.match(/:\s*["“]([\s\S]+?)["”]\.?\s*$/);
@@ -129,6 +148,8 @@ export async function getLinkPreview(raw: string): Promise<LinkPreview | null> {
       const embedHtml = await fetchHtml(embed.src);
       const full = embedHtml ? instagramFullImage(embedHtml) : undefined;
       if (full) image = full;
+      const caption = embedHtml ? instagramCaption(embedHtml) : undefined;
+      if (caption) description = caption;
     }
     if (image) {
       try { image = new URL(image, candidate).toString(); } catch { image = undefined; }

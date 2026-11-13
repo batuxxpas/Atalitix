@@ -7,7 +7,7 @@ import { SocialEmbedFrame } from "@/components/news/SocialEmbedFrame";
 import { getNews, getRelatedNews, newsHref, formatNewsDate, safeHref, isHtml, socialEmbed } from "@/lib/news";
 import { sanitizeNewsHtml } from "@/lib/sanitize";
 import { SITE_CONFIG } from "@/lib/constants";
-import { SocialLinks } from "@/components/ui/SocialLinks";
+import { SocialLinks, InstagramIcon } from "@/components/ui/SocialLinks";
 
 export const revalidate = 60;
 
@@ -43,6 +43,8 @@ export default async function NewsDetailPage({ params }: { params: Params }) {
   const source = safeHref(news.link);
   const embed = socialEmbed(news.link);
   const hasBody = !!news.icerik && news.icerik.replace(/<[^>]*>/g, "").trim().length > 0;
+  // Instagram's own embed UI clashes with the page — Instagram posts are shown in our own layout
+  const isInstagram = embed?.platform === "Instagram";
 
   const articleJsonLd = {
     "@context": "https://schema.org",
@@ -89,7 +91,49 @@ export default async function NewsDetailPage({ params }: { params: Params }) {
           )}
 
           <div className="container mt-12 md:mt-16">
-            {embed && !hasBody ? (
+            {isInstagram ? (
+              /* Instagram post: full photo (never cropped) beside the caption, in the site's own typography */
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
+                {news.gorsel_url && (
+                  <figure className="lg:col-span-7 lg:sticky lg:top-28">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={news.gorsel_url}
+                      alt={news.baslik}
+                      className="block w-full h-auto max-h-[80vh] object-contain bg-[var(--paper)] outline outline-1 -outline-offset-1 outline-[var(--rule)]"
+                    />
+                  </figure>
+                )}
+                <div className={news.gorsel_url ? "lg:col-span-5" : "lg:col-span-8 max-w-[44rem]"}>
+                  {hasBody &&
+                    (isHtml(news.icerik!) ? (
+                      <div className="news-prose" dangerouslySetInnerHTML={{ __html: sanitizeNewsHtml(news.icerik!) }} />
+                    ) : (
+                      <NewsBody text={news.icerik!} />
+                    ))}
+                  {source && (
+                    <a
+                      href={source}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`${hasBody ? "mt-10" : ""} inline-flex items-center gap-2.5 text-[14px] font-medium text-[var(--brand-navy-700)] link-underline`}
+                    >
+                      <InstagramIcon className="h-4 w-4" />
+                      Instagram&apos;da görüntüle ↗
+                    </a>
+                  )}
+                  <div className="mt-10 border-t border-[var(--rule-strong)] pt-8">
+                    <div className="flex flex-wrap items-center justify-between gap-4">
+                      <Link href="/haberler" className="text-[14px] text-[var(--ink)] link-underline">← Tüm haberler</Link>
+                      <div className="flex items-center gap-3 text-[13px] text-[var(--ink-muted)]">
+                        <span>Takip edin</span>
+                        <SocialLinks variant="icons" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : embed && !hasBody ? (
               /* Social post without extra text: the post itself, right under the title */
               <div className="max-w-[540px]">
                 <SocialEmbedFrame embed={embed} title={news.baslik} />
