@@ -55,7 +55,7 @@ export default function ErpScene3D({ play = true }: { play?: boolean }) {
     const { root, camera, pointer, scene, rig } = stage;
 
     /* Base: plain layered disc, two hairline rings, soft contact shadow */
-    const ao = softShadow(PLATE_R + 1.6, 0.18);
+    const ao = softShadow(PLATE_R + 0.7, 0.16);
     ao.position.y = 0.002;
     scene.add(ao);
     const base = new THREE.Group();
@@ -177,7 +177,6 @@ export default function ErpScene3D({ play = true }: { play?: boolean }) {
     const raycaster = new THREE.Raycaster();
     const hitTargets = modules.map((m) => m.grp);
     let tourIdx = -1, tourNext = INTRO + 0.8, lastFocus = -1;
-    const camFocus = { x: springState(), z: springState() };
 
     let startAt = -1;
     stage.run((t, dt) => {
@@ -209,24 +208,17 @@ export default function ErpScene3D({ play = true }: { play?: boolean }) {
       }
       const focus = hovered >= 0 ? hovered : tourIdx;
 
-      // Camera: cinematic arrival, then a gentle lean toward the focused department
+      // Camera: one calm arrival move at the start, then it stays put (only the mouse tilts it)
       const ip = ease.inOutCubic(ease.step(s, 0, INTRO));
-      const fm = focus >= 0 ? modules[focus].grp.position : null;
-      const fx = spring(camFocus.x, fm ? fm.x * 0.07 : 0, dt, 40, 12);
-      const fz = spring(camFocus.z, fm ? fm.z * 0.07 : 0, dt, 40, 12);
-      const fd = 1;
-      rig.az = (1 - ip) * deg(-42);
-      rig.el = (1 - ip) * 0.32;
-      rig.dist = (1 + (1 - ip) * 0.45) * fd;
-      rig.tx = fx;
-      rig.tz = fz;
-      root.rotation.y = Math.sin(t * 0.12) * 0.04;
+      rig.az = (1 - ip) * deg(-28);
+      rig.el = (1 - ip) * 0.22;
+      rig.dist = 1 + (1 - ip) * 0.35;
 
       // Entrance
       const pb = ease.outCubic(ease.step(s, 0, 0.9));
       base.scale.setScalar(0.85 + 0.15 * pb);
       base.position.y = (1 - pb) * -0.3;
-      (ao.material as THREE.MeshBasicMaterial).opacity = 0.18 * pb;
+      (ao.material as THREE.MeshBasicMaterial).opacity = 0.16 * pb;
       coreParts.forEach((c) => {
         c.m.position.y = c.y + spring(c.st, s > c.d ? 0 : 2.6, dt, 150, 15);
         c.m.visible = s > c.d;

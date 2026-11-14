@@ -101,7 +101,7 @@ export default function MaturityScene3D({
     const n = names.length;
 
     /* Base */
-    const ao = softShadow(BASE_R + 1.5, 0.2);
+    const ao = softShadow(BASE_R + 0.7, 0.18);
     scene.add(ao);
     const base = new THREE.Group();
     root.add(base);
@@ -265,12 +265,11 @@ export default function MaturityScene3D({
     stage.run((t, dt) => {
       if (startAt < 0) startAt = t;
       const s = t - startAt;
-      root.rotation.y = Math.sin(t * 0.12) * 0.04;
       // cinematic arrival
       const ip = ease.inOutCubic(ease.step(s, 0, INTRO));
-      rig.az = (1 - ip) * -0.7;
-      rig.el = (1 - ip) * 0.3;
-      rig.dist = 1 + (1 - ip) * 0.4;
+      rig.az = (1 - ip) * -0.45;
+      rig.el = (1 - ip) * 0.22;
+      rig.dist = 1 + (1 - ip) * 0.35;
 
       let hover: number | null = null;
       if (pointer.inside) {
@@ -289,7 +288,7 @@ export default function MaturityScene3D({
       const pb = ease.outCubic(ease.step(s, 0, 0.8));
       base.scale.setScalar(0.85 + 0.15 * pb);
       base.position.y = (1 - pb) * -0.3;
-      (ao.material as THREE.MeshBasicMaterial).opacity = 0.2 * pb;
+      (ao.material as THREE.MeshBasicMaterial).opacity = 0.18 * pb;
       const hp = ease.outBack(ease.step(s, 0.25, 0.7));
       hub.position.y = (1 - hp) * 1.6;
       hub.visible = hp > 0.001;

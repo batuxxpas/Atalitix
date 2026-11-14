@@ -82,7 +82,9 @@ export function softShadow(radius: number, opacity = 0.18, squash = 1) {
   g.fillRect(0, 0, 128, 128);
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
-  const m = new THREE.Mesh(new THREE.PlaneGeometry(radius * 2, radius * 2 * squash), new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity, depthWrite: false }));
+  const geo = new THREE.CircleGeometry(radius, 96);
+  geo.scale(1, squash, 1);
+  const m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity, depthWrite: false }));
   m.rotation.x = -Math.PI / 2;
   m.renderOrder = -1;
   return m;
@@ -187,8 +189,6 @@ export interface Stage {
   lite: boolean;
   /** Pointer position in the host, -1..1 (smoothed) and raw NDC for raycasting. */
   pointer: { x: number; y: number; inside: boolean; ndc: THREE.Vector2 };
-  /** -1 (host below the fold) … 0 (centred) … 1 (scrolled past), smoothed */
-  scroll: { p: number };
   /** Offsets the scene can animate: orbit angles (rad), distance multiplier, look-at shift. */
   rig: { az: number; el: number; dist: number; tx: number; ty: number; tz: number };
   /** Labels the camera keeps inside the frame. */
@@ -217,7 +217,10 @@ export function createStage(
   renderer.toneMappingExposure = 1.08;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFShadowMap;
-  renderer.domElement.style.cssText = "display:block;width:100%;height:100%";
+  // Soft edges: whatever reaches the canvas border fades out instead of ending in a hard line
+  const edgeMask = "linear-gradient(to right, transparent, #000 4%, #000 96%, transparent), linear-gradient(to bottom, transparent, #000 4%, #000 96%, transparent)";
+  renderer.domElement.style.cssText = `display:block;width:100%;height:100%;-webkit-mask-image:${edgeMask};mask-image:${edgeMask};-webkit-mask-composite:source-in;mask-composite:intersect`;
+  renderer.setClearColor(0x000000, 0);
   host.appendChild(renderer.domElement);
 
   const labels = new CSS2DRenderer();
@@ -250,11 +253,6 @@ export function createStage(
   rim.position.set(9, 6, -10);
   scene.add(rim);
 
-  const floor = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), new THREE.ShadowMaterial({ opacity: 0.045 }));
-  floor.rotation.x = -Math.PI / 2;
-  floor.position.y = -0.002;
-  floor.receiveShadow = true;
-  scene.add(floor);
 
   const root = new THREE.Group();
   scene.add(root);
@@ -300,7 +298,6 @@ export function createStage(
   host.addEventListener("pointermove", onMove);
   host.addEventListener("pointerleave", onLeave);
 
-  const scroll = { p: 0 };
   const rig = { az: 0, el: 0, dist: 1, tx: 0, ty: 0, tz: 0 };
   const look = new THREE.Vector3();
   const tracked: CSS2DObject[] = [];
@@ -360,18 +357,14 @@ export function createStage(
     last = now;
     elapsed += dt;
     clock.t = elapsed;
-    pointer.x += (ptarget.x - pointer.x) * Math.min(1, dt * 3.5);
-    pointer.y += (ptarget.y - pointer.y) * Math.min(1, dt * 3.5);
-    const r = host.getBoundingClientRect();
-    const vh = window.innerHeight || 1;
-    const sp = THREE.MathUtils.clamp((vh / 2 - (r.top + r.height / 2)) / vh, -1, 1);
-    scroll.p += (sp - scroll.p) * Math.min(1, dt * 5);
+    pointer.x += (ptarget.x - pointer.x) * Math.min(1, dt * 2.5);
+    pointer.y += (ptarget.y - pointer.y) * Math.min(1, dt * 2.5);
 
     frameFn(elapsed, dt);
 
-    // Camera orbit: base angle + scene rig (intro / focus) + pointer + scroll
-    const az = THREE.MathUtils.degToRad(opts.azimuth) + rig.az + pointer.x * 0.16 + scroll.p * 0.22;
-    const el = opts.elevation + rig.el - pointer.y * 0.05 + scroll.p * 0.1;
+    // Camera: base angle + scene rig (intro) + a small tilt that follows the mouse only
+    const az = THREE.MathUtils.degToRad(opts.azimuth) + rig.az + pointer.x * 0.1;
+    const el = opts.elevation + rig.el - pointer.y * 0.035;
     const dist = baseDist * rig.dist;
     look.set(target.x + rig.tx, target.y + rig.ty, target.z + rig.tz);
     camera.position.set(
@@ -411,7 +404,7 @@ export function createStage(
   io.observe(host);
 
   return {
-    scene, camera, renderer, root, pointer, scroll, rig, lite,
+    scene, camera, renderer, root, pointer, rig, lite,
     track: (...objs) => { tracked.push(...objs); },
     run: (frame) => { frameFn = frame; if (visible && !raf) raf = requestAnimationFrame(tick); },
     dispose: () => {
