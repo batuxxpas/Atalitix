@@ -399,21 +399,22 @@ html[data-intro="playing"] .intro-overlay { animation: intro-failsafe 0s linear 
   width: 24px;
   height: 24px;
   border-radius: 999px;
-  color: var(--brand-blue);
-  background: #e9f0ff;
+  color: var(--c, var(--brand-blue));
+  background: color-mix(in srgb, var(--c, #1d6cf2) 13%, #ffffff);
   transition: color 0.35s, background 0.35s;
 }
 .tl-chip__meta {
   font-size: 0.86em;
   font-variant-numeric: tabular-nums;
-  color: var(--brand-blue);
+  color: var(--ink-muted);
   padding-left: 7px;
   border-left: 1px solid rgba(11, 26, 79, 0.12);
   transition: color 0.35s;
 }
 .tl-chip.is-active { color: #fff; background: var(--brand-navy); border-color: var(--brand-navy); }
-.tl-chip.is-active .tl-chip__ico { color: #fff; background: var(--brand-blue); }
-.tl-chip.is-active .tl-chip__meta { color: #a9c4ff; border-color: rgba(255, 255, 255, 0.2); }
+.tl-chip.is-active .tl-chip__ico { color: #fff; background: var(--c, var(--brand-blue)); }
+.tl-chip.is-active .tl-chip__meta { color: rgba(255, 255, 255, 0.75); border-color: rgba(255, 255, 255, 0.2); }
+.tl-chip { box-shadow: 0 10px 24px -14px rgba(11, 26, 79, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.9), inset 0 -2px 0 color-mix(in srgb, var(--c, transparent) 70%, transparent); }
 .tl-chip--outer {
   font-size: clamp(10.5px, 0.95vw, 12.5px);
   font-weight: 400;

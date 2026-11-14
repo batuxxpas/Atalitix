@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { COLORS, mat, roundedBox, ease } from "./stage";
+import { mat, roundedBox, ease } from "./stage";
 
 /**
  * Small animated models that stand on each ERP module tile.
@@ -11,17 +11,22 @@ export interface Diorama {
   update: (t: number, boost: number) => void;
 }
 
-export function makePalette() {
+export function makePalette(hex: string) {
+  const c = new THREE.Color(hex);
+  const white = new THREE.Color("#ffffff");
+  const ink = new THREE.Color("#0b1a4f");
+  const tint = (k: number) => c.clone().lerp(white, k);
+  const shade = (k: number) => c.clone().lerp(ink, k);
   return {
     white: mat.satin("#ffffff"),
-    paper: mat.satin("#edf1f8"),
-    navy: mat.gloss("#1f45b0"),
-    navy6: mat.gloss("#3b74ea"),
-    blue: mat.gloss(COLORS.blue),
-    blue4: mat.satin(COLORS.blue400),
-    blue2: mat.satin(COLORS.blue200),
-    steel: mat.satin(COLORS.steel, { metalness: 0.45, roughness: 0.32 }),
-    glow: mat.glow(COLORS.blue, 1.4),
+    paper: mat.satin("#eef1f6"),
+    deep: mat.gloss(shade(0.42)),
+    mid: mat.gloss(shade(0.14)),
+    main: mat.gloss(c),
+    light: mat.satin(tint(0.38)),
+    pale: mat.satin(tint(0.72)),
+    steel: mat.satin("#b9c3d6", { metalness: 0.45, roughness: 0.32 }),
+    glow: mat.glow(tint(0.25), 1.4),
   };
 }
 type Palette = ReturnType<typeof makePalette>;
@@ -42,13 +47,13 @@ function finans(P: Palette): Diorama {
   counts.forEach((n, s) => {
     const x = -0.46 + s * 0.46;
     for (let k = 0; k < n; k++) {
-      const c = mesh(coinGeo, k % 2 ? P.blue4 : P.blue);
+      const c = mesh(coinGeo, k % 2 ? P.light : P.main);
       c.position.set(x, 0.035 + k * 0.078, s === 1 ? -0.18 : 0.12);
       g.add(c);
     }
     tops.push(0.035 + n * 0.078);
   });
-  const dropMat = P.blue.clone();
+  const dropMat = P.main.clone();
   const drop = mesh(coinGeo, dropMat);
   g.add(drop);
   // a slim card behind the coins: a bank statement
@@ -57,7 +62,7 @@ function finans(P: Palette): Diorama {
   card.rotation.x = -0.12;
   g.add(card);
   for (let r = 0; r < 3; r++) {
-    const line = new THREE.Mesh(new THREE.BoxGeometry(r === 0 ? 0.5 : 0.7 - r * 0.12, 0.035, 0.01), r === 0 ? P.navy : P.blue2);
+    const line = new THREE.Mesh(new THREE.BoxGeometry(r === 0 ? 0.5 : 0.7 - r * 0.12, 0.035, 0.01), r === 0 ? P.deep : P.pale);
     line.position.set(-0.05 - (r === 0 ? 0.1 : 0), 0.46 - r * 0.11, -0.59);
     line.rotation.x = -0.12;
     g.add(line);
@@ -81,19 +86,19 @@ function satinalma(P: Palette): Diorama {
   const g = new THREE.Group();
   const truck = new THREE.Group();
   g.add(truck);
-  const chassis = mesh(new THREE.BoxGeometry(1.36, 0.07, 0.42), P.navy);
+  const chassis = mesh(new THREE.BoxGeometry(1.36, 0.07, 0.42), P.deep);
   chassis.position.set(0, 0.17, 0);
   truck.add(chassis);
   const box = roundedBox(0.92, 0.52, 0.54, 0.06, P.white);
   box.position.set(-0.2, 0.47, 0);
   truck.add(box);
-  const stripe = mesh(new THREE.BoxGeometry(0.93, 0.07, 0.55), P.blue);
+  const stripe = mesh(new THREE.BoxGeometry(0.93, 0.07, 0.55), P.main);
   stripe.position.set(-0.2, 0.36, 0);
   truck.add(stripe);
-  const cab = roundedBox(0.36, 0.42, 0.52, 0.08, P.blue);
+  const cab = roundedBox(0.36, 0.42, 0.52, 0.08, P.main);
   cab.position.set(0.48, 0.41, 0);
   truck.add(cab);
-  const glass = roundedBox(0.04, 0.16, 0.44, 0.015, P.navy);
+  const glass = roundedBox(0.04, 0.16, 0.44, 0.015, P.deep);
   glass.position.set(0.66, 0.5, 0);
   truck.add(glass);
   const wheelGeo = new THREE.CylinderGeometry(0.115, 0.115, 0.09, 28);
@@ -102,7 +107,7 @@ function satinalma(P: Palette): Diorama {
   hubGeo.rotateX(Math.PI / 2);
   const wheels: THREE.Mesh[] = [];
   for (const x of [-0.42, 0.46]) for (const z of [-0.25, 0.25]) {
-    const w = mesh(wheelGeo, P.navy);
+    const w = mesh(wheelGeo, P.deep);
     w.position.set(x, 0.115, z);
     w.add(new THREE.Mesh(hubGeo, P.steel));
     truck.add(w);
@@ -112,7 +117,7 @@ function satinalma(P: Palette): Diorama {
   // road dashes
   const dashGeo = new THREE.BoxGeometry(0.26, 0.012, 0.05);
   const dashes = Array.from({ length: 5 }, () => {
-    const d = new THREE.Mesh(dashGeo, P.blue2);
+    const d = new THREE.Mesh(dashGeo, P.pale);
     d.position.set(0, 0.006, 0.52);
     g.add(d);
     return d;
@@ -144,13 +149,13 @@ function stok(P: Palette): Diorama {
   }
   const shelfGeo = new THREE.BoxGeometry(1.2, 0.04, 0.66);
   for (const y of [0.04, 0.47, 0.9]) {
-    const s = mesh(shelfGeo, P.navy6);
+    const s = mesh(shelfGeo, P.mid);
     s.position.y = y;
     g.add(s);
   }
   const parcel = (m: THREE.Material) => {
     const b = roundedBox(0.3, 0.3, 0.42, 0.04, m);
-    const tape = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.305, 0.425), P.blue2);
+    const tape = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.305, 0.425), P.pale);
     b.add(tape);
     return b;
   };
@@ -160,7 +165,7 @@ function stok(P: Palette): Diorama {
     b.position.set(x, y, 0);
     g.add(b);
   });
-  const moving = parcel(P.blue4);
+  const moving = parcel(P.light);
   g.add(moving);
   return {
     group: g,
@@ -185,17 +190,17 @@ function uretim(P: Palette): Diorama {
   const toothGeo = new THREE.ExtrudeGeometry(tooth, { depth: 0.66, bevelEnabled: false });
   toothGeo.translate(0, 0, -0.33);
   for (let i = 0; i < 3; i++) {
-    const r = mesh(toothGeo, i === 1 ? P.blue : P.blue4);
+    const r = mesh(toothGeo, i === 1 ? P.main : P.light);
     r.position.set(-0.72 + i * 0.37, 0.44, -0.05);
     g.add(r);
   }
   const windows = new THREE.Mesh(new THREE.BoxGeometry(0.92, 0.07, 0.01), P.glow);
   windows.position.set(-0.16, 0.25, 0.285);
   g.add(windows);
-  const door = roundedBox(0.2, 0.24, 0.02, 0.01, P.navy);
+  const door = roundedBox(0.2, 0.24, 0.02, 0.01, P.deep);
   door.position.set(0.24, 0.12, 0.28);
   g.add(door);
-  const chimney = mesh(new THREE.CylinderGeometry(0.065, 0.085, 0.62, 20), P.navy);
+  const chimney = mesh(new THREE.CylinderGeometry(0.065, 0.085, 0.62, 20), P.deep);
   chimney.position.set(0.22, 0.75, -0.24);
   g.add(chimney);
   const smoke = Array.from({ length: 3 }, () => {
@@ -219,7 +224,7 @@ function uretim(P: Palette): Diorama {
   gs.holes.push(hole);
   const gearGeo = new THREE.ExtrudeGeometry(gs, { depth: 0.08, bevelEnabled: true, bevelThickness: 0.015, bevelSize: 0.012, bevelSegments: 2, curveSegments: 6 });
   gearGeo.translate(0, 0, -0.04);
-  const gear = mesh(gearGeo, P.navy6);
+  const gear = mesh(gearGeo, P.mid);
   gear.position.set(0.66, 0.31, 0.22);
   gear.rotation.y = -0.35;
   g.add(gear);
@@ -244,7 +249,7 @@ function uretim(P: Palette): Diorama {
 function satis(P: Palette): Diorama {
   const g = new THREE.Group();
   const H = [0.32, 0.52, 0.74, 1.0];
-  const mats = [P.blue2, P.blue4, P.blue, P.navy];
+  const mats = [P.pale, P.light, P.main, P.deep];
   const barGeo = new THREE.BoxGeometry(0.22, 1, 0.22);
   barGeo.translate(0, 0.5, 0);
   const bars = H.map((h, i) => {
@@ -257,9 +262,9 @@ function satis(P: Palette): Diorama {
   const pts = H.map((h, i) => new THREE.Vector3(-0.51 + i * 0.34, h + 0.2, 0.05));
   const path = new THREE.CurvePath<THREE.Vector3>();
   for (let i = 0; i < pts.length - 1; i++) path.add(new THREE.LineCurve3(pts[i], pts[i + 1]));
-  const trend = mesh(new THREE.TubeGeometry(path, 40, 0.024, 8, false), P.blue);
+  const trend = mesh(new THREE.TubeGeometry(path, 40, 0.024, 8, false), P.main);
   g.add(trend);
-  const head = mesh(new THREE.ConeGeometry(0.07, 0.17, 20), P.blue);
+  const head = mesh(new THREE.ConeGeometry(0.07, 0.17, 20), P.main);
   const dir = pts[3].clone().sub(pts[2]).normalize();
   head.position.copy(pts[3]).addScaledVector(dir, 0.06);
   head.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
@@ -288,9 +293,9 @@ function ik(P: Palette): Diorama {
   const bodyGeo = new THREE.CapsuleGeometry(0.13, 0.2, 8, 20);
   const headGeo = new THREE.SphereGeometry(0.11, 24, 18);
   const people = [
-    { x: 0, z: -0.12, m: P.navy, s: 1.12 },
-    { x: -0.45, z: 0.14, m: P.blue, s: 1 },
-    { x: 0.45, z: 0.14, m: P.blue4, s: 1 },
+    { x: 0, z: -0.12, m: P.deep, s: 1.12 },
+    { x: -0.45, z: 0.14, m: P.main, s: 1 },
+    { x: 0.45, z: 0.14, m: P.light, s: 1 },
   ].map((p) => {
     const grp = new THREE.Group();
     const body = mesh(bodyGeo, p.m);
@@ -303,12 +308,12 @@ function ik(P: Palette): Diorama {
     g.add(grp);
     return grp;
   });
-  const ring = new THREE.Mesh(new THREE.TorusGeometry(0.66, 0.014, 8, 96), P.blue4);
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(0.66, 0.014, 8, 96), P.light);
   ring.rotation.x = Math.PI / 2;
   ring.position.y = 0.02;
   g.add(ring);
   const beads = Array.from({ length: 3 }, () => {
-    const b = mesh(new THREE.SphereGeometry(0.04, 12, 10), P.blue);
+    const b = mesh(new THREE.SphereGeometry(0.04, 12, 10), P.main);
     g.add(b);
     return b;
   });

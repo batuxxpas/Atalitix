@@ -28,6 +28,30 @@ export const ease = {
   step: (t: number, start: number, dur: number) => Math.min(1, Math.max(0, (t - start) / dur)),
 };
 
+/** Critically-damped-ish spring (semi-implicit Euler). Mutates and returns the state's value. */
+export function spring(st: { x: number; v: number }, target: number, dt: number, k = 170, c = 19) {
+  st.v += (k * (target - st.x) - c * st.v) * dt;
+  st.x += st.v * dt;
+  return st.x;
+}
+export const springState = (x = 0) => ({ x, v: 0 });
+
+/** "r,g,b" string for canvas gradients from a hex colour. */
+export function rgbString(hex: string) {
+  const n = parseInt(hex.slice(1), 16);
+  return `${(n >> 16) & 255},${(n >> 8) & 255},${n & 255}`;
+}
+
+/** Department colours — validated categorical set (colour-blind safe as neighbours on the ring). */
+export const DEPT = {
+  finans: "#0E9F75",
+  satinalma: "#7357D6",
+  stok: "#0A93A5",
+  uretim: "#E0553D",
+  satis: "#1D6CF2",
+  ik: "#B5389E",
+} as const;
+
 /* ---------- Materials: satin / gloss finishes lit by a studio environment ---------- */
 export const mat = {
   satin: (color: THREE.Color | string, o: Partial<THREE.MeshPhysicalMaterialParameters> = {}) =>
@@ -139,7 +163,7 @@ export function flowTube(curve: THREE.Curve<THREE.Vector3>, radius: number, segm
 /* ---------- Labels ---------- */
 
 /** Glass chip label (HTML, site fonts) anchored to a 3D point. */
-export function chip(text: string, opts: { icon?: string; variant?: "module" | "outer" | "dim"; meta?: string; above?: boolean; side?: boolean } = {}): CSS2DObject {
+export function chip(text: string, opts: { icon?: string; variant?: "module" | "outer" | "dim"; meta?: string; above?: boolean; side?: boolean; color?: string } = {}): CSS2DObject {
   const el = document.createElement("div");
   el.className = `tl-chip tl-chip--${opts.variant || "module"}${opts.side ? " tl-chip--meta-hover" : ""}`;
   el.innerHTML =
@@ -147,6 +171,7 @@ export function chip(text: string, opts: { icon?: string; variant?: "module" | "
     `<span class="tl-chip__txt">${text}</span>` +
     (opts.meta ? `<span class="tl-chip__meta">${opts.meta}</span>` : "");
   el.style.opacity = "0";
+  if (opts.color) el.style.setProperty("--c", opts.color);
   const obj = new CSS2DObject(el);
   if (opts.above) obj.center.set(0.5, 1); // sits on top of its point
   else obj.userData.auto = true; // anchored away from the centre each fit pass
@@ -164,6 +189,8 @@ export interface Stage {
   pointer: { x: number; y: number; inside: boolean; ndc: THREE.Vector2 };
   /** -1 (host below the fold) … 0 (centred) … 1 (scrolled past), smoothed */
   scroll: { p: number };
+  /** Offsets the scene can animate: orbit angles (rad), distance multiplier, look-at shift. */
+  rig: { az: number; el: number; dist: number; tx: number; ty: number; tz: number };
   /** Labels the camera keeps inside the frame. */
   track: (...objs: CSS2DObject[]) => void;
   run: (frame: (t: number, dt: number) => void) => void;
@@ -268,6 +295,8 @@ export function createStage(
   host.addEventListener("pointerleave", onLeave);
 
   const scroll = { p: 0 };
+  const rig = { az: 0, el: 0, dist: 1, tx: 0, ty: 0, tz: 0 };
+  const look = new THREE.Vector3();
   const tracked: CSS2DObject[] = [];
   const v = new THREE.Vector3();
   const o = new THREE.Vector3();
@@ -323,21 +352,23 @@ export function createStage(
     const sp = THREE.MathUtils.clamp((vh / 2 - (r.top + r.height / 2)) / vh, -1, 1);
     scroll.p += (sp - scroll.p) * Math.min(1, dt * 5);
 
-    // Camera orbit: base angle + pointer + scroll
-    const az = THREE.MathUtils.degToRad(opts.azimuth) + pointer.x * 0.16 + scroll.p * 0.22;
-    const el = opts.elevation - pointer.y * 0.05 + scroll.p * 0.1;
+    frameFn(elapsed, dt);
+
+    // Camera orbit: base angle + scene rig (intro / focus) + pointer + scroll
+    const az = THREE.MathUtils.degToRad(opts.azimuth) + rig.az + pointer.x * 0.16 + scroll.p * 0.22;
+    const el = opts.elevation + rig.el - pointer.y * 0.05 + scroll.p * 0.1;
+    const dist = baseDist * rig.dist;
+    look.set(target.x + rig.tx, target.y + rig.ty, target.z + rig.tz);
     camera.position.set(
-      target.x + Math.sin(az) * Math.cos(el) * baseDist,
-      target.y + Math.sin(el) * baseDist,
-      target.z + Math.cos(az) * Math.cos(el) * baseDist,
+      look.x + Math.sin(az) * Math.cos(el) * dist,
+      look.y + Math.sin(el) * dist,
+      look.z + Math.cos(az) * Math.cos(el) * dist,
     );
-    camera.lookAt(target);
+    camera.lookAt(look);
     if (Math.abs(camera.zoom - fitZoom) > 0.0005) {
       camera.zoom += (fitZoom - camera.zoom) * Math.min(1, dt * 6);
       camera.updateProjectionMatrix();
     }
-
-    frameFn(elapsed, dt);
     renderer.render(scene, camera);
     labels.render(scene, camera);
     if (++frames % 6 === 0 || fitCountdown++ < 3) fitLabels();
@@ -365,7 +396,7 @@ export function createStage(
   io.observe(host);
 
   return {
-    scene, camera, renderer, root, pointer, scroll, lite,
+    scene, camera, renderer, root, pointer, scroll, rig, lite,
     track: (...objs) => { tracked.push(...objs); },
     run: (frame) => { frameFn = frame; if (visible && !raf) raf = requestAnimationFrame(tick); },
     dispose: () => {

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
-import { createStage, chip, softShadow, flowTube, mat, COLORS, ease } from "./stage";
+import { createStage, chip, softShadow, flowTube, mat, spring, springState, COLORS, DEPT, ease } from "./stage";
 import { drawIcon } from "./icons";
 
 const RING_R = 3.25;
@@ -11,7 +11,12 @@ const UNIT = 0.52; // height per maturity level
 const FILL = 0.84; // slab share of a level (rest is the gap)
 const BASE_R = 5.5;
 const TOP = 0.3; // base top
-const LEVEL_COLORS = ["#d4e3ff", "#a3c0ff", "#6c9cfa", "#3a78ee", "#1a5fd8"].map((c) => new THREE.Color(c));
+// Same validated colour set as the ERP departments, in an order that keeps ring neighbours distinct
+const DIM_COLORS: Record<string, string> = {
+  "İnsan": DEPT.ik, "Yönetişim": DEPT.satis, "İnovasyon": DEPT.uretim,
+  "Teknoloji": DEPT.stok, "Müşteri": DEPT.satinalma, "Operasyon": DEPT.finans,
+};
+const INTRO = 2.6;
 const ICON_KEYS: Record<string, string> = {
   "İnsan": "insan", "Yönetişim": "yonetisim", "İnovasyon": "inovasyon",
   "Teknoloji": "teknoloji", "Müşteri": "musteri", "Operasyon": "operasyon",
@@ -48,7 +53,7 @@ function pieces(from: number, to: number) {
 const fmt = (n: number) => String(n).replace(".", ",");
 
 /** Round icon badge rendered to a texture (normal + active versions). */
-function badge(icon: string, active: boolean) {
+function badge(icon: string, active: boolean, hex: string) {
   const S = 512, c = document.createElement("canvas");
   c.width = c.height = S;
   const g = c.getContext("2d")!;
@@ -56,13 +61,13 @@ function badge(icon: string, active: boolean) {
   g.shadowBlur = 36;
   g.shadowOffsetY = 12;
   g.beginPath(); g.arc(S / 2, S / 2 - 8, S * 0.36, 0, Math.PI * 2);
-  g.fillStyle = active ? "#1d6cf2" : "#ffffff";
+  g.fillStyle = active ? hex : "#ffffff";
   g.fill();
   g.shadowColor = "transparent";
   g.lineWidth = 6;
   g.strokeStyle = active ? "rgba(255,255,255,0.35)" : "rgba(29,108,242,0.22)";
   g.stroke();
-  drawIcon(g, icon, S * 0.33, S * 0.33 - 8, S * 0.34, active ? "#ffffff" : "#1d6cf2", 2);
+  drawIcon(g, icon, S * 0.33, S * 0.33 - 8, S * 0.34, active ? "#ffffff" : hex, 2);
   const t = new THREE.CanvasTexture(c);
   t.colorSpace = THREE.SRGBColorSpace;
   t.anisotropy = 16;
@@ -92,7 +97,7 @@ export default function MaturityScene3D({
     const host = hostRef.current;
     if (!host) return;
     const stage = createStage(host, { width: 11.4, height: 9.4, azimuth: 30, elevation: 0.74, target: [0, 1.25, 0.1] });
-    const { root, camera, pointer, scene } = stage;
+    const { root, camera, pointer, scene, rig } = stage;
     const n = names.length;
 
     /* Base */
@@ -141,7 +146,7 @@ export default function MaturityScene3D({
     deck.receiveShadow = true;
     base.add(under, plate, deck);
 
-    // Hub: navy hex with a lit seam and a turning tick ring
+    // Hub: blue hex with a lit seam
     const hub = new THREE.Group();
     root.add(hub);
     const hubBody = new THREE.Mesh(hexPrism(0.95), mat.gloss("#3a78ee"));
@@ -157,16 +162,14 @@ export default function MaturityScene3D({
     hubTop.position.y = TOP + 0.39;
     hubTop.castShadow = true;
     hub.add(hubBody, seam, hubTop);
-    const ring = new THREE.Mesh(new THREE.TorusGeometry(1.25, 0.012, 6, 120), mat.glow(COLORS.blue400, 1));
-    ring.rotation.x = Math.PI / 2;
-    ring.position.y = TOP + 0.7;
-    hub.add(ring);
 
     /* Columns */
     const unitPrism = hexPrism(HEX_R);
     const ghostPrism = hexPrism(HEX_R + 0.04);
     const ghostEdges = new THREE.EdgesGeometry(ghostPrism, 30);
-    const levelMats = LEVEL_COLORS.map((c) => mat.satin(c, { roughness: 0.32, clearcoat: 0.9 }));
+    const WHITE = new THREE.Color("#ffffff");
+    const scanGeo = new THREE.RingGeometry(HEX_R + 0.06, HEX_R + 0.13, 6, 1, Math.PI / 6);
+    scanGeo.rotateX(-Math.PI / 2);
     const yOf = (lv: number) => TOP + Math.floor(lv) * UNIT + (lv - Math.floor(lv)) * UNIT * FILL;
 
     const cols = names.map((name, i) => {
@@ -176,9 +179,12 @@ export default function MaturityScene3D({
       grp.position.set(x, 0, z);
       grp.userData.idx = i;
       root.add(grp);
+      const hex = DIM_COLORS[name] || DEPT.satis;
+      const hue = new THREE.Color(hex);
 
+      // level blocks: pale tint at level 1 → full colour at level 5
       const slabs = pieces(0, current[i]).map(([L, f0, f1], j) => {
-        const m = levelMats[L].clone();
+        const m = mat.satin(hue.clone().lerp(WHITE, Math.max(0, 0.56 - L * 0.15)), { roughness: 0.32, clearcoat: 0.9 });
         const s = new THREE.Mesh(unitPrism, m);
         s.castShadow = true;
         s.receiveShadow = true;
@@ -187,19 +193,24 @@ export default function MaturityScene3D({
         s.position.y = y;
         s.scale.y = 0.001;
         grp.add(s);
-        return { s, m, y, h, order: j, base: LEVEL_COLORS[L] };
+        return { s, m, y, h, order: j };
       });
-      const gm = new THREE.MeshPhysicalMaterial({ color: COLORS.blue200, roughness: 0.12, clearcoat: 1, transparent: true, opacity: 0, depthWrite: false });
+      const gm = new THREE.MeshPhysicalMaterial({ color: hue.clone().lerp(WHITE, 0.75), roughness: 0.12, clearcoat: 1, transparent: true, opacity: 0, depthWrite: false });
       const gmesh = new THREE.Mesh(ghostPrism, gm);
-      const em = new THREE.LineBasicMaterial({ color: COLORS.blue, transparent: true, opacity: 0 });
+      const em = new THREE.LineBasicMaterial({ color: hue, transparent: true, opacity: 0 });
       gmesh.add(new THREE.LineSegments(ghostEdges, em));
       gmesh.position.y = yOf(current[i]) + 0.02;
       gmesh.scale.y = Math.max(0.001, yOf(target[i]) - yOf(current[i]) - 0.04);
       grp.add(gmesh);
       const ghosts = [{ gm, em }];
 
+      // measurement scan: a thin hex band sweeping from the base up to the target
+      const scanMat = new THREE.MeshBasicMaterial({ color: hue, transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide });
+      const scan = new THREE.Mesh(scanGeo, scanMat);
+      grp.add(scan);
+
       const icon = ICON_KEYS[name] || "operasyon";
-      const texN = badge(icon, false), texA = badge(icon, true);
+      const texN = badge(icon, false, hex), texA = badge(icon, true, hex);
       const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texN, transparent: true, depthWrite: false }));
       const badgeY = yOf(Math.max(current[i], target[i])) + 0.7;
       sprite.position.y = badgeY;
@@ -207,12 +218,12 @@ export default function MaturityScene3D({
       sprite.renderOrder = 5;
       grp.add(sprite);
 
-      const lab = chip(name, { variant: "module", meta: `${fmt(current[i])} → ${fmt(target[i])}`, side: true });
+      const lab = chip(name, { variant: "module", meta: `${fmt(current[i])} → ${fmt(target[i])}`, side: true, color: hex });
       lab.position.set(Math.cos(a) * 0.62, badgeY, Math.sin(a) * 0.62);
       grp.add(lab);
       stage.track(lab);
 
-      return { grp, slabs, ghosts, sprite, texN, texA, lab, badgeY, glow: 0, lift: 0, isA: false };
+      return { grp, slabs, ghosts, sprite, texN, texA, lab, badgeY, scan, scanMat, hue, top: yOf(target[i]), glow: 0, lift: springState(), isA: false };
     });
 
     /* Radar web across the current levels */
@@ -228,7 +239,7 @@ export default function MaturityScene3D({
     const web = flowTube(loop(current), 0.03, 240);
     web.uniforms.uBase.value = 0.85;
     web.uniforms.uRest.value = COLORS.blue.clone();
-    web.uniforms.uColor.value = new THREE.Color("#ffffff");
+    web.uniforms.uColor.value = new THREE.Color("#0d3fae");
     web.uniforms.uSpeed.value = 0.12;
     root.add(web.mesh);
     // translucent fan under the current web
@@ -251,10 +262,15 @@ export default function MaturityScene3D({
     let lastHover: number | null = null;
 
     let startAt = -1;
-    stage.run((t) => {
+    stage.run((t, dt) => {
       if (startAt < 0) startAt = t;
       const s = t - startAt;
-      root.rotation.y = Math.sin(t * 0.12) * 0.05;
+      root.rotation.y = Math.sin(t * 0.12) * 0.04;
+      // cinematic arrival
+      const ip = ease.inOutCubic(ease.step(s, 0, INTRO));
+      rig.az = (1 - ip) * -0.7;
+      rig.el = (1 - ip) * 0.3;
+      rig.dist = 1 + (1 - ip) * 0.4;
 
       let hover: number | null = null;
       if (pointer.inside) {
@@ -277,23 +293,20 @@ export default function MaturityScene3D({
       const hp = ease.outBack(ease.step(s, 0.25, 0.7));
       hub.position.y = (1 - hp) * 1.6;
       hub.visible = hp > 0.001;
-      ring.rotation.z = t * 0.3;
-      ring.position.y = TOP + 0.7 + Math.sin(t * 1.2) * 0.05;
       seamMat.emissiveIntensity = 1.2 + Math.sin(t * 2) * 0.25;
 
       const act = activeRef.current;
       cols.forEach((c, i) => {
         const isA = act === i;
         c.glow += ((isA ? 1 : 0) - c.glow) * 0.12;
-        c.lift += ((isA ? 0.18 : 0) - c.lift) * 0.12;
-        c.grp.position.y = c.lift;
+        c.grp.position.y = spring(c.lift, isA ? 0.2 : 0, dt, 160, 13);
         // level blocks drop in one by one
         c.slabs.forEach((sl) => {
           const p = ease.outBack(ease.step(s, 0.5 + i * 0.1 + sl.order * 0.16, 0.55));
           sl.s.scale.y = Math.max(0.001, sl.h * Math.min(1, p));
           sl.s.position.y = sl.y + (1 - Math.min(1, p)) * 0.9;
           sl.s.visible = p > 0.001;
-          sl.m.emissive.copy(COLORS.blue).multiplyScalar(c.glow * 0.35);
+          sl.m.emissive.copy(c.hue).multiplyScalar(c.glow * 0.3);
         });
         const gp = ease.step(s, 1.6 + i * 0.08, 0.7);
         const pulse = 0.5 + 0.5 * Math.sin(t * 1.8 - i * 0.6);
@@ -305,7 +318,13 @@ export default function MaturityScene3D({
         c.sprite.scale.setScalar(Math.max(0.001, bp * (0.95 + c.glow * 0.18)));
         c.sprite.position.y = c.badgeY + Math.sin(t * 1.4 + i) * 0.05;
         if (isA !== c.isA) { c.isA = isA; c.sprite.material.map = isA ? c.texA : c.texN; c.sprite.material.needsUpdate = true; }
-        c.lab.element.style.opacity = String(ease.step(s, 1.2 + i * 0.08, 0.5));
+        c.lab.element.style.opacity = String(ease.step(s, 1.2 + i * 0.08, 0.5) * (act !== null && !isA ? 0.55 : 1));
+        // scan sweep every few seconds, staggered round the ring (continuous while active)
+        const sweep = isA ? (t * 0.7) % 1 : Math.max(0, ((s - 3 - i * 0.35) % 4.2) / 1.6);
+        if (s > 3 && sweep <= 1) {
+          c.scan.position.y = TOP + 0.02 + ease.inOutCubic(sweep) * (c.top - TOP);
+          c.scanMat.opacity = Math.sin(sweep * Math.PI) * 0.85;
+        } else c.scanMat.opacity = 0;
         c.lab.element.classList.toggle("is-active", isA);
       });
 
