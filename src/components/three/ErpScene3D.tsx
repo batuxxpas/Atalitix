@@ -177,7 +177,7 @@ export default function ErpScene3D({ play = true }: { play?: boolean }) {
     const raycaster = new THREE.Raycaster();
     const hitTargets = modules.map((m) => m.grp);
     let tourIdx = -1, tourNext = INTRO + 0.8, lastFocus = -1;
-    const camFocus = { x: springState(), z: springState(), d: springState(1) };
+    const camFocus = { x: springState(), z: springState() };
 
     let startAt = -1;
     stage.run((t, dt) => {
@@ -212,9 +212,9 @@ export default function ErpScene3D({ play = true }: { play?: boolean }) {
       // Camera: cinematic arrival, then a gentle lean toward the focused department
       const ip = ease.inOutCubic(ease.step(s, 0, INTRO));
       const fm = focus >= 0 ? modules[focus].grp.position : null;
-      const fx = spring(camFocus.x, fm ? fm.x * 0.14 : 0, dt, 40, 12);
-      const fz = spring(camFocus.z, fm ? fm.z * 0.14 : 0, dt, 40, 12);
-      const fd = spring(camFocus.d, fm ? 0.95 : 1, dt, 40, 12);
+      const fx = spring(camFocus.x, fm ? fm.x * 0.07 : 0, dt, 40, 12);
+      const fz = spring(camFocus.z, fm ? fm.z * 0.07 : 0, dt, 40, 12);
+      const fd = 1;
       rig.az = (1 - ip) * deg(-42);
       rig.el = (1 - ip) * 0.32;
       rig.dist = (1 + (1 - ip) * 0.45) * fd;

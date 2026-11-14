@@ -262,6 +262,11 @@ export function createStage(
   /* Framing: fit the given world-space box at the target, then labels can pull back the zoom */
   let baseDist = 30;
   let fitZoom = 1;
+  // The zoom is only adjusted while the scene settles (and briefly after a resize), never in
+  // response to hover — otherwise a growing label would zoom out, lose the hover and loop.
+  const clock = { t: 0 };
+  let fitUntil = Infinity; // set once the camera rig has come to rest
+  let rigRested = false;
   const resize = () => {
     const w = host.clientWidth || 1, h = host.clientHeight || 1;
     renderer.setSize(w, h, false);
@@ -273,6 +278,7 @@ export function createStage(
     camera.zoom = 1;
     camera.updateProjectionMatrix();
     fitCountdown = 0;
+    fitUntil = Math.max(fitUntil, clock.t + 2.5);
   };
   let fitCountdown = 0;
   resize();
@@ -317,8 +323,15 @@ export function createStage(
       if (l.userData.side) l.center.set(ux >= 0 ? 0 : 1, 0.5);
       else l.center.set(ux > 0.35 ? 0 : ux < -0.35 ? 1 : 0.5, uy > 0.55 ? 1 : uy < -0.55 ? 0 : 0.5);
     }
-    // overflow → zoom out a little; plenty of room → ease back to the base framing
-    const margin = 6;
+    if (clock.t > fitUntil) return;
+    // wait for the intro camera move to finish before framing
+    const atRest = Math.abs(rig.az) < 0.002 && Math.abs(rig.el) < 0.002 && Math.abs(rig.dist - 1) < 0.002;
+    if (!atRest) return;
+    if (!rigRested) { rigRested = true; fitUntil = clock.t + 2.5; }
+    // overflow → zoom out a little; plenty of room → ease back to the base framing.
+    // Measured in the widest state (hover-only details shown) so hovering never overflows.
+    const margin = 16;
+    labels.domElement.classList.add("tl-fit");
     const cx = hr.left + hr.width / 2, cy = hr.top + hr.height / 2;
     let need = Infinity;
     for (const l of tracked) {
@@ -329,9 +342,10 @@ export function createStage(
       const ey = Math.max(cy - r.top, r.bottom - cy);
       need = Math.min(need, (hr.width / 2 - margin) / ex, (hr.height / 2 - margin) / ey);
     }
+    labels.domElement.classList.remove("tl-fit");
     if (!isFinite(need)) return;
-    if (need < 1) fitZoom = Math.max(0.55, fitZoom * Math.max(0.9, need * 0.985));
-    else if (need > 1.08 && fitZoom < 1) fitZoom = Math.min(1, fitZoom * 1.015);
+    if (need < 1) fitZoom = Math.max(0.55, fitZoom * need * 0.99);
+    else if (need > 1.04 && fitZoom < 1) fitZoom = Math.min(1, fitZoom * Math.min(need * 0.99, 1.1));
   };
 
   /* Loop that sleeps while off-screen */
@@ -345,6 +359,7 @@ export function createStage(
     const dt = last < 0 ? 0.016 : Math.min((now - last) / 1000, 0.05);
     last = now;
     elapsed += dt;
+    clock.t = elapsed;
     pointer.x += (ptarget.x - pointer.x) * Math.min(1, dt * 3.5);
     pointer.y += (ptarget.y - pointer.y) * Math.min(1, dt * 3.5);
     const r = host.getBoundingClientRect();
@@ -371,7 +386,7 @@ export function createStage(
     }
     renderer.render(scene, camera);
     labels.render(scene, camera);
-    if (++frames % 6 === 0 || fitCountdown++ < 3) fitLabels();
+    if (++frames % 3 === 0 || fitCountdown++ < 3) fitLabels();
     // Adaptive resolution: if the device can't keep ~50 fps, step the pixel ratio down
     if (frames > 90) {
       slowAcc += dt; slowN++;

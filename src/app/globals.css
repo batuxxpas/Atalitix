@@ -411,9 +411,15 @@ html[data-intro="playing"] .intro-overlay { animation: intro-failsafe 0s linear 
   border-left: 1px solid rgba(11, 26, 79, 0.12);
   transition: color 0.35s;
 }
-.tl-chip.is-active { color: #fff; background: var(--brand-navy); border-color: var(--brand-navy); }
+/* Active: stays light — white chip, outline and glow in the unit's own colour */
+.tl-chip.is-active {
+  color: var(--brand-navy);
+  background: rgba(255, 255, 255, 0.96);
+  border-color: color-mix(in srgb, var(--c, #1d6cf2) 55%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--c, #1d6cf2) 16%, transparent), 0 12px 26px -12px color-mix(in srgb, var(--c, #1d6cf2) 60%, transparent);
+}
 .tl-chip.is-active .tl-chip__ico { color: #fff; background: var(--c, var(--brand-blue)); }
-.tl-chip.is-active .tl-chip__meta { color: rgba(255, 255, 255, 0.75); border-color: rgba(255, 255, 255, 0.2); }
+.tl-chip.is-active .tl-chip__meta { color: var(--ink-body); }
 .tl-chip { box-shadow: 0 10px 24px -14px rgba(11, 26, 79, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.9), inset 0 -2px 0 color-mix(in srgb, var(--c, transparent) 70%, transparent); }
 .tl-chip--outer {
   font-size: clamp(10.5px, 0.95vw, 12.5px);
@@ -431,5 +437,8 @@ html[data-intro="playing"] .intro-overlay { animation: intro-failsafe 0s linear 
   .tl-chip__ico svg { width: 11px; height: 11px; }
   .tl-chip--outer { font-size: 10px; padding: 3px 7px; }
 }
-.tl-chip--meta-hover .tl-chip__meta { display: none; }
-.tl-chip--meta-hover.is-active .tl-chip__meta { display: inline; }
+/* Maturity labels: the level appears on a second line, so the label grows taller, never wider */
+.tl-chip--meta-hover { display: inline-grid; justify-items: start; row-gap: 3px; border-radius: 14px; }
+.tl-chip--meta-hover .tl-chip__meta { display: none; padding-left: 0; border-left: 0; font-size: 0.82em; }
+.tl-chip--meta-hover.is-active .tl-chip__meta,
+.tl-fit .tl-chip--meta-hover .tl-chip__meta { display: block; }
