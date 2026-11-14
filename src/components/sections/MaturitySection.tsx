@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
-import { InViewMask, FadeIn } from "@/components/motion";
+import { FadeIn, WordReveal } from "@/components/motion";
 import { StepLine, BackToSolutions } from "@/components/ui/StepLine";
 
 const EASE_OUT = [0.22, 1, 0.36, 1] as const;
@@ -176,11 +176,9 @@ export function MaturitySection() {
           <FadeIn className="mb-6">
             <p className="section-label">2 · Dijital Olgunluk Değerlendirme</p>
           </FadeIn>
-          <InViewMask>
-            <h2 className="section-title">
+          <WordReveal as="h2" className="section-title">
               Dönüşüm; <em className="text-[var(--brand-blue)]">olgunluk fotoğrafı</em> ve uygulanabilir bir proje portföyü üzerinden tasarlanır.
-            </h2>
-          </InViewMask>
+            </WordReveal>
         </div>
 
         {/* Dimensions + radar */}
@@ -252,11 +250,9 @@ export function MaturitySection() {
             <FadeIn className="mb-5">
               <p className="section-label">2.1 · Veri, AI ve Otomasyon Fırsatları</p>
             </FadeIn>
-            <InViewMask>
-              <h3 className="font-serif text-[1.7rem] md:text-[2rem] leading-tight text-[var(--ink)]">
-                Fikirler çoktur; değer üreten fırsatlar <em className="text-[var(--brand-blue)]">süreç etkisi, veri hazırlığı</em> ve uygulanabilirlikle seçilir.
-              </h3>
-            </InViewMask>
+            <WordReveal as="h3" className="font-serif text-[1.7rem] md:text-[2rem] leading-tight text-[var(--ink)]">
+              Fikirler çoktur; değer üreten fırsatlar <em className="text-[var(--brand-blue)]">süreç etkisi, veri hazırlığı</em> ve uygulanabilirlikle seçilir.
+            </WordReveal>
           </div>
 
           <div className="mt-12 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">

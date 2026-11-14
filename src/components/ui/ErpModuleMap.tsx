@@ -131,6 +131,15 @@ export function ErpModuleMap({ play = true }: { play?: boolean }) {
             );
           })}
 
+        {/* Ripples spreading from the core — the system is "live" */}
+        {on && !reduce &&
+          [0, 1.5].map((d) => (
+            <circle key={`rip${d}`} cx={C} cy={C} r={R_CORE} fill="none" stroke="var(--brand-blue)" strokeWidth={1} opacity={0}>
+              <animate attributeName="r" values={`${R_CORE};${R_INNER}`} dur="3s" begin={`${1.2 + d}s`} repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.45;0" dur="3s" begin={`${1.2 + d}s`} repeatCount="indefinite" />
+            </circle>
+          ))}
+
         {/* Core */}
         <motion.g
           initial={{ scale: 0.6, opacity: 0 }}
@@ -160,6 +169,13 @@ export function ErpModuleMap({ play = true }: { play?: boolean }) {
               style={{ cursor: "default" }}
             >
               <circle cx={p.x} cy={p.y} r={22} fill="transparent" />
+              {/* Halo when a data pulse reaches / leaves this module (same rhythm as the pulses) */}
+              {on && !reduce && (
+                <circle cx={p.x} cy={p.y} r={6} fill="none" stroke="var(--brand-blue)" strokeWidth={1.2} opacity={0}>
+                  <animate attributeName="r" values="6;18;18" keyTimes="0;0.35;1" dur="2.4s" begin={`${1.6 + i * 0.4}s`} repeatCount="indefinite" />
+                  <animate attributeName="opacity" values="0.7;0;0" keyTimes="0;0.35;1" dur="2.4s" begin={`${1.6 + i * 0.4}s`} repeatCount="indefinite" />
+                </circle>
+              )}
               <circle
                 cx={p.x} cy={p.y} r={active ? 8 : 6}
                 fill={active ? "var(--brand-blue)" : "#fff"}

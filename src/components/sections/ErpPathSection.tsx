@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import { InViewMask, FadeIn } from "@/components/motion";
+import { FadeIn, WordReveal } from "@/components/motion";
 import { StepLine, BackToSolutions } from "@/components/ui/StepLine";
 
 const EASE_OUT = [0.22, 1, 0.36, 1] as const;
@@ -73,11 +73,9 @@ export function ErpPathSection() {
           <FadeIn className="mb-6">
             <p className="section-label">1.1 · ERP Kapsamı ve Kavramsal Tasarım</p>
           </FadeIn>
-          <InViewMask>
-            <h2 className="section-title">
+          <WordReveal as="h2" className="section-title">
               ERP kararı, ürün listesinden önce <em className="text-[var(--brand-blue)]">süreç mimarisi</em> ve operasyon hedefleri üzerinden verilir.
-            </h2>
-          </InViewMask>
+            </WordReveal>
         </div>
 
         {/* 1.1 — flow */}
@@ -116,11 +114,9 @@ export function ErpPathSection() {
             <FadeIn className="mb-5">
               <p className="section-label">1.2 · Odoo</p>
             </FadeIn>
-            <InViewMask>
-              <h3 className="font-serif text-[1.7rem] md:text-[2rem] leading-tight text-[var(--ink)]">
-                Odoo doğru yol olduğunda, <em className="text-[var(--brand-blue)]">sertifikalı</em> ekiple uygulama.
-              </h3>
-            </InViewMask>
+            <WordReveal as="h3" className="font-serif text-[1.7rem] md:text-[2rem] leading-tight text-[var(--ink)]">
+              Odoo doğru yol olduğunda, <em className="text-[var(--brand-blue)]">sertifikalı</em> ekiple uygulama.
+            </WordReveal>
             <FadeIn delay={0.1} className="mt-5">
               <p className="text-[15px] leading-relaxed text-[var(--ink-body)]">
                 Kapsam çalışması Odoo&apos;yu işaret ettiğinde; kurulum, uyarlama, veri aktarımı, kullanıcı eğitimi ve canlıya geçişi sertifikalı ekibimizle yürütürüz.

@@ -12,7 +12,7 @@ import {
   arrayMove, sortableKeyboardCoordinates
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { InViewMask, FadeIn } from "@/components/motion";
+import { FadeIn, WordReveal, plainText } from "@/components/motion";
 
 interface Solution {
   id?: string | number;
@@ -192,9 +192,11 @@ export function SolutionsSection({ solutions: initialSolutions, hero, subItems =
             <FadeIn instant={isEditorMode} className="mb-6">
               <InlineEditable section="hero" field="solutions_label" defaultValue={hero?.solutions_label || "ÇÖZÜM ALANLARI"} tagName="p" className="section-label" />
             </FadeIn>
-            <InViewMask instant={isEditorMode}>
+            {isEditorMode ? (
               <InlineEditable section="hero" field="solutions_title" defaultValue={hero?.solutions_title || ""} tagName="h2" className="section-title" />
-            </InViewMask>
+            ) : (
+              <WordReveal as="h2" className="section-title">{plainText(hero?.solutions_title)}</WordReveal>
+            )}
           </div>
           <FadeIn instant={isEditorMode} delay={0.15} className="lg:col-span-5 lg:pt-12">
             <InlineEditable section="hero" field="solutions_desc" defaultValue={hero?.solutions_desc || ""} tagName="p" className="text-[15px] leading-relaxed text-[var(--ink-muted)]" />

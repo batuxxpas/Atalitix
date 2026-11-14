@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Header, Footer } from "@/components/layout";
+import { SmoothScroll } from "@/components/motion/SmoothScroll";
 import { NewsLead, NewsCard } from "@/components/news/NewsCards";
 import { getNewsList, NEWS_TYPES, NEWS_PAGE_SIZE, type NewsType } from "@/lib/news";
 import { SocialLinks } from "@/components/ui/SocialLinks";
@@ -37,6 +38,7 @@ export default async function NewsIndexPage({ searchParams }: { searchParams: Se
 
   return (
     <>
+      <SmoothScroll />
       <Header />
       <main className="pt-20 bg-white">
         <section className="container pt-14 md:pt-20 pb-24 md:pb-32">

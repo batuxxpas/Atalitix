@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { InViewMask, FadeIn } from "@/components/motion";
+import { FadeIn, WordReveal } from "@/components/motion";
 import { NewsLead, NewsCard } from "@/components/news/NewsCards";
 import { NEWS_TYPES, type News } from "@/lib/news-utils";
 
@@ -28,9 +28,9 @@ export function NewsSection({ items }: { items: News[] }) {
             <FadeIn className="mb-6">
               <p className="section-label">Haberler</p>
             </FadeIn>
-            <InViewMask>
-              <h2 className="section-title">Gündem</h2>
-            </InViewMask>
+            <WordReveal as="h2" className="section-title">
+              Gündem
+            </WordReveal>
           </div>
 
           <div role="tablist" aria-label="Haber türü" className="flex gap-8">

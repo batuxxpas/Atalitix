@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Header, Footer } from "@/components/layout";
+import { SmoothScroll } from "@/components/motion/SmoothScroll";
 import { NewsCover, NewsCard, NewsBody } from "@/components/news/NewsCards";
 import { SocialEmbedFrame } from "@/components/news/SocialEmbedFrame";
 import { getNews, getRelatedNews, newsHref, formatNewsDate, safeHref, isHtml, socialEmbed } from "@/lib/news";
@@ -60,6 +61,7 @@ export default async function NewsDetailPage({ params }: { params: Params }) {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd).replace(/</g, "\\u003c") }} />
+      <SmoothScroll />
       <Header />
       <main className="pt-20 bg-white">
         <article>

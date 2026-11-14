@@ -12,7 +12,8 @@ import {
   useSortable, arrayMove, sortableKeyboardCoordinates
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { InViewMask, FadeIn } from "@/components/motion";
+import { InViewMask, FadeIn, plainText } from "@/components/motion";
+import { ApproachHorizontal } from "./ApproachHorizontal";
 
 const EASE_OUT = [0.22, 1, 0.36, 1] as const;
 
@@ -188,8 +189,19 @@ export function ApproachSection({ approachSteps: initialApproach, experienceItem
 
   return (
     <>
-      {/* Approach — full-bleed navy */}
-      <section id="yaklasim" className="relative bg-[var(--brand-navy-900)] text-white py-20 md:py-28">
+      {/* Approach — desktop: pinned, sideways-scrolling steps; mobile/editor: vertical list */}
+      <div id="yaklasim">
+      {!isEditorMode && (
+        <div className="hidden lg:block">
+          <ApproachHorizontal
+            steps={activeApproach.map((st) => ({ title: plainText(st.title), description: plainText(st.description) }))}
+            label={plainText(hero?.approach_label || "YAKLAŞIM")}
+            title={plainText(hero?.approach_title)}
+            desc={plainText(hero?.approach_desc)}
+          />
+        </div>
+      )}
+      <section className={`relative bg-[var(--brand-navy-900)] text-white py-20 md:py-28 ${isEditorMode ? "" : "lg:hidden"}`}>
         <div className="container">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
             <div className="lg:col-span-5">
@@ -224,6 +236,7 @@ export function ApproachSection({ approachSteps: initialApproach, experienceItem
           </div>
         </div>
       </section>
+      </div>
 
       {/* Experience */}
       <section id="deneyim" className="relative bg-white py-20 md:py-28">

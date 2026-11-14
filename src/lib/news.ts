@@ -13,7 +13,6 @@ export async function getNewsList(opts: { tur?: NewsType; page?: number; limit?:
     .from("haberler")
     .select("*", { count: "exact" })
     .eq("is_active", true)
-    .order("tarih", { ascending: false })
     .order("created_at", { ascending: false })
     .range((page - 1) * limit, page * limit - 1);
   if (opts.tur) q = q.eq("tur", opts.tur);
@@ -42,7 +41,7 @@ export async function getRelatedNews(current: News, limit = 3): Promise<News[]> 
     .select("*")
     .eq("is_active", true)
     .neq("id", current.id)
-    .order("tarih", { ascending: false })
+    .order("created_at", { ascending: false })
     .limit(limit);
   return (data ?? []) as unknown as News[];
 }

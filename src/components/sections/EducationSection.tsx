@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { InViewMask, FadeIn } from "@/components/motion";
+import { FadeIn, WordReveal } from "@/components/motion";
 import { StepLine, BackToSolutions } from "@/components/ui/StepLine";
 
 const EASE_OUT = [0.22, 1, 0.36, 1] as const;
@@ -130,11 +130,9 @@ export function EducationSection() {
           <FadeIn className="mb-6">
             <p className="section-label">3 · Dijital Eğitim ve Kullanıcı Adaptasyonu</p>
           </FadeIn>
-          <InViewMask>
-            <h2 className="section-title">
+          <WordReveal as="h2" className="section-title">
               Eğitim, dönüşümün ayrı bir aktivitesi değil; tasarlanan süreçlerin <em className="text-[var(--brand-blue)]">sürdürülebilir kullanım</em> desteğidir.
-            </h2>
-          </InViewMask>
+            </WordReveal>
           <FadeIn delay={0.1} className="mt-6">
             <p className="text-[15.5px] leading-relaxed text-[var(--ink-body)]">
               Eğitimlerimiz “Önce Süreç, Sonra Araç” prensibine dayanır. Kavramsal anlatımın ötesinde; gerçek sanayi ve otomotiv uygulamaları, Türkiye ve dünyadan iyi uygulama ve başarısız proje örnekleri, vaka çalışmaları ve katılımcıların kendi süreçlerine yönelik uygulamalarla ilerler.

@@ -12,7 +12,7 @@ export default async function AdminNewsPage() {
   const { data, error } = await getAdminClient()
     .from("haberler")
     .select("*")
-    .order("tarih", { ascending: false });
+    .order("created_at", { ascending: false });
 
   const rows = (data ?? []) as unknown as Row[];
 

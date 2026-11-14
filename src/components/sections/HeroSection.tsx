@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, Variants, useInView } from "framer-motion";
+import { motion, Variants, useInView, useScroll, useTransform } from "framer-motion";
 import { InlineEditable, useEditor } from "@/components/editor";
 import { useIntroReady, MaskLine } from "@/components/motion";
 import { ErpModuleMap } from "@/components/ui";
@@ -49,6 +49,13 @@ export function HeroSection({ hero, processSteps: initialSteps }: HeroSectionPro
   const show = isEditorMode || introReady;
   const steps: ProcessStep[] = isEditorMode && data?.processSteps ? data.processSteps : initialSteps;
 
+  // Gentle depth: copy and map drift at different speeds as the hero scrolls away
+  const heroRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: heroP } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+  const copyY = useTransform(heroP, [0, 1], [0, -40]);
+  const mapY = useTransform(heroP, [0, 1], [0, -110]);
+  const mapScale = useTransform(heroP, [0, 1], [1, 0.94]);
+
   const fade: Variants = {
     hidden: { opacity: 0, y: 14 },
     visible: (d: number = 0) => ({ opacity: 1, y: 0, transition: { duration: 0.9, delay: d, ease: EASE_OUT } }),
@@ -69,10 +76,10 @@ export function HeroSection({ hero, processSteps: initialSteps }: HeroSectionPro
 
   return (
     <section className="relative bg-white">
-      <div className="container pt-12 md:pt-16 lg:pt-20">
+      <div ref={heroRef} className="container pt-12 md:pt-16 lg:pt-20">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-center">
           {/* Left — copy */}
-          <div className="lg:col-span-6">
+          <motion.div className="lg:col-span-6" style={isEditorMode ? undefined : { y: copyY }}>
             <motion.div {...anim(0.05)} className="mb-8">
               <span className="section-label">
                 <InlineEditable section="hero" field="badge_text" defaultValue={hero.badge_text} tagName="span" />
@@ -126,11 +133,12 @@ export function HeroSection({ hero, processSteps: initialSteps }: HeroSectionPro
                 <InlineEditable section="hero" field="cta_secondary_text" defaultValue={hero.cta_secondary_text} tagName="span" />
               </a>
             </motion.div>
-          </div>
+          </motion.div>
 
           {/* Right — ERP module map */}
           <motion.div
             className="lg:col-span-6"
+            style={isEditorMode ? undefined : { y: mapY, scale: mapScale }}
             initial={isEditorMode ? false : { opacity: 0 }}
             animate={show ? { opacity: 1 } : { opacity: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}

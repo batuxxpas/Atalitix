@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { motion } from "framer-motion";
-import { InViewMask, FadeIn } from "@/components/motion";
+import { FadeIn, WordReveal } from "@/components/motion";
 import { SocialLinks } from "@/components/ui/SocialLinks";
 
 export function ContactSection() {
@@ -31,9 +31,9 @@ export function ContactSection() {
             <FadeIn className="mb-6">
               <p className="section-label">İletişim</p>
             </FadeIn>
-            <InViewMask className="mb-8">
-              <h2 className="section-title">Görüşme planlayın.</h2>
-            </InViewMask>
+            <WordReveal as="h2" className="section-title mb-8">
+              Görüşme planlayın.
+            </WordReveal>
             <FadeIn delay={0.1}>
               <p className="text-[15px] leading-relaxed text-[var(--ink-muted)] max-w-md">
                 Kısa bir keşif çalışmasıyla süreç, sistem, veri ve olgunluk yapınızı değerlendirip ilk fırsat haritasını çıkarabiliriz.
