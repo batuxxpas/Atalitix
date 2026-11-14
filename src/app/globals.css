@@ -367,3 +367,37 @@ html[data-intro="playing"] .intro-overlay { animation: intro-failsafe 0s linear 
   pointer-events: none;
 }
 .news-editor img.ProseMirror-selectednode { outline: 3px solid #6366f1; }
+
+/* ===================================
+   3D scene labels (HTML, site fonts)
+   =================================== */
+.tl-core {
+  font-family: var(--font-serif);
+  font-size: clamp(22px, 2.6vw, 34px);
+  color: #fff;
+  letter-spacing: -0.01em;
+  pointer-events: none;
+  user-select: none;
+}
+.tl-module {
+  font-family: var(--font-sans);
+  font-size: clamp(12px, 1.1vw, 14.5px);
+  font-weight: 500;
+  color: var(--brand-navy);
+  white-space: nowrap;
+  padding: 2px 6px;
+  background: rgba(255, 255, 255, 0.82);
+  border-radius: 2px;
+  transition: color 0.3s, background 0.3s;
+  pointer-events: none;
+  user-select: none;
+}
+.tl-module.is-active { color: #fff; background: var(--brand-blue); }
+.tl-outer {
+  font-family: var(--font-sans);
+  font-size: clamp(11px, 1vw, 13px);
+  color: var(--ink-muted);
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}

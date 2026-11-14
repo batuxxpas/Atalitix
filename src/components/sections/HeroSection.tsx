@@ -4,7 +4,7 @@ import { useRef } from "react";
 import { motion, Variants, useInView, useScroll, useTransform } from "framer-motion";
 import { InlineEditable, useEditor } from "@/components/editor";
 import { useIntroReady, MaskLine } from "@/components/motion";
-import { ErpModuleMap } from "@/components/ui";
+import { ErpVisual } from "@/components/three/ErpVisual";
 
 interface ProcessStep {
   step_number: number;
@@ -143,7 +143,7 @@ export function HeroSection({ hero, processSteps: initialSteps }: HeroSectionPro
             animate={show ? { opacity: 1 } : { opacity: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
-            <ErpModuleMap play={show} />
+            <ErpVisual play={show} />
           </motion.div>
         </div>
       </div>

@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 import { FadeIn, WordReveal } from "@/components/motion";
 import { StepLine, BackToSolutions } from "@/components/ui/StepLine";
+import { MaturityVisual } from "@/components/three/MaturityVisual";
 
 const EASE_OUT = [0.22, 1, 0.36, 1] as const;
 
@@ -20,6 +21,7 @@ const DIMENSIONS = [
 // Illustrative profile only (0–5 scale) — labelled as an example on the chart
 const CURRENT = [3, 2, 2.5, 3, 3.5, 2.5];
 const TARGET = [4, 3.5, 3.5, 4.5, 4.5, 4];
+const DIMENSION_NAMES = DIMENSIONS.map((d) => d.name);
 
 const PORTFOLIO_FLOW = [
   { title: "Skor & boşluk analizi", desc: "Boyut bazlı seviye" },
@@ -206,7 +208,14 @@ export function MaturitySection() {
             </ul>
           </div>
           <div className="lg:col-span-6">
-            <Radar active={active} />
+            <MaturityVisual
+              names={DIMENSION_NAMES}
+              current={CURRENT}
+              target={TARGET}
+              active={active}
+              onActive={setActive}
+              fallback={<Radar active={active} />}
+            />
           </div>
         </div>
 
