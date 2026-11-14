@@ -121,11 +121,6 @@ function Radar({ active }: { active: number | null }) {
           );
         })}
       </svg>
-      <figcaption className="mt-3 flex flex-wrap justify-center gap-x-6 gap-y-1 text-[12.5px] text-[var(--ink-muted)]">
-        <span className="inline-flex items-center gap-2"><span className="h-2.5 w-4 bg-[var(--brand-navy)]/20 border border-[var(--brand-navy)]" />Mevcut durum</span>
-        <span className="inline-flex items-center gap-2"><span className="h-0 w-5 border-t-[1.5px] border-dashed border-[var(--brand-blue)]" />12 ay hedefi</span>
-        <span className="italic">Örnek profil</span>
-      </figcaption>
     </figure>
   );
 }

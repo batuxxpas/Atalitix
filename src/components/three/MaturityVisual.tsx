@@ -22,11 +22,6 @@ export function MaturityVisual({
       <div className="relative w-full aspect-[1.18/1]">
         {mode === "3d" && <MaturityScene3D names={names} current={current} target={target} active={active} onActive={onActive} />}
       </div>
-      <figcaption className="mt-1 flex flex-wrap justify-center gap-x-6 gap-y-1 text-[12.5px] text-[var(--ink-muted)]">
-        <span className="inline-flex items-center gap-2"><span className="flex h-3 w-3 flex-col gap-[1px]"><span className="flex-1 rounded-[1px] bg-[#8a94ab]" /><span className="flex-1 rounded-[1px] bg-[#b9c1d2]" /><span className="flex-1 rounded-[1px] bg-[#e1e5ee]" /></span>Mevcut seviye (koyulaştıkça yükselir)</span>
-        <span className="inline-flex items-center gap-2"><span className="h-3 w-3 rounded-[2px] border border-[#8a94ab] bg-white/60" />12 ay hedefi</span>
-        <span className="italic">Örnek profil</span>
-      </figcaption>
     </figure>
   );
 }

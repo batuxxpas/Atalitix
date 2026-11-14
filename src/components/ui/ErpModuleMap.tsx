@@ -207,21 +207,6 @@ export function ErpModuleMap({ play = true }: { play?: boolean }) {
           );
         })}
       </svg>
-
-      {/* Legend */}
-      <motion.figcaption
-        className="mt-4 flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-[13px] text-[var(--ink-muted)]"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: on ? 1 : 0 }}
-        transition={{ delay: 1.8, duration: 0.6 }}
-      >
-        <span className="inline-flex items-center gap-2">
-          <span className="h-2.5 w-2.5 rounded-full border-[1.5px] border-[var(--brand-navy)]" /> ERP modülleri
-        </span>
-        <span className="inline-flex items-center gap-2">
-          <span className="h-2 w-2 rotate-45 bg-[var(--brand-blue)]" /> ERP dışı katman
-        </span>
-      </motion.figcaption>
     </figure>
   );
 }
