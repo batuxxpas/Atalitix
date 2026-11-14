@@ -53,8 +53,6 @@ export function HeroSection({ hero, processSteps: initialSteps }: HeroSectionPro
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress: heroP } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const copyY = useTransform(heroP, [0, 1], [0, -40]);
-  const mapY = useTransform(heroP, [0, 1], [0, -110]);
-  const mapScale = useTransform(heroP, [0, 1], [1, 0.94]);
 
   const fade: Variants = {
     hidden: { opacity: 0, y: 14 },
@@ -138,7 +136,6 @@ export function HeroSection({ hero, processSteps: initialSteps }: HeroSectionPro
           {/* Right — ERP module map */}
           <motion.div
             className="lg:col-span-6"
-            style={isEditorMode ? undefined : { y: mapY, scale: mapScale }}
             initial={isEditorMode ? false : { opacity: 0 }}
             animate={show ? { opacity: 1 } : { opacity: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}

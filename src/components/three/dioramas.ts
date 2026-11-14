@@ -15,8 +15,8 @@ export function makePalette() {
   return {
     white: mat.satin("#ffffff"),
     paper: mat.satin("#edf1f8"),
-    navy: mat.gloss(COLORS.navy),
-    navy6: mat.gloss(COLORS.navy600),
+    navy: mat.gloss("#1f45b0"),
+    navy6: mat.gloss("#3b74ea"),
     blue: mat.gloss(COLORS.blue),
     blue4: mat.satin(COLORS.blue400),
     blue2: mat.satin(COLORS.blue200),

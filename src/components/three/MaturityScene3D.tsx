@@ -11,7 +11,7 @@ const UNIT = 0.52; // height per maturity level
 const FILL = 0.84; // slab share of a level (rest is the gap)
 const BASE_R = 5.5;
 const TOP = 0.3; // base top
-const LEVEL_COLORS = ["#c4d7ff", "#8fb0fb", "#3d7ff0", "#22357f", "#0b1a4f"].map((c) => new THREE.Color(c));
+const LEVEL_COLORS = ["#d4e3ff", "#a3c0ff", "#6c9cfa", "#3a78ee", "#1a5fd8"].map((c) => new THREE.Color(c));
 const ICON_KEYS: Record<string, string> = {
   "İnsan": "insan", "Yönetişim": "yonetisim", "İnovasyon": "inovasyon",
   "Teknoloji": "teknoloji", "Müşteri": "musteri", "Operasyon": "operasyon",
@@ -49,23 +49,23 @@ const fmt = (n: number) => String(n).replace(".", ",");
 
 /** Round icon badge rendered to a texture (normal + active versions). */
 function badge(icon: string, active: boolean) {
-  const S = 256, c = document.createElement("canvas");
+  const S = 512, c = document.createElement("canvas");
   c.width = c.height = S;
   const g = c.getContext("2d")!;
   g.shadowColor = "rgba(11,26,79,0.28)";
-  g.shadowBlur = 18;
-  g.shadowOffsetY = 6;
-  g.beginPath(); g.arc(S / 2, S / 2 - 4, S * 0.36, 0, Math.PI * 2);
+  g.shadowBlur = 36;
+  g.shadowOffsetY = 12;
+  g.beginPath(); g.arc(S / 2, S / 2 - 8, S * 0.36, 0, Math.PI * 2);
   g.fillStyle = active ? "#1d6cf2" : "#ffffff";
   g.fill();
   g.shadowColor = "transparent";
-  g.lineWidth = 3;
+  g.lineWidth = 6;
   g.strokeStyle = active ? "rgba(255,255,255,0.35)" : "rgba(29,108,242,0.22)";
   g.stroke();
-  drawIcon(g, icon, S * 0.33, S * 0.33 - 4, S * 0.34, active ? "#ffffff" : "#1d6cf2", 2);
+  drawIcon(g, icon, S * 0.33, S * 0.33 - 8, S * 0.34, active ? "#ffffff" : "#1d6cf2", 2);
   const t = new THREE.CanvasTexture(c);
   t.colorSpace = THREE.SRGBColorSpace;
-  t.anisotropy = 4;
+  t.anisotropy = 16;
   return t;
 }
 
@@ -109,7 +109,7 @@ export default function MaturityScene3D({
     plate.castShadow = true;
     plate.receiveShadow = true;
     // Deck markings: level hexes + spokes
-    const S = 1024, cv = document.createElement("canvas");
+    const S = 2048, cv = document.createElement("canvas");
     cv.width = cv.height = S;
     const g = cv.getContext("2d")!;
     const k = S / 2 / BASE_R;
@@ -123,9 +123,9 @@ export default function MaturityScene3D({
       }
       g.closePath();
     };
-    g.strokeStyle = "rgba(11,26,79,0.10)"; g.lineWidth = 2;
+    g.strokeStyle = "rgba(11,26,79,0.10)"; g.lineWidth = 3;
     [1.45, BASE_R - 0.4].forEach((r) => { hexPath(r); g.stroke(); });
-    g.setLineDash([6, 10]); g.strokeStyle = "rgba(29,108,242,0.3)";
+    g.setLineDash([12, 20]); g.strokeStyle = "rgba(29,108,242,0.3)";
     hexPath(RING_R + 1.0); g.stroke();
     for (let i = 0; i < n; i++) {
       const a = ((i * 360) / n - 90) * (Math.PI / 180);
@@ -134,7 +134,7 @@ export default function MaturityScene3D({
     g.setLineDash([]);
     const deckTex = new THREE.CanvasTexture(cv);
     deckTex.colorSpace = THREE.SRGBColorSpace;
-    deckTex.anisotropy = 8;
+    deckTex.anisotropy = 16;
     const deck = new THREE.Mesh(new THREE.PlaneGeometry(BASE_R * 2, BASE_R * 2), new THREE.MeshStandardMaterial({ map: deckTex, transparent: true, roughness: 0.9, depthWrite: false }));
     deck.rotation.x = -Math.PI / 2;
     deck.position.y = TOP + 0.002;
@@ -144,15 +144,15 @@ export default function MaturityScene3D({
     // Hub: navy hex with a lit seam and a turning tick ring
     const hub = new THREE.Group();
     root.add(hub);
-    const hubBody = new THREE.Mesh(hexPrism(0.95), mat.gloss(COLORS.navy));
+    const hubBody = new THREE.Mesh(hexPrism(0.95), mat.gloss("#3a78ee"));
     hubBody.scale.y = 0.34;
     hubBody.position.y = TOP;
     hubBody.castShadow = true;
-    const seamMat = mat.glow(COLORS.blue, 1.4);
+    const seamMat = mat.glow(new THREE.Color("#a9c8ff"), 1.3);
     const seam = new THREE.Mesh(hexPrism(0.9), seamMat);
     seam.scale.y = 0.05;
     seam.position.y = TOP + 0.34;
-    const hubTop = new THREE.Mesh(hexPrism(0.86), mat.gloss(COLORS.navy600));
+    const hubTop = new THREE.Mesh(hexPrism(0.86), mat.gloss(COLORS.blue));
     hubTop.scale.y = 0.16;
     hubTop.position.y = TOP + 0.39;
     hubTop.castShadow = true;

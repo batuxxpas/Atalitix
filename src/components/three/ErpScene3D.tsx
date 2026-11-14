@@ -34,15 +34,15 @@ const deg = (d: number) => (d * Math.PI) / 180;
 
 /** Fine engraved markings on the base plate (rings, ticks). */
 function plateTexture() {
-  const S = 1024, c = document.createElement("canvas");
+  const S = 2048, c = document.createElement("canvas");
   c.width = c.height = S;
   const g = c.getContext("2d")!;
   const k = S / 2 / PLATE_R;
   g.translate(S / 2, S / 2);
   g.strokeStyle = "rgba(11,26,79,0.10)";
-  g.lineWidth = 2;
+  g.lineWidth = 3;
   for (const r of [1.85, 3.1, 5.65]) { g.beginPath(); g.arc(0, 0, r * k, 0, Math.PI * 2); g.stroke(); }
-  g.setLineDash([6, 10]);
+  g.setLineDash([12, 20]);
   g.strokeStyle = "rgba(29,108,242,0.28)";
   g.beginPath(); g.arc(0, 0, MOD_R * k, 0, Math.PI * 2); g.stroke();
   g.setLineDash([]);
@@ -54,18 +54,18 @@ function plateTexture() {
   }
   const t = new THREE.CanvasTexture(c);
   t.colorSpace = THREE.SRGBColorSpace;
-  t.anisotropy = 8;
+  t.anisotropy = 16;
   return t;
 }
 
 /** Text/icon decal drawn on a canvas (crisp, site font). */
-function decal(draw: (g: CanvasRenderingContext2D, S: number) => void, size = 512) {
+function decal(draw: (g: CanvasRenderingContext2D, S: number) => void, size = 1024) {
   const c = document.createElement("canvas");
   c.width = c.height = size;
   draw(c.getContext("2d")!, size);
   const t = new THREE.CanvasTexture(c);
   t.colorSpace = THREE.SRGBColorSpace;
-  t.anisotropy = 8;
+  t.anisotropy = 16;
   return t;
 }
 
@@ -109,23 +109,23 @@ export default function ErpScene3D({ play = true }: { play?: boolean }) {
     /* Core: three stacked slabs with lit seams, ERP engraved on top */
     const core = new THREE.Group();
     root.add(core);
-    const seamMat = mat.glow(COLORS.blue, 1.5);
+    const seamMat = mat.glow(new THREE.Color("#a9c8ff"), 1.3);
     const coreParts: { m: THREE.Object3D; y: number; d: number }[] = [];
     const addCore = (m: THREE.Object3D, y: number, d: number) => { m.position.y = y; core.add(m); coreParts.push({ m, y, d }); };
-    addCore(roundedBox(2.5, 0.34, 2.5, 0.12, P.navy), PLATE_TOP + 0.17, 0.15);
+    addCore(roundedBox(2.5, 0.34, 2.5, 0.12, mat.gloss(COLORS.blue)), PLATE_TOP + 0.17, 0.15);
     addCore(roundedBox(2.38, 0.06, 2.38, 0.03, seamMat), PLATE_TOP + 0.37, 0.25);
-    addCore(roundedBox(2.3, 0.34, 2.3, 0.12, P.navy6), PLATE_TOP + 0.57, 0.33);
+    addCore(roundedBox(2.3, 0.34, 2.3, 0.12, mat.gloss("#4d8ff7")), PLATE_TOP + 0.57, 0.33);
     addCore(roundedBox(2.18, 0.06, 2.18, 0.03, seamMat), PLATE_TOP + 0.77, 0.43);
-    addCore(roundedBox(2.1, 0.3, 2.1, 0.1, P.navy), PLATE_TOP + 0.95, 0.5);
+    addCore(roundedBox(2.1, 0.3, 2.1, 0.1, mat.gloss("#ffffff", { roughness: 0.3 })), PLATE_TOP + 0.95, 0.5);
     const coreTopY = PLATE_TOP + 1.1;
     const fontSerif = getComputedStyle(document.body).getPropertyValue("--font-serif").trim() || "Georgia, serif";
     const ercTex = decal((g, S) => {
-      g.fillStyle = "#ffffff";
+      g.fillStyle = "#0b1a4f";
       g.textAlign = "center";
       g.textBaseline = "middle";
       g.font = `400 ${S * 0.36}px ${fontSerif}`;
       g.fillText("ERP", S / 2, S / 2 + S * 0.02);
-      g.strokeStyle = "rgba(111,157,255,0.55)";
+      g.strokeStyle = "rgba(29,108,242,0.45)";
       g.lineWidth = S * 0.006;
       g.strokeRect(S * 0.12, S * 0.12, S * 0.76, S * 0.76);
     });
@@ -139,10 +139,10 @@ export default function ErpScene3D({ play = true }: { play?: boolean }) {
       const g = (ercTex.image as HTMLCanvasElement).getContext("2d")!;
       const S = (ercTex.image as HTMLCanvasElement).width;
       g.clearRect(0, 0, S, S);
-      g.fillStyle = "#ffffff"; g.textAlign = "center"; g.textBaseline = "middle";
+      g.fillStyle = "#0b1a4f"; g.textAlign = "center"; g.textBaseline = "middle";
       g.font = `400 ${S * 0.36}px ${fontSerif}`;
       g.fillText("ERP", S / 2, S / 2 + S * 0.02);
-      g.strokeStyle = "rgba(111,157,255,0.55)"; g.lineWidth = S * 0.006;
+      g.strokeStyle = "rgba(29,108,242,0.45)"; g.lineWidth = S * 0.006;
       g.strokeRect(S * 0.12, S * 0.12, S * 0.76, S * 0.76);
       ercTex.needsUpdate = true;
     });
@@ -231,7 +231,7 @@ export default function ErpScene3D({ play = true }: { play?: boolean }) {
       const card = roundedBox(1.1, 0.12, 0.84, 0.05, glassMat);
       card.castShadow = false;
       grp.add(card);
-      const icoTex = decal((g, S) => drawIcon(g, o.icon, S * 0.18, S * 0.18, S * 0.64, "#1d6cf2", 1.9), 256);
+      const icoTex = decal((g, S) => drawIcon(g, o.icon, S * 0.18, S * 0.18, S * 0.64, "#1d6cf2", 1.9), 512);
       const ico = new THREE.Mesh(new THREE.PlaneGeometry(0.66, 0.66), new THREE.MeshBasicMaterial({ map: icoTex, transparent: true, depthWrite: false }));
       ico.rotation.x = -Math.PI / 2;
       ico.position.y = 0.065;

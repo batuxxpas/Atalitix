@@ -38,7 +38,7 @@ export const mat = {
     new THREE.MeshStandardMaterial({ color: "#000000", emissive: color, emissiveIntensity: intensity, roughness: 1 }),
 };
 
-export function roundedBox(w: number, h: number, d: number, r: number, material: THREE.Material, segments = 4) {
+export function roundedBox(w: number, h: number, d: number, r: number, material: THREE.Material, segments = 6) {
   const m = new THREE.Mesh(new RoundedBoxGeometry(w, h, d, segments, Math.min(r, w / 2, h / 2, d / 2)), material);
   m.castShadow = true;
   m.receiveShadow = true;
@@ -180,10 +180,14 @@ export function createStage(
 ): Stage {
   const lite = window.innerWidth < 768 || (navigator.hardwareConcurrency || 8) <= 4;
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, lite ? 1.6 : 2));
+  // Supersample: render above the screen's pixel density, then step down only if frames get slow
+  const dpr = window.devicePixelRatio || 1;
+  const minPR = Math.min(Math.max(dpr, 1), 2);
+  let pixelRatio = lite ? Math.min(Math.max(dpr, 1.5), 2.5) : Math.min(Math.max(dpr * 1.5, 2), 3);
+  renderer.setPixelRatio(pixelRatio);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.NeutralToneMapping;
-  renderer.toneMappingExposure = 1.02;
+  renderer.toneMappingExposure = 1.08;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFShadowMap;
   renderer.domElement.style.cssText = "display:block;width:100%;height:100%";
@@ -198,17 +202,17 @@ export function createStage(
   const envScene = new RoomEnvironment();
   const env = pmrem.fromScene(envScene, 0.04).texture;
   scene.environment = env;
-  scene.environmentIntensity = 0.62;
+  scene.environmentIntensity = 0.9;
 
   const camera = new THREE.PerspectiveCamera(opts.fov ?? 24, 1, 0.5, 200);
   const target = new THREE.Vector3(...(opts.target ?? [0, 0.6, 0]));
 
   // Key light with soft shadows + gentle fill
-  scene.add(new THREE.HemisphereLight(0xffffff, 0xd8e0f0, 1.1));
-  const sun = new THREE.DirectionalLight(0xffffff, 2.4);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0xe4ebf8, 1.35));
+  const sun = new THREE.DirectionalLight(0xffffff, 2.2);
   sun.position.set(-7, 16, 9);
   sun.castShadow = true;
-  sun.shadow.mapSize.set(lite ? 1024 : 2048, lite ? 1024 : 2048);
+  sun.shadow.mapSize.set(lite ? 2048 : 4096, lite ? 2048 : 4096);
   const sc = sun.shadow.camera;
   sc.left = -11; sc.right = 11; sc.top = 11; sc.bottom = -11; sc.near = 1; sc.far = 50;
   sun.shadow.radius = 5;
@@ -219,7 +223,7 @@ export function createStage(
   rim.position.set(9, 6, -10);
   scene.add(rim);
 
-  const floor = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), new THREE.ShadowMaterial({ opacity: 0.06 }));
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), new THREE.ShadowMaterial({ opacity: 0.045 }));
   floor.rotation.x = -Math.PI / 2;
   floor.position.y = -0.002;
   floor.receiveShadow = true;
@@ -305,7 +309,7 @@ export function createStage(
   let visible = false, raf = 0, frameFn: ((t: number, dt: number) => void) | null = null;
   let last = -1;
   let elapsed = 0;
-  let frames = 0;
+  let frames = 0, slowAcc = 0, slowN = 0;
   const tick = (now: number) => {
     raf = 0;
     if (!visible || !frameFn) return;
@@ -337,6 +341,18 @@ export function createStage(
     renderer.render(scene, camera);
     labels.render(scene, camera);
     if (++frames % 6 === 0 || fitCountdown++ < 3) fitLabels();
+    // Adaptive resolution: if the device can't keep ~50 fps, step the pixel ratio down
+    if (frames > 90) {
+      slowAcc += dt; slowN++;
+      if (slowN === 60) {
+        if (slowAcc / slowN > 0.021 && pixelRatio > minPR) {
+          pixelRatio = Math.max(minPR, pixelRatio - 0.5);
+          renderer.setPixelRatio(pixelRatio);
+          renderer.setSize(host.clientWidth || 1, host.clientHeight || 1, false);
+        }
+        slowAcc = 0; slowN = 0;
+      }
+    }
     raf = requestAnimationFrame(tick);
   };
   const io = new IntersectionObserver(([entry]) => {
